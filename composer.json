@@ -1,0 +1,33 @@
+{
+  "autoload": {
+    "psr-4": {
+      "StellarWP\\Pigeon\\": "src/"
+    }
+  },
+  "require": {
+    "lucatume/di52": "^3.0",
+    "stellarwp/db": "^1.0",
+    "stellarwp/schema": "^1.1"
+  },
+  "require-dev": {
+    "brianhenryie/strauss": "^0.13.0"
+  },
+  "scripts": {
+    "strauss": [
+      "vendor/bin/strauss"
+    ],
+    "post-install-cmd": [
+      "@strauss"
+    ],
+    "post-update-cmd": [
+      "@strauss"
+    ]
+  },
+  "extra": {
+    "strauss": {
+      "namespace_prefix": "StellarWP\\Pigeon\\",
+      "classmap_prefix": "StellarWP_Pigeon_",
+      "constant_prefix": "STELLARWP_PIGEON_"
+    }
+  }
+}
