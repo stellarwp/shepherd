@@ -6,18 +6,27 @@ use StellarWP\Pigeon\Provider;
 
 class Pigeon {
 
-	public static $initialized = false;
+	public static $enabled = false;
 
-	public static $module;
+	public static $provider;
+
+	public static $toggle_option_name = 'enable_pigeon';
 
 	public static function init() {
-		if ( ! self::$initialized ) {
+		if ( ! static::is_enabled() ) {
 			return;
 		}
 
-		self::$module = new Provider();
-		self::$module->register();
-		self::$initialized = true;
+		self::$provider = new Provider();
+		self::$provider->register();
+	}
+
+	public static function is_enabled() {
+		return
+			\tribe_get_option( self::$toggle_option_name, self::$enabled ) ||
+			( defined( 'STELLARWP_PIGEON_ENABLE' ) && STELLARWP_PIGEON_ENABLE );
 	}
 
 }
+
+Pigeon::init();

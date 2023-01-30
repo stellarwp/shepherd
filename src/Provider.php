@@ -2,10 +2,30 @@
 
 namespace StellarWP\Pigeon;
 
-class Provider {
+use lucatume\DI52\ServiceProvider;
+use StellarWP\Pigeon\Templates\DefaultTemplate;
+
+class Provider extends ServiceProvider {
 
 	public function register() {
-		add_action( 'plugin_activate', [ $this, 'enable_big_sql_selects' ] );
+		$this->register_filters();
+		$this->register_actions();
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function register_actions() {
+		add_action( 'init', [ $this, 'register_templates' ] );
+
+	}
+
+	public function register_filters() {
+
+	}
+
+	public function register_templates() {
+		tribe( DefaultTemplate::class )->register();
 	}
 
 }
