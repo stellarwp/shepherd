@@ -2,14 +2,21 @@
 
 namespace StellarWP\Pigeon;
 
-use lucatume\DI52\ServiceProvider;
 use StellarWP\Pigeon\Templates\DefaultTemplate;
 
-class Provider extends ServiceProvider {
+class Provider extends \tad_DI52_ServiceProvider {
+
+	private $has_registered = false;
 
 	public function register() {
+		if ( $this->has_registered ) {
+			return false;
+		}
+
 		$this->register_filters();
 		$this->register_actions();
+		$this->has_registered = true;
+		return true;
 	}
 
 	/**

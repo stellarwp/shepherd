@@ -4,6 +4,7 @@ namespace StellarWP;
 
 use StellarWP\Pigeon\Provider;
 
+require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 class Pigeon {
 
 	public static $enabled = false;
@@ -17,8 +18,7 @@ class Pigeon {
 			return;
 		}
 
-		self::$provider = new Provider();
-		self::$provider->register();
+		tribe_register_provider( Provider::class );
 	}
 
 	public static function is_enabled() {
@@ -26,7 +26,5 @@ class Pigeon {
 			\tribe_get_option( self::$toggle_option_name, self::$enabled ) ||
 			( defined( 'STELLARWP_PIGEON_ENABLE' ) && STELLARWP_PIGEON_ENABLE );
 	}
-
 }
 
-Pigeon::init();
