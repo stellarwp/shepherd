@@ -1,28 +1,20 @@
 {
+  "name": "stellarwp/pigeon",
   "autoload": {
     "psr-4": {
       "StellarWP\\Pigeon\\": "src/"
     }
   },
   "require": {
-    "lucatume/di52": "^3.0",
     "stellarwp/db": "^1.0",
-    "stellarwp/schema": "^1.1"
+    "stellarwp/schema": "^1.1",
+    "brianhenryie/strauss": "^0.13.0"
   },
   "require-dev": {
-    "brianhenryie/strauss": "^0.13.0",
-    "bordoni/phpass": "0.3.5",
-    "automattic/vipwpcs": "^2.0",
-    "codeception/codeception": "^2.5.5",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-    "lucatume/function-mocker-le": "^1.0",
-    "lucatume/wp-browser": "^3.0.14",
+    "bordoni/phpass": "^0.3.6",
+    "lucatume/wp-browser": "^3.1",
     "the-events-calendar/coding-standards": "dev-master",
-    "the-events-calendar/tec-testing-facilities": "dev-master",
-    "phpunit/phpunit": "~6.0",
-    "wp-cli/checksum-command": "1.0.5",
-    "wp-coding-standards/wpcs": "^2.1",
-    "lucatume/codeception-snapshot-assertions": "^0.2.4"
+    "the-events-calendar/tec-testing-facilities": "dev-master"
   },
   "scripts": {
     "strauss": [

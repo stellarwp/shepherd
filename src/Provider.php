@@ -32,7 +32,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	}
 
 	public function register_templates() {
-		tribe( DefaultTemplate::class )->register();
+		$this->container->make( DefaultTemplate::class )->register();
 	}
 
 }
