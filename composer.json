@@ -8,31 +8,13 @@
   "require": {
     "stellarwp/db": "^1.0",
     "stellarwp/schema": "^1.1",
-    "brianhenryie/strauss": "^0.13.0"
+    "lucatume/di52": "^2.1"
   },
   "require-dev": {
     "bordoni/phpass": "^0.3.6",
     "lucatume/wp-browser": "^3.1",
     "the-events-calendar/coding-standards": "dev-master",
     "the-events-calendar/tec-testing-facilities": "dev-master"
-  },
-  "scripts": {
-    "strauss": [
-      "vendor/bin/strauss"
-    ],
-    "post-install-cmd": [
-      "@strauss"
-    ],
-    "post-update-cmd": [
-      "@strauss"
-    ]
-  },
-  "extra": {
-    "strauss": {
-      "namespace_prefix": "StellarWP\\Pigeon\\",
-      "classmap_prefix": "StellarWP_Pigeon_",
-      "constant_prefix": "STELLARWP_PIGEON_"
-    }
   },
   "config": {
     "allow-plugins": {

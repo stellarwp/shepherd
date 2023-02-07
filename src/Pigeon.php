@@ -8,8 +8,6 @@ class Pigeon extends \tad_DI52_Container {
 
 	public static $instance;
 
-	public static $toggle_option_name = 'enable_pigeon';
-
 	public static function init() {
 		if ( ! static::is_enabled() ) {
 			return;
