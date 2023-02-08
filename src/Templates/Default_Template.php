@@ -10,10 +10,17 @@ final class Default_Template implements Template_Interface {
 
 	public function register() {
 		$args = [
+			'label'           => __( 'Pigeon Templates', 'pigeon' ),
+			'labels'          => [
+				'name'          => __( 'Pigeon Template', 'pigeon' ),
+				'singular_name' => __( 'Pigeon Templates', 'pigeon' ),
+			],
 			'public' => true, // @TODO: change to false before deploying
-			'hierarchical' => false,
+			'supports' => ['title', 'editor'],
+			'hierarchical' => true,
 			'has_archive' => false,
 			'rewrite' => false,
+			'show_ui' => true,
 		];
 		\register_post_type( $this->post_type_name, $args );
 

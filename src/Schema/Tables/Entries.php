@@ -22,7 +22,7 @@ class Entries extends Contracts\Table {
 
 		return "
 			CREATE TABLE {$table_name} (
-				`entry_id`        bigint                                  NOT NULL PRIMARY KEY,
+				`entry_id`        bigint                                  NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				`template_id`     bigint                                  NOT NULL,
 				`content`         longtext                                NOT NULL,
 				`delivery_module` varchar(200)                            NOT NULL,

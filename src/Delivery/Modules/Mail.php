@@ -1,12 +1,11 @@
 <?php
 
-namespace StellarWP\Pigeon\Delivery\Modules\WP_Mail;
+namespace StellarWP\Pigeon\Delivery\Modules;
 
-use StellarWP\Pigeon\Delivery\Modules\Module_Interface;
 use StellarWP\Pigeon\Entry\Entry_Interface;
 use StellarWP\Pigeon\Templates\Template_Interface;
 
-class Module implements Module_Interface {
+class Mail implements Module_Interface {
 
 
 	public function deliver( Entry_Interface $entry ) {
