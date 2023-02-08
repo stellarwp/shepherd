@@ -2,7 +2,7 @@
 
 namespace StellarWP\Pigeon\Templates;
 
-use StellarWP\Pigeon\Entry\Entry_Interface;
+use StellarWP\Pigeon\Entry\Model_Interface;
 
 final class Default_Template implements Template_Interface {
 
@@ -31,7 +31,7 @@ final class Default_Template implements Template_Interface {
 		// check if the default template exists, and create it
 	}
 
-	public function compose( Entry_Interface $entry ) {
+	public function compose( Model_Interface $entry ) {
 		// compose the template with entry data
 	}
 
