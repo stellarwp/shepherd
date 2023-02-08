@@ -2,9 +2,9 @@
 
 namespace StellarWP\Pigeon\Templates;
 
-use StellarWP\Pigeon\Entry\EntryInterface;
+use StellarWP\Pigeon\Entry\Entry_Interface;
 
-final class DefaultTemplate implements TemplateInterface {
+final class Default_Template implements Template_Interface {
 
 	protected $post_type_name = 'pigeon_templates';
 
@@ -24,7 +24,7 @@ final class DefaultTemplate implements TemplateInterface {
 		// check if the default template exists, and create it
 	}
 
-	public function compose( EntryInterface $entry ) {
+	public function compose( Entry_Interface $entry ) {
 		// compose the template with entry data
 	}
 

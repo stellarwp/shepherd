@@ -2,10 +2,8 @@
 
 namespace StellarWP\Pigeon;
 
-use StellarWP\Pigeon\Config\Container;
 use StellarWP\Pigeon\Config\Database;
-use StellarWP\Pigeon\Schema\Definitions;
-use StellarWP\Pigeon\Templates\DefaultTemplate;
+use StellarWP\Pigeon\Templates\Default_Template;
 use StellarWP\Schema\Tables\Contracts\Table;
 
 class Provider extends \tad_DI52_ServiceProvider {
@@ -37,7 +35,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	}
 
 	public function register_templates() {
-		$this->container->make( DefaultTemplate::class )->register();
+		$this->container->make( Default_Template::class )->register();
 	}
 
 	public function register_database() {

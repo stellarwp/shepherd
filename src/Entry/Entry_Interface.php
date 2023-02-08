@@ -2,6 +2,6 @@
 
 namespace StellarWP\Pigeon\Entry;
 
-interface EntryInterface {
+interface Entry_Interface {
 
 }

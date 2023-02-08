@@ -5,7 +5,7 @@ namespace StellarWP\Pigeon\Schema\Tables;
 use StellarWP\Schema\Tables\Contracts;
 use StellarWP\Pigeon\Config\Config;
 
-class EntriesMeta extends Contracts\Table {
+class Entries_Meta extends Contracts\Table {
 
 	const SCHEMA_VERSION = '1.0.0';
 

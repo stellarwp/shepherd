@@ -3,7 +3,7 @@
 namespace StellarWP\Pigeon\Config;
 
 use StellarWP\Pigeon\Schema\Tables\Entries;
-use StellarWP\Pigeon\Schema\Tables\EntriesMeta;
+use StellarWP\Pigeon\Schema\Tables\Entries_Meta;
 use StellarWP\Schema\Register;
 use StellarWP\Schema\Config;
 use StellarWP\DB\DB;
@@ -19,7 +19,7 @@ class Database extends DB {
 
 	public function set_tables() {
 		Register::table( Entries::class );
-		Register::table( EntriesMeta::class );
+		Register::table( Entries_Meta::class );
 	}
 
 }
