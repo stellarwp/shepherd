@@ -27,18 +27,32 @@ class Entries extends Contracts\Table {
 				`content`         longtext                                NOT NULL,
 				`delivery_module` varchar(200)                            NOT NULL,
 				`status`          varchar(200)                            NOT NULL,
-				`recipient`       longtext                                		,
-				`created_at`      timestamp DEFAULT CURRENT_TIMESTAMP()   NOT NULL,
-				`updated_at`      timestamp DEFAULT CURRENT_TIMESTAMP()   NOT NULL ON UPDATE CURRENT_TIMESTAMP(),
-				`completed_at`    timestamp DEFAULT '0000-00-00 00:00:00' NOT NULL,
+				`recipient`       longtext                                	      ,
 				`public_key`      varchar(200)                            NOT NULL,
 				`private_key`     varchar(200)                            NOT NULL,
-				`retries`         bigint                                  NOT NULL
+				`retries`         bigint                                  NOT NULL,
+				`created_at`      timestamp DEFAULT CURRENT_TIMESTAMP()   NOT NULL,
+				`updated_at`      timestamp DEFAULT CURRENT_TIMESTAMP()   NOT NULL ON UPDATE CURRENT_TIMESTAMP(),
+				`completed_at`    timestamp DEFAULT '0000-00-00 00:00:00' NOT NULL
 		) {$charset_collate};
 		";
 	}
 
 	public static function base_table_name() {
 		return rtrim( Config::get_hook_prefix(), '_' ) . '_' . static::$base_table_name;
+	}
+
+	public static function column_formats() {
+		return [
+			'entry_id' => '%d',
+			'template_id' => '%d',
+			'content' => '%s',
+			'delivery_module' => '%s',
+			'status' => '%s',
+			'recipient' => '%s',
+			'public_key' => '%s',
+			'private_key' => '%s',
+			'retries' => '%d',
+			];
 	}
 }

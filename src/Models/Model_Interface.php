@@ -10,6 +10,6 @@ interface Model_Interface {
 
 	public function set_data( ...$args ) :void;
 
-	public function validate_dataset( $args ) :bool;
+	public function validate_dataset() :bool;
 
 }

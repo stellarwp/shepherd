@@ -18,8 +18,12 @@ class Envelope {
 			$entry = new Entry( $module );
 			$entry->set_data( $args );
 
-			$envelope = new $module($entry);
-			$envelope->send();
+			if( ! $entry->module_active() ) {
+				continue;
+			}
+
+			$module = new $module($entry);
+			$module->send();
 		}
 	}
 
