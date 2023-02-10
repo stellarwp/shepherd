@@ -57,4 +57,8 @@ class Entry implements Model_Interface {
 
 		return $this;
 	}
+
+	public function schedule()  :Entry {
+		return $this;
+	}
 }

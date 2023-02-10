@@ -4,13 +4,19 @@ namespace StellarWP\Pigeon\Delivery\Modules;
 
 use StellarWP\Pigeon\Entry\Base;
 use StellarWP\Pigeon\Entry\Model_Interface;
+use StellarWP\Pigeon\Models\Entry;
+use StellarWP\Pigeon\Scheduling\Action_Scheduler;
 use StellarWP\Pigeon\Templates\Template_Interface;
 
 class Mail implements Module_Interface {
 
 	public static $instance;
 
-	public static function init() {
+	public $scheduled = true;
+
+	const MAX_BATCH_SIZE = 50;
+
+	public static function init() :Mail {
 		if ( static::$instance instanceof Mail ) {
 			return static::$instance;
 		}
@@ -19,14 +25,11 @@ class Mail implements Module_Interface {
 		return static::$instance;
 	}
 
-	public function deliver( Model_Interface $entry ) {
-		$contents = $entry->get_contents();
-		$recipients = $entry->get_recipients();
-		$template = $entry->get_template();
+	public function send( Entry $entry ) :Mail {
+		// wp_mail();
+		return $this;
 	}
 
-	public function send( array $envelopes ) {
-		// TODO: Implement send() method.
-	}
+
 
 }

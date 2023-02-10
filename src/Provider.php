@@ -3,6 +3,7 @@
 namespace StellarWP\Pigeon;
 
 use StellarWP\Pigeon\Config\Database;
+use StellarWP\Pigeon\Scheduling\Action_Scheduler;
 use StellarWP\Pigeon\Templates\Default_Template;
 use StellarWP\Schema\Tables\Contracts\Table;
 
@@ -15,6 +16,8 @@ class Provider extends \tad_DI52_ServiceProvider {
 			return false;
 		}
 
+		$this->container->register( Scheduling\Provider::class );
+
 		$this->register_filters();
 		$this->register_actions();
 		$this->has_registered = true;
@@ -26,6 +29,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	 */
 	public function register_actions() {
 		add_action( 'init', [ $this, 'register_templates' ] );
+		add_action( 'init', [ $this, 'register_main_schedule'] );
 		add_action( 'plugins_loaded', [ $this, 'register_database' ], 2 );
 
 	}
@@ -41,6 +45,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	public function register_database() {
 		$this->container->make( Database::class )->register();
 	}
+
 
 	public function add( Table $table ) {
 		$this->container->make( $table );

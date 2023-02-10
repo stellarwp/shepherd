@@ -15,15 +15,7 @@ class Envelope {
 		$modules = static::get_modules();
 
 		foreach( $modules as $module ) {
-			$entry = new Entry( $module );
-			$entry->set_data( $args );
 
-			if( ! $entry->module_active() ) {
-				continue;
-			}
-
-			$module = new $module($entry);
-			$module->send();
 		}
 	}
 
