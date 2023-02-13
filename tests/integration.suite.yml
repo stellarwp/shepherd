@@ -1,0 +1,22 @@
+actor: IntegrationTester
+modules:
+    enabled:
+        - \Helper\Integration
+        - WPLoader
+    config:
+        WPLoader:
+            wpRootFolder: %WP_ROOT_FOLDER%
+            dbName: %TEST_SITE_DB_NAME%
+            dbHost: %TEST_SITE_DB_HOST%
+            dbUser: %TEST_SITE_DB_USER%
+            dbPassword: %TEST_SITE_DB_PASSWORD%
+            tablePrefix: test_
+            domain: %TEST_SITE_WP_DOMAIN%
+            adminEmail: admin@%WP_DOMAIN%
+            title: 'Pigeon Tests'
+            plugins:
+                - the-events-calendar/the-events-calendar.php
+                - src-et/event-tickets.php
+            activatePlugins:
+                - the-events-calendar/the-events-calendar.php
+                - src-et/event-tickets.php

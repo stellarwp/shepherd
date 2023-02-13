@@ -6,15 +6,19 @@
     }
   },
   "require": {
+    "lucatume/di52": "^2.1",
     "stellarwp/db": "^1.0",
     "stellarwp/schema": "^1.1",
-    "lucatume/di52": "^2.1"
+    "woocommerce/action-scheduler": "^3.5"
   },
   "require-dev": {
     "bordoni/phpass": "^0.3.6",
     "lucatume/wp-browser": "^3.1",
     "the-events-calendar/coding-standards": "dev-master",
-    "the-events-calendar/tec-testing-facilities": "dev-master"
+    "the-events-calendar/tec-testing-facilities": "dev-master",
+    "codeception/module-db": "*",
+    "codeception/module-phpbrowser": "*",
+    "codeception/module-asserts": "*"
   },
   "config": {
     "allow-plugins": {
