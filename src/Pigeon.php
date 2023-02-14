@@ -2,13 +2,17 @@
 
 namespace StellarWP\Pigeon;
 
-class Pigeon extends \tad_DI52_Container {
+use StellarWP\ContainerContract\ContainerInterface;
+
+class Pigeon {
 
 	public static $enabled = false;
 
-	public static $instance;
+	protected static $container;
 
-	public static function init() {
+	protected static $instance;
+
+	public static function init( ContainerInterface $container ) {
 		if ( ! static::is_enabled() ) {
 			return;
 		}
@@ -20,7 +24,8 @@ class Pigeon extends \tad_DI52_Container {
 		}
 
 		static::$instance = new Pigeon();
-		static::$instance->register( Provider::class );
+		static::$container = $container;
+		static::$container->register( Provider::class );
 
 		return static::$instance;
 	}
@@ -28,6 +33,10 @@ class Pigeon extends \tad_DI52_Container {
 	public static function is_enabled() {
 		return
 			( defined( 'STELLARWP_PIGEON_ENABLE' ) && STELLARWP_PIGEON_ENABLE );
+	}
+
+	public static function get_container() {
+		return static::$container;
 	}
 }
 
