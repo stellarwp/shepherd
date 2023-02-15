@@ -12,7 +12,7 @@ class BootstrapTest extends \Codeception\TestCase\WPTestCase {
 	}
 
 	public function test_init_returns_null_if_pigeon_not_enabled() {
-		$instance = Pigeon::init( new ExampleContainer() );
+		$instance = $this->make( Pigeon::class )->init( new ExampleContainer() );
 		$this->assertNull( $instance );
 	}
 
@@ -31,7 +31,8 @@ class BootstrapTest extends \Codeception\TestCase\WPTestCase {
 		if ( ! defined( 'STELLARWP_PIGEON_ENABLE' ) ) {
 			define( 'STELLARWP_PIGEON_ENABLE', true );
 		}
-		$instance = Pigeon::init( new ExampleContainer() );
+
+		$instance = $this->make( Pigeon::class )->init( new ExampleContainer() );
 		$this->assertTrue(  $instance instanceof Pigeon );
 	}
 
