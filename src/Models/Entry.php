@@ -10,10 +10,10 @@ class Entry implements Model_Interface {
 
 	public $type;
 
-	public $raw_data;
+	public $data;
 
 
-	public function __constructor( Module_Interface $module ) :void {
+	public function __construct( Module_Interface $module ) {
 		$this->type = $module::class;
 	}
 

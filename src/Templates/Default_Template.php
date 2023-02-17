@@ -6,14 +6,14 @@ use StellarWP\Pigeon\Entry\Model_Interface;
 
 final class Default_Template implements Template_Interface {
 
-	protected $post_type_name = 'pigeon_templates';
+	protected $post_type_name = 'stellarwp_pigeon_templates';
 
 	public function register() {
 		$args = [
-			'label'           => __( 'Pigeon Templates', 'pigeon' ),
+			'label'           => __( 'Pigeon Templates', 'stellarwp_pigeon' ),
 			'labels'          => [
-				'name'          => __( 'Pigeon Template', 'pigeon' ),
-				'singular_name' => __( 'Pigeon Templates', 'pigeon' ),
+				'name'          => __( 'Pigeon Template', 'stellarwp_pigeon' ),
+				'singular_name' => __( 'Pigeon Templates', 'stellarwp_pigeon' ),
 			],
 			'public' => true, // @TODO: change to false before deploying
 			'supports' => ['title', 'editor'],

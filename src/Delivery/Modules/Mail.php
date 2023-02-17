@@ -14,7 +14,6 @@ class Mail implements Module_Interface {
 
 	public $scheduled = true;
 
-	const MAX_BATCH_SIZE = 50;
 
 	public static function init() :Mail {
 		if ( static::$instance instanceof Mail ) {
@@ -29,7 +28,28 @@ class Mail implements Module_Interface {
 		// wp_mail();
 		return $this;
 	}
-
-
-
 }
+
+
+
+'event-title',
+'event-excerpt',
+'event-start-date',
+'event-end-date',
+'event-start-time',
+'event-end-time',
+'event-online',
+'zoom-id',
+'zoom-url',
+'zoom-password',
+'zoom-numbers',
+'location-name',
+'location-address',
+'ticket-name',
+'ticket-price'.
+'ticket-remaining',
+'event-url',
+'days-until-event',
+'attendee-first-name',
+'attendee-last-name',
+'attendee-ticket-type',

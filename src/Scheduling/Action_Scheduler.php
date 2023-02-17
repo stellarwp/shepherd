@@ -2,29 +2,51 @@
 
 namespace StellarWP\Pigeon\Scheduling;
 
-use StellarWP\Pigeon\Models\Entry;
+use StellarWP\Pigeon\Delivery\Batch;
 
 class Action_Scheduler {
 
-	const SCHEDULED_TIME_OFFSET = 60;
+	const SCHEDULE_TIME_OFFSET = 60;
 
-	public function dispatch( $batch ) {
-		foreach( $batch as $entry ) {
-			$envelope = Entry::get_entry_envelope( $entry );
-			$sender = new $envelope( $entry );
-			$sender->send();
-		}
-	}
+	const SCHEDULE_ACTION_INTERVAL = 60;
+
+	const SCHEDULE_ACTION_NAME = 'stellarwp_pigeon_schedule_default';
+
+	const SCHEDULE_ACTIONS_GROUP = 'stellarwp_pigeon_schedule_group';
+
+	const DISPATCH_ACTION_NAME = 'stellarwp_pigeon_dispatch';
+
+
 	public function register_main_schedule() {
-		if ( false === as_has_scheduled_action( 'stellarwp_pigeon_schedule_default' ) ) {
-			as_schedule_recurring_action( time(), MINUTE_IN_SECONDS, 'stellarwp_pigeon_schedule_default', array(), '', true );
+		if ( false === as_has_scheduled_action( static::SCHEDULE_ACTION_NAME) ) {
+			as_schedule_recurring_action(
+				$this->schedule_time(),
+				$this->schedule_interval(),
+				static::SCHEDULE_ACTION_NAME,
+				[],
+				static::SCHEDULE_ACTIONS_GROUP,
+				true
+			);
 		}
 
-		add_action( 'stellarwp_pigeon_schedule_default', [ $this, 'schedule' ] );
+		add_action( static::SCHEDULE_ACTION_NAME, [ $this, 'schedule' ] );
 	}
 
 	public function schedule() {
-		$batch = get_posts(); // max size of ready to send entries
-		as_schedule_single_action( static::SCHEDULED_TIME_OFFSET + time(), 'stellarwp_pigeon_dispatch', $batch, 'stellarwp_pigeon_actions', true );
+		as_schedule_single_action(
+			$this->schedule_time(),
+			static::DISPATCH_ACTION_NAME,
+			new Batch(),
+			static::SCHEDULE_ACTIONS_GROUP,
+			true
+		);
+	}
+
+	public function schedule_time() {
+		return time() + static::SCHEDULE_TIME_OFFSET;
+	}
+
+	public function schedule_interval() {
+		return static::SCHEDULE_ACTION_INTERVAL;
 	}
 }
