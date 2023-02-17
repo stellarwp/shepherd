@@ -29,7 +29,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	 */
 	public function register_actions() {
 		add_action( 'init', [ $this, 'register_templates' ] );
-		add_action( 'plugins_loaded', [ $this, 'register_database' ], 2 );
+		add_action( 'init', [ $this, 'register_database' ], 2 );
 
 	}
 

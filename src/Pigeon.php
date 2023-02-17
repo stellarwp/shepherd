@@ -25,11 +25,10 @@ class Pigeon {
 			return static::$instance;
 		}
 
-		static::$instance = new Pigeon();
-		$this->container = $container;
-		$this->container->register( Provider::class );
+		static::set_instance( new Pigeon() );
 
-		return static::$instance;
+		static::$instance->container = $container;
+		static::$instance->container->register( Provider::class );
 	}
 
 	public static function is_enabled() {
@@ -37,8 +36,13 @@ class Pigeon {
 			( defined( 'STELLARWP_PIGEON_ENABLE' ) && STELLARWP_PIGEON_ENABLE );
 	}
 
-	public function get_instance() {
+	public static function get_instance() {
 		return static::$instance;
+	}
+
+	public static function set_instance( Pigeon $instance ) {
+		static::$instance = $instance;
+
 	}
 
 	public function get_container() {

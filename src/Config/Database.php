@@ -14,7 +14,7 @@ class Database extends DB {
 	protected $container;
 
 	public function __construct() {
-		$this->set_container( Pigeon::get_container() );
+		$this->set_container( Pigeon::get_instance()->get_container() );
 	}
 
 	public function register() {

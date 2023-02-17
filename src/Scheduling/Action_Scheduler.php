@@ -25,6 +25,6 @@ class Action_Scheduler {
 
 	public function schedule() {
 		$batch = get_posts(); // max size of ready to send entries
-		as_schedule_single_action( static::SCHEDULED_TIME_OFFSET + time(), 'stellarwp_pigeon_dispatch', $batch, 'pigeon', true );
+		as_schedule_single_action( static::SCHEDULED_TIME_OFFSET + time(), 'stellarwp_pigeon_dispatch', $batch, 'stellarwp_pigeon_actions', true );
 	}
 }
