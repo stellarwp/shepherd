@@ -11,7 +11,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 		$this->register_actions();
 	}
 	public function register_actions() {
-		add_action( 'init', [ $this, 'load_action_scheduler'], -1 );
+		add_action( 'init', [ $this, 'load_action_scheduler'] );
 		add_action( 'init', [ $this, 'register_schedules'], 20 );
 		add_action( 'stellarwp_pigeon_dispatch', [ $this, 'dispatch' ] );
 	}
@@ -28,12 +28,12 @@ class Provider extends \tad_DI52_ServiceProvider {
 
 	/**
 	 * Loads Action Scheduler late, after the `plugins_loaded` hook, at the
-	 * start of the `init` one, so if another plugin has loaded it, we're good.
+	 * start of the `init` one, so if a plugin has loaded it, we're good.
 	 *
 	 * @since TBD
 	 */
 	public function load_action_scheduler() {
-		if ( function_exists( 'as_has_scheduled_action' ) ) {
+		if ( function_exists( 'as_has_scheduled_action' ) || class_exists( 'Tribe__Main' ) ) {
 			return;
 		}
 
