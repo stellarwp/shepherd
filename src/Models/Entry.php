@@ -13,8 +13,7 @@ class Entry implements Model_Interface {
 	public $data;
 
 
-	public function __construct( Module_Interface $module ) {
-		$this->type = $module::class;
+	public function __construct() {
 	}
 
 	public function set_data( ...$args ) :void {

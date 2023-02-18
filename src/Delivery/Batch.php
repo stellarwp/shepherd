@@ -7,7 +7,7 @@ use StellarWP\Pigeon\Schema\Tables\Entries_Meta;
 
 class Batch {
 
-	const MAX_BATCH_SIZE = 50;
+	const MAX_BATCH_SIZE = 500;
 
 	const STATUS_TO_FETCH = 'ready';
 

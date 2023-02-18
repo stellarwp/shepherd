@@ -15,7 +15,7 @@ class Meta implements Model_Interface {
 
 	protected $keys;
 
-	public function __construct( Module_Interface $module ) {
+	public function __construct() {
 	}
 
 	public function set_data(): void {
