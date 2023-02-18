@@ -3,7 +3,6 @@
 namespace StellarWP\Pigeon;
 
 use StellarWP\Pigeon\Config\Database;
-use StellarWP\Pigeon\Scheduling\Action_Scheduler;
 use StellarWP\Pigeon\Templates\Default_Template;
 use StellarWP\Schema\Tables\Contracts\Table;
 

@@ -2,6 +2,9 @@
 
 namespace StellarWP\Pigeon\Scheduling;
 
+use PHP_CodeSniffer\Tests\Core\Tokenizer\BackfillEnumTest;
+use StellarWP\Pigeon\Delivery\Batch;
+
 class Provider extends \tad_DI52_ServiceProvider {
 
 	public function register() {
@@ -21,9 +24,8 @@ class Provider extends \tad_DI52_ServiceProvider {
 		$action_scheduler->register_main_schedule();
 	}
 
-	public function dispatch( $batch ) {
-		$action_scheduler = $this->container->make( Action_Scheduler::class );
-		$action_scheduler->dispatch( $batch );
+	public function dispatch( Batch $batch ) {
+		$batch->dispatch();
 	}
 
 	/**
