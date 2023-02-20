@@ -2,6 +2,8 @@
 
 namespace StellarWP\Pigeon\Tags;
 
+use StellarWP\Pigeon\Models\Entry;
+
 class Collection {
 
 	/**
@@ -20,6 +22,12 @@ class Collection {
 			$this->add( $tag );
 		}
 
-		return $this;
+		return $this->data;
+	}
+
+	public function entry( Entry $entry ) {
+		array_map( function( Tag $tag ) use ( $entry ) {
+			$tag->compose( $entry );
+		}, $this->get_all() );
 	}
 }

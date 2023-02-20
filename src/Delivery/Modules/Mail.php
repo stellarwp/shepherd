@@ -32,24 +32,3 @@ class Mail implements Module_Interface {
 
 
 
-'event-title',
-'event-excerpt',
-'event-start-date',
-'event-end-date',
-'event-start-time',
-'event-end-time',
-'event-online',
-'zoom-id',
-'zoom-url',
-'zoom-password',
-'zoom-numbers',
-'location-name',
-'location-address',
-'ticket-name',
-'ticket-price'.
-'ticket-remaining',
-'event-url',
-'days-until-event',
-'attendee-first-name',
-'attendee-last-name',
-'attendee-ticket-type',

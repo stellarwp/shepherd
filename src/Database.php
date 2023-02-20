@@ -1,8 +1,7 @@
 <?php
 
-namespace StellarWP\Pigeon\Config;
+namespace StellarWP\Pigeon;
 
-use StellarWP\Pigeon\Pigeon;
 use StellarWP\Pigeon\Schema\Tables\Entries;
 use StellarWP\Pigeon\Schema\Tables\Entries_Meta;
 use StellarWP\Schema\Register;

@@ -1,6 +1,6 @@
 <?php
 
-namespace StellarWP\Pigeon\Config;
+namespace StellarWP\Pigeon;
 
 class Config {
 
