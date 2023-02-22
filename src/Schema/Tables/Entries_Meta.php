@@ -3,7 +3,7 @@
 namespace StellarWP\Pigeon\Schema\Tables;
 
 use StellarWP\Schema\Tables\Contracts;
-use StellarWP\Pigeon\Config\Config;
+use StellarWP\Pigeon\Config;
 
 class Entries_Meta extends Contracts\Table {
 

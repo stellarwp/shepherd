@@ -2,7 +2,6 @@
 
 namespace StellarWP\Pigeon;
 
-use StellarWP\Pigeon\Config\Database;
 use StellarWP\Pigeon\Templates\Default_Template;
 use StellarWP\Schema\Tables\Contracts\Table;
 

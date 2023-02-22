@@ -2,7 +2,7 @@
 
 namespace StellarWP\Pigeon\Schema\Tables;
 
-use StellarWP\Pigeon\Config\Config;
+use StellarWP\Pigeon\Config;
 use StellarWP\Schema\Tables\Contracts;
 
 class Entries extends Contracts\Table {

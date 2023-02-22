@@ -9,7 +9,9 @@
     "lucatume/di52": "^2.1",
     "stellarwp/db": "^1.0",
     "stellarwp/schema": "^1.1",
-    "woocommerce/action-scheduler": "^3.5"
+    "woocommerce/action-scheduler": "^3.5",
+    "stellarwp/models": "^0.0.1",
+    "stellarwp/installer": "^1.1"
   },
   "require-dev": {
     "bordoni/phpass": "^0.3.6",
