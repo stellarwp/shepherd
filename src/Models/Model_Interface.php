@@ -8,7 +8,7 @@ interface Model_Interface {
 
 	public function __construct();
 
-	public function set_data() :void;
+	public function set_data() :Model_Interface;
 
 	public function validate_dataset() :bool;
 

@@ -2,10 +2,10 @@
 
 namespace StellarWP\Pigeon\Delivery;
 
-use PhpParser\Node\Expr\AssignOp\Mod;
 use StellarWP\Pigeon\Delivery\Modules\Mail;
 use StellarWP\Pigeon\Delivery\Modules\Module_Interface;
 use StellarWP\Pigeon\Models\Entry;
+use StellarWP\Pigeon\Templates\Default_Template;
 
 class Envelope {
 
@@ -23,6 +23,7 @@ class Envelope {
 		$this->set_available_modules();
 		$this->set_entry_module();
 	}
+
 
 	public function set_available_modules() {
 		$this->available_modules = [
@@ -49,5 +50,36 @@ class Envelope {
 		}
 
 		$this->entry_module = $this->entry->type::init();
+	}
+
+	public function package( $template_name, $modules = ['Mail'], ...$args ) {
+		$template = new Default_Template( $template_name );
+		$template->set_args( $args );
+
+		if ( $template->validate() ) {
+			$entry = new Entry();
+			$entry->set_data( $args );
+		}
+
+		return $template->render( $entry );
+	}
+
+	/**
+	 * Package a message to be sent. Uses the same signature as wp_mail but routes
+	 * the messages through Pigeon before delivering to the modules to send.
+	 *
+	 * @see wp_mail at wp-includes/pluggable.php
+	 *
+	 * @param string|string[] $to          Array or comma-separated list of email addresses to send message.
+	 * @param string          $subject     Email subject.
+	 * @param string          $message     Message contents.
+	 * @param string|string[] $headers     Optional. Additional headers.
+	 * @param string|string[] $attachments Optional. Paths to files to attach.
+	 *
+	 * @return bool Whether the message was sent successfully.
+	 *
+	 */
+	public function dispatch( $to, $subject, $message, $headers = '', $attachments = array() ) {
+
 	}
 }

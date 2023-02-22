@@ -3,12 +3,15 @@
 namespace StellarWP\Pigeon\Templates;
 
 use StellarWP\Pigeon\Entry\Model_Interface;
+use StellarWP\Pigeon\Models\Entry;
 
 interface Template_Interface {
 
 	public function register();
 
-	public function compose( Model_Interface $entry );
+	public function render( Entry $entry );
 
-	public function render();
+	public function validate();
+
+	public function create_entry();
 }

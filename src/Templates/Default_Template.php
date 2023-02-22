@@ -3,10 +3,20 @@
 namespace StellarWP\Pigeon\Templates;
 
 use StellarWP\Pigeon\Entry\Model_Interface;
+use StellarWP\Pigeon\Models\Entry;
+use const Patchwork\CodeManipulation\Actions\RedefinitionOfNew\publicizeConstructors;
 
 final class Default_Template implements Template_Interface {
 
-	protected $post_type_name = 'stellarwp_pigeon_templates';
+	protected $post_type_name = 'pigeon_templates';
+
+	protected $template;
+
+	public function __construct( $template = null ) {
+		if ( $template ) {
+			$this->get_template( $template );
+		}
+	}
 
 	public function register() {
 		$args = [
@@ -21,6 +31,7 @@ final class Default_Template implements Template_Interface {
 			'has_archive' => false,
 			'rewrite' => false,
 			'show_ui' => true,
+			'show_in_rest' => true,
 		];
 		\register_post_type( $this->post_type_name, $args );
 
@@ -31,11 +42,33 @@ final class Default_Template implements Template_Interface {
 		// check if the default template exists, and create it
 	}
 
-	public function compose( Model_Interface $entry ) {
-		// compose the template with entry data
+	public function set_template( \WP_Post $template ) {
+		$this->template = $template;
+		return $this;
+	}
+	public function get_template( $template ) {
+
+		if ( \is_int( $template ) ) {
+			$template_post = get_post( $template );
+			if ( $template_post instanceof \WP_Post ) {
+				return $this->set_template( $template_post );
+			}
+		}
+
+		$query = new \WP_Query( [
+			'posts_per_page' => 1,
+			'post_type' => $this->post_type_name,
+			'post_title' => $template,
+		] );
+
+		if ( $query->have_posts() ) {
+			return $this->set_template( $query->next_post() );
+		}
+
+		return $this;
 	}
 
-	public function render() {
-		// render the default template
+	public function render( Entry $entry ) {
+		echo 'hello';
 	}
 }

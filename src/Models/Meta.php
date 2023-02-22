@@ -18,8 +18,9 @@ class Meta implements Model_Interface {
 	public function __construct() {
 	}
 
-	public function set_data(): void {
+	public function set_data() :Meta {
 		$this->set_tags();
+		return $this;
 	}
 
 	public function set_tags() {

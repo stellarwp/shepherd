@@ -16,7 +16,7 @@ class Entry implements Model_Interface {
 	public function __construct() {
 	}
 
-	public function set_data( ...$args ) :void {
+	public function set_data( ...$args ) :Entry {
 		$this->raw_data = $args;
 
 		try {
@@ -25,6 +25,8 @@ class Entry implements Model_Interface {
 		} catch ( \Exception $exception ) {
 
 		}
+
+		return $this;
 	}
 
 	public function module_active() {
