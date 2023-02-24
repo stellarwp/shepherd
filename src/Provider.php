@@ -32,6 +32,9 @@ class Provider extends \tad_DI52_ServiceProvider {
 	}
 
 	public function register_filters() {
+		add_filter( 'tribe_events_template_paths', [ $this, 'register_pigeon_template_path'] );
+		add_filter( 'tribe_tickets_template_paths', [ $this, 'register_pigeon_template_path'] );
+		add_filter( 'template_include', [ $this, 'register_pigeon_template'] );
 
 	}
 
@@ -41,6 +44,14 @@ class Provider extends \tad_DI52_ServiceProvider {
 
 	public function register_database() {
 		$this->container->make( Database::class )->register();
+	}
+
+	public function register_pigeon_template_path( $templates ) {
+		return $this->container->make( Default_Template::class )->register_template_path( $templates );
+	}
+
+	public function register_pigeon_template( $template ) {
+		return $this->container->make( Default_Template::class )->replace_template( $template );
 	}
 
 

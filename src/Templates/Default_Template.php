@@ -48,7 +48,7 @@ final class Default_Template implements Template_Interface {
 	}
 	public function get_template( $template ) {
 
-		if ( \is_int( $template ) ) {
+		if ( is_int( $template ) ) {
 			$template_post = get_post( $template );
 			if ( $template_post instanceof \WP_Post ) {
 				return $this->set_template( $template_post );
@@ -68,7 +68,40 @@ final class Default_Template implements Template_Interface {
 		return $this;
 	}
 
+	public function set_args( ...$args ) {
+		$this->args = $args;
+	}
+
+	public function validate() {
+		return true;
+	}
+
 	public function render( Entry $entry ) {
-		echo 'hello';
+		return 'hello';
+	}
+
+	public function register_template_path( $templates ) {
+		$templates[] = STELLARWP_PIGEON_PATH;
+		return $templates;
+	}
+
+	public function replace_template( $template ) {
+		if ( ! is_singular( $this->post_type_name ) ) {
+			return $template;
+		}
+
+		$original_template = $template;
+
+		$template = STELLARWP_PIGEON_PATH . 'src/views/pigeon-email-template.php';
+
+		if ( \class_exists( 'Tribe__Events__Templates' ) ) {
+			$template = \Tribe__Events__Templates::getTemplateHierarchy( 'pigeon-email-template.php' );
+		}
+
+		if ( \class_exists( 'Tribe__Tickets__Templates' ) ) {
+			$template = \Tribe__Tickets__Templates::get_template_hierarchy( 'pigeon-email-template.php' );
+		}
+
+		return apply_filters( 'stellarwp_pigeon_email_template', $template, $original_template );
 	}
 }

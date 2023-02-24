@@ -79,7 +79,13 @@ class Envelope {
 	 * @return bool Whether the message was sent successfully.
 	 *
 	 */
-	public function dispatch( $to, $subject, $message, $headers = '', $attachments = array() ) {
+	public function dispatch( ...$args ) {
+		$this->dispatch_args = $args;
+
+		foreach( $this->get_available_modules() as $module ) {
+			$instance = $module::init();
+			$instance->send();
+		}
 
 	}
 }

@@ -13,5 +13,4 @@ interface Template_Interface {
 
 	public function validate();
 
-	public function create_entry();
 }
