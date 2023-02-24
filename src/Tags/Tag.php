@@ -2,7 +2,7 @@
 
 namespace StellarWP\Pigeon\Tags;
 
-class Tag implements Tag_Interface{
+abstract class Tag implements Tag_Interface{
 
 	public function __construct( $slug, $args ) {
 	}
@@ -13,5 +13,9 @@ class Tag implements Tag_Interface{
 
 	public function print() {
 		// TODO: Implement print() method.
+	}
+
+	public function get_tag_name() {
+		return "%%{$this->tag_name}%%"
 	}
 }

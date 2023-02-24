@@ -4,6 +4,7 @@ namespace StellarWP\Pigeon\Templates;
 
 use StellarWP\Pigeon\Entry\Model_Interface;
 use StellarWP\Pigeon\Models\Entry;
+use StellarWP\Pigeon\Tags\Collection;
 use const Patchwork\CodeManipulation\Actions\RedefinitionOfNew\publicizeConstructors;
 
 final class Default_Template implements Template_Interface {
@@ -76,8 +77,44 @@ final class Default_Template implements Template_Interface {
 		return true;
 	}
 
-	public function render( Entry $entry ) {
-		return 'hello';
+	public function get_key( $key ) {
+		return $this->template->{$key};
+	}
+
+	public function get_template_body_raw() {
+		return $this->template->post_content;
+	}
+
+	public function render( Collection $tags ) {
+		$content = $this->get_template_body_raw();
+
+		foreach( $tags->get_all() as $tag ) {
+			if ( false === strpos( $content, $tag->get_tag_name() ) ) {
+				continue;
+			}
+
+			$content = str_replace( $tag->get_tag_name(), $tag->render(), $content );
+		}
+
+		$this->format_to_display( $content );
+
+		return $this;
+	}
+
+	public function format_to_display( $body ) {
+		$post = $this->template;
+		$post->post_content = $body;
+
+		setup_postdata( $post );
+
+		\ob_start();
+		include $this->pigeon_email_template( null, true );
+		$this->rendered = \ob_get_contents();
+		\ob_end_clean();
+
+		\wp_reset_postdata();
+
+		return $this;
 	}
 
 	public function register_template_path( $templates ) {
@@ -85,8 +122,8 @@ final class Default_Template implements Template_Interface {
 		return $templates;
 	}
 
-	public function replace_template( $template ) {
-		if ( ! is_singular( $this->post_type_name ) ) {
+	public function pigeon_email_template( $template, $force = false ) {
+		if ( ! is_singular( $this->post_type_name ) && ! $force ) {
 			return $template;
 		}
 

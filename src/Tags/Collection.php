@@ -22,7 +22,7 @@ class Collection {
 			$this->add( $tag );
 		}
 
-		return $this->data;
+		return (array) $this->data;
 	}
 
 	public function entry( Entry $entry ) {

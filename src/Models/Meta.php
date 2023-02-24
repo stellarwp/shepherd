@@ -2,7 +2,6 @@
 
 namespace StellarWP\Pigeon\Models;
 
-use StellarWP\Pigeon\Delivery\Modules\Module_Interface;
 use StellarWP\Pigeon\Tags\Collection;
 use StellarWP\Pigeon\Tags\Default_Tags;
 

@@ -51,7 +51,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	}
 
 	public function register_pigeon_template( $template ) {
-		return $this->container->make( Default_Template::class )->replace_template( $template );
+		return $this->container->make( Default_Template::class )->pigeon_email_template( $template );
 	}
 
 
