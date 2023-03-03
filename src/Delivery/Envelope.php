@@ -57,11 +57,14 @@ class Envelope {
 		$template->set_args( $args );
 
 		if ( $template->validate() ) {
-			$entry = new Entry();
-			$entry->set_data( $args );
+			return '';
 		}
 
-		return $template->render( $entry );
+		$entry = Entry::instance();
+		$entry->set_data( $args );
+		$template->set_entry( $entry );
+
+		return $template->render()->get_rendered_content();
 	}
 
 	/**

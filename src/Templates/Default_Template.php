@@ -5,7 +5,6 @@ namespace StellarWP\Pigeon\Templates;
 use StellarWP\Pigeon\Entry\Model_Interface;
 use StellarWP\Pigeon\Models\Entry;
 use StellarWP\Pigeon\Tags\Collection;
-use const Patchwork\CodeManipulation\Actions\RedefinitionOfNew\publicizeConstructors;
 
 final class Default_Template implements Template_Interface {
 
@@ -13,9 +12,13 @@ final class Default_Template implements Template_Interface {
 
 	protected $template;
 
-	public function __construct( $template = null ) {
+	public function __construct( $template = null, $entry = null ) {
 		if ( $template ) {
 			$this->get_template( $template );
+		}
+
+		if ( $entry instanceof Entry ) {
+			$this->set_entry( $entry );
 		}
 	}
 
@@ -41,6 +44,15 @@ final class Default_Template implements Template_Interface {
 
 	public function create_default_template() {
 		// check if the default template exists, and create it
+	}
+
+	public function set_entry( Entry $entry ) {
+		$this->entry = $entry;
+		return $this;
+	}
+
+	public function get_entry() :Entry {
+		return $this->entry;
 	}
 
 	public function set_template( \WP_Post $template ) {
@@ -85,25 +97,35 @@ final class Default_Template implements Template_Interface {
 		return $this->template->post_content;
 	}
 
-	public function render( Collection $tags ) {
-		$content = $this->get_template_body_raw();
+	public function set_rendered_content( $content ) {
+		$this->rendered = $content;
+	}
+
+	public function get_rendered_content() {
+		if ( empty( $this->rendered ) ) {
+			$this->rendered = $this->get_template_body_raw();
+		}
+
+		return $this->rendered;
+	}
+
+	public function render() {
+		$tags = new Collection();
 
 		foreach( $tags->get_all() as $tag ) {
-			if ( false === strpos( $content, $tag->get_tag_name() ) ) {
+			if ( false === strpos( $this->get_rendered_content(), $tag->get_tag_name() ) ) {
 				continue;
 			}
 
-			$content = str_replace( $tag->get_tag_name(), $tag->render(), $content );
+			$this->set_rendered_content( $tag->set_entry( $this->get_entry() )->set_template( $this )->compose() );
 		}
 
-		$this->format_to_display( $content );
-
-		return $this;
+		return $this->format_to_display();
 	}
 
-	public function format_to_display( $body ) {
+	public function format_to_display() {
 		$post = $this->template;
-		$post->post_content = $body;
+		$post->post_content = $this->get_rendered_content();
 
 		setup_postdata( $post );
 

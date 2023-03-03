@@ -24,8 +24,10 @@ class Provider extends \tad_DI52_ServiceProvider {
 		$action_scheduler->register_main_schedule();
 	}
 
-	public function dispatch( Batch $batch ) {
-		$batch->dispatch();
+	public function dispatch( $batches ) {
+		foreach( $batches as $batch ) {
+			$batch->dispatch();
+		}
 	}
 
 	/**

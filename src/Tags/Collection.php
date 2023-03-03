@@ -12,7 +12,7 @@ class Collection {
 	protected $data;
 
 	public function add( Tag $tag ) {
-		$this->data[ $tag->slug ] = $tag;
+		$this->data[ $tag->tag_name ] = $tag;
 	}
 
 	public function get_all() {

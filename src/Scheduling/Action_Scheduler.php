@@ -36,7 +36,7 @@ class Action_Scheduler {
 		as_schedule_single_action(
 			$this->schedule_time(),
 			static::DISPATCH_ACTION_NAME,
-			new Batch(),
+			[ new Batch() ],
 			static::SCHEDULE_ACTIONS_GROUP,
 			true
 		);

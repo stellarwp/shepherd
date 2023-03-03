@@ -2,15 +2,13 @@
 
 namespace StellarWP\Pigeon\Tags;
 
-use StellarWP\Pigeon\Models\Entry;
-
 interface Tag_Interface {
 
-	public function register();
+	public function register( $tags );
 
-	public function get_tag_name();
+	public function get_tag_name(): string;
 
-	public function compose( Entry $entry );
+	public function compose(): string;
 
-	public function render();
+	public function render(): string;
 }

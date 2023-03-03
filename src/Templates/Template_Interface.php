@@ -10,7 +10,7 @@ interface Template_Interface {
 
 	public function register();
 
-	public function render( Collection $tags );
+	public function render();
 
 	public function validate();
 

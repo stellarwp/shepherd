@@ -20,6 +20,10 @@ class Batch {
 		$this->entries = $this->fetch();
 	}
 
+	public function get_entries() {
+		return $this->entries;
+	}
+
 	public function fetch() {
 		global $wpdb;
 		$entries_table      = Entries::base_table_name();
