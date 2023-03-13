@@ -155,14 +155,26 @@ class Entry implements Model_Interface {
 
 	public function save(): Entry {
 		global $wpdb;
-		$entry_table = Entries::base_table_name();
-		$clean_data  = $this->clean_data();
+		$entry_table      = Entries::base_table_name();
+		$entry_meta_table = Entries_Meta::base_table_name();
+		$clean_data       = $this->clean_data();
 
+		// Entries
 		if ( ! empty( $this->get( 'entry_id' ) ) ) {
 			$db = $wpdb->update( $entry_table, $clean_data, [ Entries::COL_ENTRY_ID['name'] => $this->get( 'entry_id' ) ] );
 		} else {
 			$db                     = $wpdb->insert( $entry_table, $clean_data );
 			$this->data['entry_id'] = $wpdb->insert_id;
+		}
+
+		// Entries Meta
+		$meta_data = array_diff( $this->get_data(), $clean_data );
+		$meta      = $wpdb->get_row( $wpdb->prepare( "SELECT meta_id FROM $entry_meta_table WHERE entry_id = %d", $this->get('entry_id') ) );
+
+		if ( ! empty( $meta->meta_id ) ) {
+			$db = $wpdb->update( $entry_meta_table, [ 'meta_key' => 'entry_data', 'meta_type' => 'json',  'meta_value' => json_encode( $meta_data ) ], [ 'meta_id' => $meta->meta_id ] );
+		} else {
+			$db = $wpdb->insert( $entry_meta_table, [ 'entry_id' => $this->get('entry_id'), 'meta_key' => 'entry_data', 'meta_value' => json_encode( $meta_data ) ] );
 		}
 
 		if ( false === $db ) {
@@ -172,7 +184,7 @@ class Entry implements Model_Interface {
 		return $this;
 	}
 
-	public function load( $entry_id ) {
+	public function load( $entry_id ) :bool {
 		global $wpdb;
 		$entries_table      = Entries::base_table_name();
 		$entries_meta_table = Entries_Meta::base_table_name();
@@ -187,6 +199,11 @@ class Entry implements Model_Interface {
 			),
 			ARRAY_A
 		);
+
+		$meta = json_decode( $this->data['meta_value'] ?? [], true );
+		$this->data = array_merge( $this->data, $meta );
+
+		return ! empty( $this->data );
 	}
 
 	public function schedule(): Entry {

@@ -24,9 +24,11 @@ class Provider extends \tad_DI52_ServiceProvider {
 		/*
 		add_action( 'wp', function() {
 			$db = new \ActionScheduler_DBStore();
-			$action = $db->fetch_action(485);
-			$as = new \ActionScheduler_Action( Action_Scheduler::DISPATCH_ACTION_NAME, $action->get_args() );
-			$as->execute();
+			$action = $db->fetch_action(0);
+			if ( ! empty( $action->get_hook() ) ) {
+				$as = new \ActionScheduler_Action( Action_Scheduler::DISPATCH_ACTION_NAME, $action->get_args() );
+				$as->execute();
+			}
 		}  );
 		*/
 	}

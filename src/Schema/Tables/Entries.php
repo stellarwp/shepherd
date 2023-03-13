@@ -168,6 +168,7 @@ class Entries extends Contracts\Table {
 			'public_key'      => '%s',
 			'private_key'     => '%s',
 			'retries'         => '%d',
+			'completed_at' => '%s',
 		];
 	}
 }

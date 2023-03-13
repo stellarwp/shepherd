@@ -65,7 +65,10 @@ class Provider extends \tad_DI52_ServiceProvider {
 	 */
 	public function register_send_hook( ...$args ) {
 
-		if ( ! empty( $args['headers'] ) ) {
+		$array = array_filter( $args );
+		$args  = array_pop( $array );
+
+		if ( ! empty( $args['headers']['X-Pigeon-Module'] ) ) {
 			// this Pigeon has already processed this, return null
 			return null;
 		}

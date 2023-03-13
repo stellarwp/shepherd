@@ -74,12 +74,13 @@ class Batch {
 
 		foreach ( $this->entries as $entry ) {
 			$entry_obj = new Entry();
-			$entry_obj->load( $entry );
-			/**
-			 * @var Module_Interface
-			 */
-			$module = $entry_obj->get( 'delivery_module' );
-			$module::send( $entry_obj );
+			if ( $entry_obj->load( $entry ) ) {
+				/**
+				 * @var Module_Interface
+				 */
+				$module = $entry_obj->get( 'delivery_module' );
+				$module::send( $entry_obj );
+			}
 		}
 	}
 }
