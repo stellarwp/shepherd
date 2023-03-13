@@ -2,13 +2,16 @@
 
 namespace StellarWP\Pigeon\Templates;
 
+use StellarWP\Pigeon\Delivery\Modules\Mail;
 use StellarWP\Pigeon\Entry\Model_Interface;
 use StellarWP\Pigeon\Models\Entry;
 use StellarWP\Pigeon\Tags\Collection;
 
 final class Default_Template implements Template_Interface {
 
-	protected $post_type_name = 'pigeon_templates';
+	public static $post_type_name = 'pigeon_templates';
+
+	public static $default_template_name = 'Pigeon Default Template';
 
 	protected $template;
 
@@ -37,13 +40,12 @@ final class Default_Template implements Template_Interface {
 			'show_ui' => true,
 			'show_in_rest' => true,
 		];
-		\register_post_type( $this->post_type_name, $args );
-
-		$this->create_default_template();
+		\register_post_type( static::$post_type_name, $args );
 	}
 
 	public function create_default_template() {
-		// check if the default template exists, and create it
+		$id = wp_insert_post( [ 'post_type' => static::$post_type_name, 'post_title' => static::$default_template_name, 'post_status' => 'publish' ] );
+		return get_post( $id );
 	}
 
 	public function set_entry( Entry $entry ) {
@@ -55,8 +57,14 @@ final class Default_Template implements Template_Interface {
 		return $this->entry;
 	}
 
+	public function set_delivery_module() :Default_Template {
+		$this->template->delivery_module = Mail::class;
+		return $this;
+	}
+
 	public function set_template( \WP_Post $template ) {
 		$this->template = $template;
+		$this->set_delivery_module();
 		return $this;
 	}
 	public function get_template( $template ) {
@@ -70,12 +78,17 @@ final class Default_Template implements Template_Interface {
 
 		$query = new \WP_Query( [
 			'posts_per_page' => 1,
-			'post_type' => $this->post_type_name,
-			'post_title' => $template,
+			'post_type' => static::$post_type_name,
+			'title' => $template,
+			'post_status' => 'publish',
 		] );
 
 		if ( $query->have_posts() ) {
 			return $this->set_template( $query->next_post() );
+		}
+
+		if ( static::$default_template_name === $template ) {
+			return $this->set_template( $this->create_default_template() );
 		}
 
 		return $this;
@@ -109,8 +122,12 @@ final class Default_Template implements Template_Interface {
 		return $this->rendered;
 	}
 
-	public function render() {
+	public function render( $content_provided = '' ) {
 		$tags = new Collection();
+
+		if ( ! empty( $content_provided ) ) {
+			$this->set_rendered_content( $content_provided );
+		}
 
 		foreach( $tags->get_all() as $tag ) {
 			if ( false === strpos( $this->get_rendered_content(), $tag->get_tag_name() ) ) {
@@ -126,6 +143,11 @@ final class Default_Template implements Template_Interface {
 	public function format_to_display() {
 		$post = $this->template;
 		$post->post_content = $this->get_rendered_content();
+
+		// If we have a complete HTML structure already, return from here instead of loading the template files
+		if ( 0 === strpos( strtolower( trim( $post->post_content ) ), '<!doctype' ) ) {
+			return $this;
+		}
 
 		setup_postdata( $post );
 
@@ -145,7 +167,7 @@ final class Default_Template implements Template_Interface {
 	}
 
 	public function pigeon_email_template( $template, $force = false ) {
-		if ( ! is_singular( $this->post_type_name ) && ! $force ) {
+		if ( ! is_singular( static::$post_type_name ) && ! $force ) {
 			return $template;
 		}
 

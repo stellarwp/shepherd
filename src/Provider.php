@@ -2,6 +2,9 @@
 
 namespace StellarWP\Pigeon;
 
+use StellarWP\Pigeon\Delivery\Envelope;
+use StellarWP\Pigeon\Models\Entry;
+use StellarWP\Pigeon\Schema\Tables\Entries;
 use StellarWP\Pigeon\Templates\Default_Template;
 use StellarWP\Schema\Tables\Contracts\Table;
 
@@ -35,6 +38,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 		add_filter( 'tribe_events_template_paths', [ $this, 'register_pigeon_template_path'] );
 		add_filter( 'tribe_tickets_template_paths', [ $this, 'register_pigeon_template_path'] );
 		add_filter( 'template_include', [ $this, 'register_pigeon_template'] );
+		add_filter( 'pre_wp_mail', [ $this, 'register_send_hook'], 999, 5 );
 
 	}
 
@@ -52,6 +56,27 @@ class Provider extends \tad_DI52_ServiceProvider {
 
 	public function register_pigeon_template( $template ) {
 		return $this->container->make( Default_Template::class )->pigeon_email_template( $template );
+	}
+
+	/**
+	 * @param ...$args
+	 *
+	 * @return true for email scheduled, false for not scheduled
+	 */
+	public function register_send_hook( ...$args ) {
+
+		if ( ! empty( $args['headers'] ) ) {
+			// this Pigeon has already processed this, return null
+			return null;
+		}
+
+		/**
+		 * @var $envelope Envelope;
+		 */
+		$envelope = $this->container->instance( Envelope::class, [ new Entry() ] )();
+		$envelope->create( $args );
+
+		return $envelope->get_entry()->get( Entries::COL_STATUS['name'] );
 	}
 
 

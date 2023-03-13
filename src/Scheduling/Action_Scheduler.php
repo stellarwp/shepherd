@@ -8,7 +8,7 @@ class Action_Scheduler {
 
 	const SCHEDULE_TIME_OFFSET = 60;
 
-	const SCHEDULE_ACTION_INTERVAL = 60;
+	const SCHEDULE_ACTION_INTERVAL = 120;
 
 	const SCHEDULE_ACTION_NAME = 'stellarwp_pigeon_schedule_default';
 
@@ -29,14 +29,14 @@ class Action_Scheduler {
 			);
 		}
 
-		add_action( static::SCHEDULE_ACTION_NAME, [ $this, 'schedule' ] );
 	}
 
-	public function schedule() {
+	public function process_new_batch() {
+		$batch = new Batch();
 		as_schedule_single_action(
 			$this->schedule_time(),
 			static::DISPATCH_ACTION_NAME,
-			[ new Batch() ],
+			[ $batch->get_entries() ],
 			static::SCHEDULE_ACTIONS_GROUP,
 			true
 		);

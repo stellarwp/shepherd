@@ -4,7 +4,7 @@ namespace StellarWP\Pigeon\Models;
 
 use StellarWP\Pigeon\Delivery\Modules\Mail;
 use StellarWP\Pigeon\Schema\Tables\Entries;
-use StellarWP\Pigeon\Tags\Collection;
+use StellarWP\Pigeon\Schema\Tables\Entries_Meta;
 use StellarWP\Pigeon\Templates\Default_Template;
 
 class Entry implements Model_Interface {
@@ -34,21 +34,23 @@ class Entry implements Model_Interface {
 
 	protected function cleanup( $args ) {
 		static $clean_args = [];
-		foreach( $args as $key => $arg ) {
+		foreach ( $args as $key => $arg ) {
 
-			if ( is_numeric( $key ) && is_array( $arg ) && 1 === count( $arg ) ) {
+			if ( is_numeric( $key ) && is_array( $arg ) ) {
 				$this->cleanup( $arg );
-			} else {
+			}
+
+			if ( ! empty( $arg ) && ! is_numeric( $key ) ) {
 				$clean_args[ $key ] = $arg;
 			}
 		}
 
-		return $clean_args;
+		return wp_parse_args( $clean_args, $this->data );
 	}
 
 	public function set_data( ...$args ): Entry {
 		$this->raw_data = $args;
-		$this->data = $this->cleanup( $this->raw_data );
+		$this->data     = $this->cleanup( $this->raw_data );
 
 		try {
 			$this->validate_dataset();
@@ -61,7 +63,9 @@ class Entry implements Model_Interface {
 	}
 
 	public function get( $key ) {
-		return $this->get_data()->{$key} ?? false;
+		$data = $this->get_data();
+
+		return $data[ $key ] ?? false;
 	}
 
 	public function module_active() {
@@ -78,14 +82,15 @@ class Entry implements Model_Interface {
 	}
 
 	public function compose(): Entry {
-		$this->template = new Default_Template( 'tickets/email', $this );
+		$this->template = new Default_Template( Default_Template::$default_template_name, $this );
 		$this->keys     = $this->generate_keys();
 
 		$this->data = wp_parse_args( $this->data,
 			[
 				'template_id'     => $this->template->get_key( 'ID' ),
-				'content'         => $this->template->render()->get_rendered_content(),
-				'delivery_module' => 'mail',
+				'content'         => $this->template->render( $this->get( 'message' ) )->get_rendered_content(),
+				'delivery_module' => $this->template->get_key( 'delivery_module' ),
+				'recipient'       => $this->get( 'to' ),
 				'status'          => 'draft',
 				'public_key'      => $this->keys['public'],
 				'private_key'     => $this->keys['private'],
@@ -137,11 +142,11 @@ class Entry implements Model_Interface {
 	}
 
 	public function clean_data() {
-		$data = $this->get_data();
-		$formats = Entries::column_formats();
+		$data       = $this->get_data();
+		$formats    = Entries::column_formats();
 		$extra_keys = array_diff( array_keys( $data ), array_keys( $formats ) );
 
-		foreach( $extra_keys as $key ) {
+		foreach ( $extra_keys as $key ) {
 			unset( $data[ $key ] );
 		}
 
@@ -151,16 +156,42 @@ class Entry implements Model_Interface {
 	public function save(): Entry {
 		global $wpdb;
 		$entry_table = Entries::base_table_name();
-		$clean_data = $this->clean_data();
+		$clean_data  = $this->clean_data();
 
-		if ( false === $wpdb->insert( $entry_table, $clean_data ) ) {
+		if ( ! empty( $this->get( 'entry_id' ) ) ) {
+			$db = $wpdb->update( $entry_table, $clean_data, [ Entries::COL_ENTRY_ID['name'] => $this->get( 'entry_id' ) ] );
+		} else {
+			$db                     = $wpdb->insert( $entry_table, $clean_data );
+			$this->data['entry_id'] = $wpdb->insert_id;
+		}
+
+		if ( false === $db ) {
 			throw new \Exception();
 		}
 
 		return $this;
 	}
 
+	public function load( $entry_id ) {
+		global $wpdb;
+		$entries_table      = Entries::base_table_name();
+		$entries_meta_table = Entries_Meta::base_table_name();
+
+		$this->data = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM $entries_table as t1
+         		LEFT JOIN $entries_meta_table as t2 ON t1.entry_id = t2.entry_id  
+				WHERE 1=1
+				AND t1.entry_id = %d",
+				$entry_id
+			),
+			ARRAY_A
+		);
+	}
+
 	public function schedule(): Entry {
+		$this->set_data( [ 'status' => 'ready' ] );
+
 		return $this;
 	}
 }

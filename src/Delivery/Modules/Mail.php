@@ -5,8 +5,6 @@ namespace StellarWP\Pigeon\Delivery\Modules;
 use StellarWP\Pigeon\Entry\Base;
 use StellarWP\Pigeon\Entry\Model_Interface;
 use StellarWP\Pigeon\Models\Entry;
-use StellarWP\Pigeon\Scheduling\Action_Scheduler;
-use StellarWP\Pigeon\Templates\Template_Interface;
 
 class Mail implements Module_Interface {
 
@@ -14,19 +12,39 @@ class Mail implements Module_Interface {
 
 	public $scheduled = true;
 
+	/**
+	 * public static function init() :Mail {
+	 * if ( static::$instance instanceof Mail ) {
+	 * return static::$instance;
+	 * }
+	 *
+	 * static::$instance = new Mail();
+	 * return static::$instance;
+	 * }
+	 **/
 
-	public static function init() :Mail {
-		if ( static::$instance instanceof Mail ) {
-			return static::$instance;
+	public static function send( Entry $entry ) {
+		$to          = $entry->get( 'recipient' );
+		$subject     = $entry->get( 'subject' );
+		$message     = $entry->get( 'content' );
+		$headers     = $entry->get( 'headers' );
+		$attachments = $entry->get( 'attachments' );
+
+		if ( empty( $attachments ) ) {
+			$attachments = [];
 		}
 
-		static::$instance = new Mail();
-		return static::$instance;
-	}
+		$headers['X-Pigeon-Module'] = Mail::class;
 
-	public function send( Entry $entry ) :Mail {
-		// wp_mail();
-		return $this;
+		$success = wp_mail( $to, $subject, $message, $headers, $attachments );
+
+		if ( $success ) {
+			$entry->set_data( [ 'status' => 'complete', 'completed_at' => gmdate('c') ] );
+			return;
+		}
+
+		$retries = $entry->get('retries');
+		$entry->set_data( [ 'retries' => $retries + 1 ] );
 	}
 }
 

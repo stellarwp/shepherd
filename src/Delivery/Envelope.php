@@ -11,7 +11,7 @@ class Envelope {
 
 	public $available_modules;
 
-	public $entry;
+	protected $entry;
 
 	/**
 	 * @var Module_Interface;
@@ -19,7 +19,7 @@ class Envelope {
 	public $entry_module;
 
 	public function __construct( Entry $entry ) {
-		$this->entry = $entry;
+		$this->set_entry( $entry );
 		$this->set_available_modules();
 		$this->set_entry_module();
 	}
@@ -37,6 +37,14 @@ class Envelope {
 
 	public function get_entry_module() {
 		return $this->entry_module;
+	}
+
+	public function set_entry( Entry $entry ) {
+		$this->entry = $entry;
+	}
+
+	public function get_entry() :Entry {
+		return $this->entry;
 	}
 
 	public function set_entry_module() {
@@ -79,16 +87,10 @@ class Envelope {
 	 * @param string|string[] $headers     Optional. Additional headers.
 	 * @param string|string[] $attachments Optional. Paths to files to attach.
 	 *
-	 * @return bool Whether the message was sent successfully.
+	 * @return bool Whether the entry was properly scheduled for sending
 	 *
 	 */
-	public function dispatch( ...$args ) {
-		$this->dispatch_args = $args;
-
-		foreach( $this->get_available_modules() as $module ) {
-			$instance = $module::init();
-			$instance->send();
-		}
-
+	public function create( ...$args ) {
+		$this->get_entry()->set_data( $args )->schedule();
 	}
 }
