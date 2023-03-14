@@ -69,7 +69,14 @@ class Provider extends \tad_DI52_ServiceProvider {
 		$args  = array_pop( $array );
 
 		if ( ! empty( $args['headers']['X-Pigeon-Module'] ) ) {
-			// this Pigeon has already processed this, return null
+			// Pigeon has already processed this
+			return null;
+		}
+
+		$should_process = apply_filters( 'stellarwp_pigeon_process_message', false, $args );
+
+		if ( ! $should_process && empty( $args['headers']['X-Pigeon-Process'] ) ) {
+			// Pigeon should not process this
 			return null;
 		}
 
