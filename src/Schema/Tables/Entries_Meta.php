@@ -35,6 +35,7 @@ class Entries_Meta extends Contracts\Table {
 	}
 
 	public static function base_table_name() {
-		return rtrim( Config::get_hook_prefix(), '_' ) . '_' . static::$base_table_name;
+		global $wpdb;
+		return $wpdb->prefix . rtrim( Config::get_hook_prefix(), '_' ) . '_' . static::$base_table_name;
 	}
 }
