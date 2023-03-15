@@ -1,10 +1,8 @@
 <?php
 
-namespace unit;
+namespace StellarWP\Pigeon;
 
-use StellarWP\Pigeon\Config\Config;
-
-class ConfigTest extends \Codeception\Test\Unit {
+class ConfigTest extends \Codeception\TestCase\WPTestCase {
 
 	public function test_get_hook_prefix_throws_exception_if_no_prefix() {
 		$this->expectException( \RuntimeException::class );
