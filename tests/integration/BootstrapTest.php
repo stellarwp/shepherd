@@ -27,13 +27,16 @@ class BootstrapTest extends \Codeception\TestCase\WPTestCase {
 		$this->assertTrue( Pigeon::is_enabled() );
 	}
 
-	public function test_init_returns_instance_if_pigeon_enabled() {
+	public function test_instance_is_set_on_init_if_pigeon_enabled() {
 		if ( ! defined( 'STELLARWP_PIGEON_ENABLE' ) ) {
 			define( 'STELLARWP_PIGEON_ENABLE', true );
 		}
 
-		$instance = $this->make( Pigeon::class )->init( new ExampleContainer() );
-		$this->assertTrue(  $instance instanceof Pigeon );
+		$this->expectException( \TypeError::class );
+		$this->assertTrue( Pigeon::get_instance() instanceof Pigeon );
+
+		$this->make( Pigeon::class )->init( new ExampleContainer() );
+		$this->assertTrue(  Pigeon::get_instance() instanceof Pigeon );
 	}
 
 
