@@ -168,7 +168,7 @@ class Entry implements Model_Interface {
 		}
 
 		// Entries Meta
-		$meta_data = array_diff( $this->get_data(), $clean_data );
+		$meta_data = array_map( 'unserialize', array_diff( array_map( 'serialize', $this->get_data() ), array_map( 'serialize', $clean_data ) ) );
 		$meta      = $wpdb->get_row( $wpdb->prepare( "SELECT meta_id FROM $entry_meta_table WHERE entry_id = %d", $this->get('entry_id') ) );
 
 		if ( ! empty( $meta->meta_id ) ) {

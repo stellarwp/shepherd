@@ -4,46 +4,67 @@ namespace StellarWP\Pigeon\Scheduling;
 
 use StellarWP\Pigeon\Delivery\Batch;
 
+/**
+ * Scheduling Service Provider
+ *
+ * @since   TBD
+ *
+ * @package StellarWP\Pigeon;
+ */
 class Provider extends \tad_DI52_ServiceProvider {
 
-	public function register() {
+	/**
+	 * Registers Pigeon's scheduling hooks
+	 *
+	 * @since TBD
+	 */
+	public function register(): void {
 		$this->container->singleton( Action_Scheduler::class );
 
 		$this->load_action_scheduler();
 		$this->register_actions();
 	}
-	public function register_actions() {
-		add_action( 'init', [ $this, 'load_action_scheduler'] );
-		add_action( 'init', [ $this, 'register_schedules'], 20 );
+
+	/**
+	 * Registers entry points for Pigeon's scheduling functionality
+	 *
+	 * @since TBD
+	 */
+	public function register_actions(): void {
+		add_action( 'init', [ $this, 'load_action_scheduler' ] );
+		add_action( 'init', [ $this, 'register_schedules' ], 20 );
 
 		// Action Scheduler actions
 		add_action( Action_Scheduler::DISPATCH_ACTION_NAME, [ $this, 'dispatch' ] );
 		add_action( Action_Scheduler::SCHEDULE_ACTION_NAME, [ $this, 'process_batch' ] );
-
-		// Testing AS without cron
-		/*
-		add_action( 'wp', function() {
-			$db = new \ActionScheduler_DBStore();
-			$action = $db->fetch_action(0);
-			if ( ! empty( $action->get_hook() ) ) {
-				$as = new \ActionScheduler_Action( Action_Scheduler::DISPATCH_ACTION_NAME, $action->get_args() );
-				$as->execute();
-			}
-		}  );
-		*/
 	}
 
-	public function register_schedules() {
+	/**
+	 * Registers Pigeon's main schedule
+	 *
+	 * @since TBD
+	 */
+	public function register_schedules(): void {
 		$action_scheduler = $this->container->make( Action_Scheduler::class );
 		$action_scheduler->register_main_schedule();
 	}
 
-	public function process_batch() {
+	/**
+	 * Process new batches of entries as part of the scheduled tasks
+	 *
+	 * @since TBD
+	 */
+	public function process_batch(): void {
 		$action_scheduler = $this->container->make( Action_Scheduler::class );
 		$action_scheduler->process_new_batch();
 	}
 
-	public function dispatch( $entries ) {
+	/**
+	 * Dispatch a new batch of entries to their delivery modules.
+	 *
+	 * @since TBD
+	 */
+	public function dispatch( $entries ): void {
 		$batch = new Batch();
 		$batch->set_entries( $entries );
 		$batch->dispatch();
@@ -55,7 +76,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	 *
 	 * @since TBD
 	 */
-	public function load_action_scheduler() {
+	public function load_action_scheduler(): void {
 		if ( function_exists( 'as_has_scheduled_action' ) || class_exists( 'Tribe__Main' ) ) {
 			return;
 		}

@@ -7,12 +7,16 @@ use StellarWP\ContainerContract\ContainerInterface;
 /**
  * Pigeon Message Delivery System
  *
+ * @since TBD
+ *
  * @package StellarWP\Pigeon
  */
 class Pigeon {
 
 	/**
 	 * Is Pigeon enabled
+	 *
+	 * @since TBD
 	 *
 	 * @var bool
 	 */
@@ -21,6 +25,8 @@ class Pigeon {
 	/**
 	 * The singleton instance of Pigeon
 	 *
+	 * @since TBD
+	 *
 	 * @var Pigeon
 	 */
 	protected static $instance;
@@ -28,12 +34,16 @@ class Pigeon {
 	/**
 	 * The DI container used to initialize Pigeon
 	 *
+	 * @since TBD
+	 *
 	 * @var ContainerInterface
 	 */
 	protected $container;
 
 	/**
 	 * Initialize Pigeon
+	 *
+	 * @since TBD
 	 *
 	 * @param ContainerInterface $container
 	 *
@@ -59,6 +69,8 @@ class Pigeon {
 	/**
 	 * Static method to check if Pigeon has been enabled in the code
 	 *
+	 * @since TBD
+	 *
 	 * @return bool
 	 */
 	public static function is_enabled() {
@@ -69,6 +81,8 @@ class Pigeon {
 	/**
 	 * Returns the statically stored Pigeon instance
 	 *
+	 * @since TBD
+	 *
 	 * @return Pigeon
 	 */
 	public static function get_instance(): Pigeon {
@@ -77,6 +91,8 @@ class Pigeon {
 
 	/**
 	 * Stores the Pigeon instance in a static property
+	 *
+	 * @since TBD
 	 *
 	 * @param Pigeon $instance
 	 *
@@ -88,6 +104,8 @@ class Pigeon {
 
 	/**
 	 * Returns the container used to initialize Pigeon
+	 *
+	 * @since TBD
 	 *
 	 * @return ContainerInterface
 	 */
