@@ -1,14 +1,13 @@
 <?php
 
-namespace integration;
+namespace StellarWP\Pigeon;
 
-use StellarWP\Pigeon\Pigeon;
+use _support\ExampleContainer;
 
 class BootstrapTest extends \Codeception\TestCase\WPTestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		include_once 'ExampleContainer.php';
 	}
 
 	public function test_init_returns_null_if_pigeon_not_enabled() {
