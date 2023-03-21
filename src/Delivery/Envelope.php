@@ -9,6 +9,10 @@ use StellarWP\Pigeon\Templates\Default_Template;
 
 class Envelope {
 
+	const MODULE_ACTIVE_SIGNATURE = 'X-Pigeon-Module';
+
+	const MODULE_PROCESS_SIGNATURE = 'X-Pigeon-Process';
+
 	public $available_modules;
 
 	protected $entry;
