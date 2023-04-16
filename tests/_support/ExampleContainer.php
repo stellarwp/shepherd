@@ -1,6 +1,5 @@
 <?php
 
-namespace _support;
 
 class ExampleContainer extends \tad_DI52_Container implements \StellarWP\ContainerContract\ContainerInterface {
 

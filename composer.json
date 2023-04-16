@@ -18,9 +18,13 @@
     "lucatume/wp-browser": "^3.1",
     "the-events-calendar/coding-standards": "dev-master",
     "the-events-calendar/tec-testing-facilities": "dev-master",
-    "codeception/module-db": "*",
-    "codeception/module-phpbrowser": "*",
-    "codeception/module-asserts": "*"
+    "codeception/module-asserts": "^1.0",
+    "codeception/module-phpbrowser": "^1.0",
+    "codeception/module-webdriver": "^1.0",
+    "codeception/module-db": "^1.0",
+    "codeception/module-filesystem": "^1.0",
+    "codeception/module-cli": "^1.0",
+    "codeception/util-universalframework": "^1.0"
   },
   "config": {
     "allow-plugins": {

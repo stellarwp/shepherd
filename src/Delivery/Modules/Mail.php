@@ -35,7 +35,9 @@ class Mail implements Module_Interface {
 			$attachments = [];
 		}
 
-		$headers[ Envelope::MODULE_ACTIVE_SIGNATURE ] = Mail::class;
+		$active = Envelope::MODULE_ACTIVE_SIGNATURE;
+		$class = Mail::class;
+		$headers[] = "{$active}: $class";
 
 		$success = wp_mail( $to, $subject, $message, $headers, $attachments );
 
@@ -72,19 +74,37 @@ class Mail implements Module_Interface {
 		$array = array_filter( $args );
 		$args  = array_pop( $array );
 
-		if ( ! empty( $args['headers'][ Envelope::MODULE_ACTIVE_SIGNATURE ] ) ) {
+		if ( false !== array_search( $this->get_header_signature( Envelope::MODULE_ACTIVE_SIGNATURE ), $args['headers'] ) ) {
 			// Pigeon has already processed this
 			return null;
 		}
 
 		$should_process = apply_filters( 'stellarwp_pigeon_process_message', false, $args );
 
-		if ( ! $should_process && empty( $args['headers'][ Envelope::MODULE_PROCESS_SIGNATURE ] ) ) {
+		if ( ! $should_process && false === array_search( $this->get_header_signature( Envelope::MODULE_PROCESS_SIGNATURE ), $args['headers'] ) ) {
 			// Pigeon should not process this
 			return null;
 		}
 
 		return static::envelope( $args );
+	}
+
+	protected function get_header_signature( $name ) {
+
+		switch ( $name ) {
+			case Envelope::MODULE_PROCESS_SIGNATURE:
+				$param = $name;
+				$value = 'true';
+				break;
+			case Envelope::MODULE_ACTIVE_SIGNATURE:
+				$param = $name;
+				$value = Mail::class;
+				break;
+			default:
+				return "";
+		}
+
+		return "{$param}: $value";
 	}
 }
 

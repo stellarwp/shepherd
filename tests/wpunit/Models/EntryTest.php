@@ -1,6 +1,6 @@
 <?php
 
-namespace integration\Models;
+namespace wpunit\Models;
 
 use StellarWP\Pigeon\Models\Entry;
 

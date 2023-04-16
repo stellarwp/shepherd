@@ -1,6 +1,8 @@
 <?php
 
-namespace StellarWP\Pigeon;
+namespace wpunit;
+
+use StellarWP\Pigeon\Config;
 
 class ConfigTest extends \Codeception\TestCase\WPTestCase {
 

@@ -3,3 +3,6 @@ vendor
 vendor-prefixed
 _plugins
 _wordpress
+
+codeception.slic.yml
+.env.testing*

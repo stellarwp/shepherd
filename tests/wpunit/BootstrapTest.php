@@ -1,8 +1,9 @@
 <?php
 
-namespace StellarWP\Pigeon;
+namespace wpunit;
 
-use _support\ExampleContainer;
+use ExampleContainer;
+use StellarWP\Pigeon\Pigeon;
 
 class BootstrapTest extends \Codeception\TestCase\WPTestCase {
 

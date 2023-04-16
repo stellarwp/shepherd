@@ -1,6 +1,6 @@
 <?php
 
-namespace integration\Delivery;
+namespace wpunit\Delivery;
 
 use StellarWP\Pigeon\Delivery\Envelope;
 use StellarWP\Pigeon\Delivery\Modules\Mail;

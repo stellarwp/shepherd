@@ -1,8 +1,9 @@
 <?php
 
-namespace StellarWP\Pigeon\Delivery\Modules;
+namespace wpunit\Delivery\Modules;
 
 use StellarWP\Pigeon\Delivery\Envelope;
+use StellarWP\Pigeon\Delivery\Modules\Mail;
 use StellarWP\Pigeon\Models\Entry;
 
 class MailTest extends \Codeception\TestCase\WPTestCase {
@@ -37,18 +38,19 @@ class MailTest extends \Codeception\TestCase\WPTestCase {
 		remove_filter( 'stellarwp_pigeon_process_message', '__return_true' );
 	}
 
-	public function test_can_send_mail() {
+	public function test_cannot_send_mail() {
+		\add_filter( 'pre_wp_mail', '__return_true' );
+
 		$entry = $this->create_entry();
-
-		//Mail::send( $entry );
-		$this->assertEquals( 'complete', $entry->get( 'status' ) );
-
-		\add_filter( 'pre_wp_mail', '__return_false' );
-		$entry = $this->create_entry();
-
 		Mail::send( $entry );
 		$this->assertEquals( 'ready', $entry->get( 'status' ) );
 		$this->assertTrue( $entry->get( 'retries' ) > 0 );
+	}
+
+	public function test_can_send_mail() {
+		$entry = $this->create_entry();
+		Mail::send( $entry );
+		$this->assertEquals( 'complete', $entry->get( 'status' ) );
 	}
 
 	private function create_entry( $args = [] ) {
