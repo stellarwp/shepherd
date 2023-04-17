@@ -11,7 +11,7 @@ use StellarWP\Pigeon\Schema\Tables\Entries;
 /**
  * E-mail Delivery Module
  *
- * @since TBD
+ * @since   TBD
  *
  * @package StellarWP/Pigeon
  */
@@ -35,14 +35,15 @@ class Mail implements Module_Interface {
 			$attachments = [];
 		}
 
-		$active = Envelope::MODULE_ACTIVE_SIGNATURE;
-		$class = Mail::class;
+		$active    = Envelope::MODULE_ACTIVE_SIGNATURE;
+		$class     = Mail::class;
 		$headers[] = "{$active}: $class";
 
 		$success = wp_mail( $to, $subject, $message, $headers, $attachments );
 
 		if ( $success ) {
 			$entry->set_data( [ 'status' => 'complete', 'completed_at' => gmdate( 'c' ) ] );
+
 			return;
 		}
 
@@ -65,23 +66,24 @@ class Mail implements Module_Interface {
 	 *
 	 * @since TBD
 	 *
-	 * @param $args wp_mail parameters
+	 * @param array $args parameters
 	 *
-	 * @return null|bool. Returns null if the email was not intercepted. True if it was properly processed. False if not.
+	 * @return null|bool. Returns null if the email was not intercepted. True if it was properly processed. False if
+	 *                    not.
 	 */
 	public function intercept( $args ) {
 
 		$array = array_filter( $args );
 		$args  = array_pop( $array );
 
-		if ( false !== array_search( $this->get_header_signature( Envelope::MODULE_ACTIVE_SIGNATURE ), $args['headers'] ) ) {
+		if ( false !== in_array( $this->get_header_signature( Envelope::MODULE_ACTIVE_SIGNATURE ), $args['headers'], true ) ) {
 			// Pigeon has already processed this
 			return null;
 		}
 
 		$should_process = apply_filters( 'stellarwp_pigeon_process_message', false, $args );
 
-		if ( ! $should_process && false === array_search( $this->get_header_signature( Envelope::MODULE_PROCESS_SIGNATURE ), $args['headers'] ) ) {
+		if ( ! $should_process && false === in_array( $this->get_header_signature( Envelope::MODULE_PROCESS_SIGNATURE ), $args['headers'], true ) ) {
 			// Pigeon should not process this
 			return null;
 		}
@@ -89,7 +91,7 @@ class Mail implements Module_Interface {
 		return static::envelope( $args );
 	}
 
-	protected function get_header_signature( $name ) {
+	protected function get_header_signature( $name ): string {
 
 		switch ( $name ) {
 			case Envelope::MODULE_PROCESS_SIGNATURE:
@@ -98,7 +100,7 @@ class Mail implements Module_Interface {
 				break;
 			case Envelope::MODULE_ACTIVE_SIGNATURE:
 				$param = $name;
-				$value = Mail::class;
+				$value = __CLASS__;
 				break;
 			default:
 				return "";

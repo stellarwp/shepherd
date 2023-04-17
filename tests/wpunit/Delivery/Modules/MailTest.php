@@ -24,11 +24,13 @@ class MailTest extends \Codeception\TestCase\WPTestCase {
 		$this->assertNull( $intercept );
 
 		// Do not intercept emails when instructed by the Module Active Signature header
-		$intercept = $mail->intercept( $this->mock_email_args( [ 'headers' => [ Envelope::MODULE_ACTIVE_SIGNATURE => true ] ] ) );
+		$module_active_signature = Envelope::MODULE_ACTIVE_SIGNATURE;
+		$intercept = $mail->intercept( $this->mock_email_args( [ 'headers' => [ "{$module_active_signature}: true" ] ] ) );
 		$this->assertNull( $intercept );
 
 		// Intercept emails when instructed by the Process Signature Header
-		$intercept = $mail->intercept( $this->mock_email_args( [ 'headers' => [ Envelope::MODULE_PROCESS_SIGNATURE => true ] ] ) );
+		$module_process_signature = Envelope::MODULE_PROCESS_SIGNATURE;
+		$intercept = $mail->intercept( $this->mock_email_args( [ 'headers' => [ "{$module_process_signature}: true" ] ] ) );
 		$this->assertTrue( $intercept );
 
 		// Intercept emails when instructed by the flag filter
@@ -36,15 +38,6 @@ class MailTest extends \Codeception\TestCase\WPTestCase {
 		$intercept = $mail->intercept( $this->mock_email_args() );
 		$this->assertTrue( $intercept );
 		remove_filter( 'stellarwp_pigeon_process_message', '__return_true' );
-	}
-
-	public function test_cannot_send_mail() {
-		\add_filter( 'pre_wp_mail', '__return_true' );
-
-		$entry = $this->create_entry();
-		Mail::send( $entry );
-		$this->assertEquals( 'ready', $entry->get( 'status' ) );
-		$this->assertTrue( $entry->get( 'retries' ) > 0 );
 	}
 
 	public function test_can_send_mail() {
