@@ -1,4 +1,4 @@
-<?php // phpcs:disable PEAR.Commenting.FileComment
+<?php
 /**
  * Pigeon
  *

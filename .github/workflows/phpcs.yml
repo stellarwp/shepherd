@@ -1,0 +1,22 @@
+name: 'PHPCS'
+on:
+  pull_request:
+jobs:
+  phpcs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Composer install
+        uses: php-actions/composer@v6
+        with:
+          php_version: 7.4
+          php_extensions: zip
+
+      - name: PHP Code Sniffer
+        uses: php-actions/phpcs@v1
+        with:
+          php_version: 7.4
+          path: ./
+          standard: phpcs.xml

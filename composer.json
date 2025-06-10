@@ -54,9 +54,29 @@
   "scripts": {
     "test:analysis": [
       "phpstan analyse -c phpstan.neon.dist --memory-limit=512M"
+    ],
+    "compatibility:php-7.4": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 7.4",
+    "compatibility:php-8.0": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.0",
+    "compatibility:php-8.1": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.1",
+    "compatibility:php-8.2": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.2",
+    "compatibility:php-8.3": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.3",
+    "compatibility:php-8.4": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.4",
+    "compatibility": [
+      "@compatibility:php-7.4",
+      "@compatibility:php-8.0",
+      "@compatibility:php-8.1",
+      "@compatibility:php-8.2",
+      "@compatibility:php-8.3",
+      "@compatibility:php-8.4"
     ]
   },
   "scripts-descriptions": {
-    "test:analysis": "Run static code analysis."
+    "test:analysis": "Run static code analysis.",
+    "compatibility:php-7.4": "Run PHPCompatibilityWP compatibility checks for PHP 7.4.",
+    "compatibility:php-8.0": "Run PHPCompatibilityWP compatibility checks for PHP 8.0.",
+    "compatibility:php-8.1": "Run PHPCompatibilityWP compatibility checks for PHP 8.1.",
+    "compatibility:php-8.2": "Run PHPCompatibilityWP compatibility checks for PHP 8.2.",
+    "compatibility:php-8.3": "Run PHPCompatibilityWP compatibility checks for PHP 8.3.",
+    "compatibility:php-8.4": "Run PHPCompatibilityWP compatibility checks for PHP 8.4."
   }
 }
