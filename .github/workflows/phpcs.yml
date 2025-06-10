@@ -15,11 +15,16 @@ jobs:
           php_extensions: zip
 
       - name: Fix and Push phpcbf issues
+        continue-on-error: true
         run: |
           vendor/bin/phpcbf ./
-          git add .
-          git commit -m "Fix PHPCS issues"
-          git push
+
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
 
       - name: PHP Code Sniffer
         uses: php-actions/phpcs@v1
