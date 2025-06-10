@@ -50,7 +50,8 @@
     "codeception/module-webdriver": "^2.0",
     "codeception/util-universalframework": "^1.0",
     "lucatume/wp-browser": "^3.0.15",
-    "phpcompatibility/phpcompatibility-wp": "^2.1"
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "szepeviktor/phpstan-wordpress": "^2.0"
   },
   "scripts": {
     "test:analysis": [

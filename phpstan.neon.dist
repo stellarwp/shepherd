@@ -15,7 +15,6 @@ parameters:
 	level: 5
 	inferPrivatePropertyTypeFromConstructor: true
 	reportUnmatchedIgnoredErrors: false
-	checkGenericClassInNonGenericObjectType: false
 	treatPhpDocTypesAsCertain: false
 
 	# Paths to be analyzed.
