@@ -19,5 +19,5 @@ jobs:
         with:
           php_version: 7.4
           path: ./
-          vendored_phpcs_path: ./vendor/bin/phpcs
+          vendored_phpcs_path: vendor/bin/phpcs
           standard: phpcs.xml
