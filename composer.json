@@ -1,34 +1,62 @@
 {
   "name": "stellarwp/pigeon",
+  "description": "A library for offloading tasks to background processes.",
+  "type": "library",
+  "license": "GPL-2.0",
+  "config": {
+    "platform": {
+      "php": "7.4"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
   "autoload": {
     "psr-4": {
       "StellarWP\\Pigeon\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "StellarWP\\Pigeon\\Tests\\": "tests/_support/Helper/"
+    }
+  },
+  "authors": [
+    {
+      "name": "StellarWP",
+      "email": "dev@stellarwp.com"
+    },
+    {
+      "name": "Dimitrios Pantazis",
+      "email": "dimi@stellarwp.com"
+    }
+  ],
+  "minimum-stability": "stable",
   "require": {
-    "lucatume/di52": "^2.1",
-    "stellarwp/db": "^1.0",
-    "stellarwp/schema": "^1.1",
-    "woocommerce/action-scheduler": "^3.5",
-    "stellarwp/models": "^0.0.1",
-    "stellarwp/installer": "^1.1"
+    "php": ">=7.4",
+    "lucatume/di52": "^4.0",
+    "stellarwp/db": "^1.1",
+    "stellarwp/schema": "^2.0",
+    "woocommerce/action-scheduler": "3.9.2"
   },
   "require-dev": {
-    "bordoni/phpass": "^0.3.6",
-    "lucatume/wp-browser": "^3.1",
-    "the-events-calendar/coding-standards": "dev-master",
-    "the-events-calendar/tec-testing-facilities": "dev-master",
-    "codeception/module-asserts": "^1.0",
-    "codeception/module-phpbrowser": "^1.0",
-    "codeception/module-webdriver": "^1.0",
-    "codeception/module-db": "^1.0",
-    "codeception/module-filesystem": "^1.0",
-    "codeception/module-cli": "^1.0",
-    "codeception/util-universalframework": "^1.0"
+    "stellarwp/coding-standards": "^2.1",
+    "codeception/module-asserts": "^2.0",
+    "codeception/module-cli": "^2.0",
+    "codeception/module-db": "^2.1",
+    "codeception/module-filesystem": "^2.0",
+    "codeception/module-phpbrowser": "^2.0",
+    "codeception/module-rest": "^2.0",
+    "codeception/module-webdriver": "^2.0",
+    "codeception/util-universalframework": "^1.0",
+    "lucatume/wp-browser": "^3.0.15"
   },
-  "config": {
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
-    }
+  "scripts": {
+    "test:analysis": [
+      "phpstan analyse -c phpstan.neon.dist --memory-limit=512M"
+    ]
+  },
+  "scripts-descriptions": {
+    "test:analysis": "Run static code analysis."
   }
 }
