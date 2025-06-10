@@ -44,5 +44,4 @@ class Provider extends \tad_DI52_ServiceProvider {
 	public function intercept_outgoing_mail( ...$args ) {
 		return $this->container->make( Mail::class )->intercept( $args );
 	}
-
 }

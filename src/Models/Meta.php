@@ -17,14 +17,14 @@ class Meta implements Model_Interface {
 	public function __construct() {
 	}
 
-	public function set_data() :Meta {
+	public function set_data(): Meta {
 		$this->set_tags();
 		return $this;
 	}
 
 	public function set_tags() {
 		$tag_collection = Default_Tags::get();
-		$this->tags = $tag_collection->get_all();
+		$this->tags     = $tag_collection->get_all();
 		$this->set_key( 'tags', $this->tags );
 	}
 

@@ -18,7 +18,7 @@ class Database extends DB {
 
 	public function register() {
 
-		if ( empty( $this->container  ) ) {
+		if ( empty( $this->container ) ) {
 			return;
 		}
 
@@ -36,5 +36,4 @@ class Database extends DB {
 	public function set_container( $container ) {
 		$this->container = $container;
 	}
-
 }

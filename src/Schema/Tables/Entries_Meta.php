@@ -17,7 +17,7 @@ class Entries_Meta extends Contracts\Table {
 
 	protected function get_definition() {
 		global $wpdb;
-		$table_name = self::base_table_name();
+		$table_name      = self::base_table_name();
 		$charset_collate = $wpdb->get_charset_collate();
 
 		return "
@@ -31,7 +31,6 @@ class Entries_Meta extends Contracts\Table {
 				`updated_at`      timestamp DEFAULT CURRENT_TIMESTAMP()   NOT NULL ON UPDATE CURRENT_TIMESTAMP()
 		) {$charset_collate};
 		";
-
 	}
 
 	public static function base_table_name() {

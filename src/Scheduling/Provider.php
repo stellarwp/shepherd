@@ -7,7 +7,7 @@ use StellarWP\Pigeon\Delivery\Batch;
 /**
  * Scheduling Service Provider
  *
- * @since   TBD
+ * @since TBD
  *
  * @package StellarWP\Pigeon;
  */

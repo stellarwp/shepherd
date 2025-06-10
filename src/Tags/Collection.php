@@ -26,8 +26,11 @@ class Collection {
 	}
 
 	public function entry( Entry $entry ) {
-		array_map( function( Tag $tag ) use ( $entry ) {
-			$tag->compose( $entry );
-		}, $this->get_all() );
+		array_map(
+			function ( Tag $tag ) use ( $entry ) {
+				$tag->compose( $entry );
+			},
+			$this->get_all() 
+		);
 	}
 }

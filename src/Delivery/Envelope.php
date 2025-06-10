@@ -47,7 +47,7 @@ class Envelope {
 		$this->entry = $entry;
 	}
 
-	public function get_entry() :Entry {
+	public function get_entry(): Entry {
 		return $this->entry;
 	}
 
@@ -64,7 +64,7 @@ class Envelope {
 		$this->entry_module = $this->entry->type::init();
 	}
 
-	public function package( $template_name, $modules = ['Mail'], ...$args ) {
+	public function package( $template_name, $modules = [ 'Mail' ], ...$args ) {
 		$template = new Default_Template( $template_name );
 		$template->set_args( $args );
 
@@ -92,7 +92,6 @@ class Envelope {
 	 * @param string|string[] $attachments Optional. Paths to files to attach.
 	 *
 	 * @return bool Whether the entry was properly scheduled for sending
-	 *
 	 */
 	public function create( ...$args ) {
 		$this->get_entry()->set_data( $args )->schedule();

@@ -5,7 +5,7 @@ namespace StellarWP\Pigeon\Templates;
 /**
  * Templating Service Provider
  *
- * @since   TBD
+ * @since TBD
  *
  * @package StellarWP\Pigeon;
  */

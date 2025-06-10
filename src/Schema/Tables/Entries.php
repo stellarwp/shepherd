@@ -9,8 +9,8 @@ class Entries extends Contracts\Table {
 
 	const SCHEMA_VERSION = '1.0.0';
 
-	const STATUS_DRAFT = 'draft';
-	const STATUS_READY = 'ready';
+	const STATUS_DRAFT      = 'draft';
+	const STATUS_READY      = 'ready';
 	const STATUS_PROCESSING = 'processing';
 
 	const STATUS_COMPLETE = 'complete';
@@ -169,7 +169,7 @@ class Entries extends Contracts\Table {
 			'public_key'      => '%s',
 			'private_key'     => '%s',
 			'retries'         => '%d',
-			'completed_at' => '%s',
+			'completed_at'    => '%s',
 		];
 	}
 }

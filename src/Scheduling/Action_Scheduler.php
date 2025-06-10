@@ -18,7 +18,7 @@ class Action_Scheduler {
 
 
 	public function register_main_schedule() {
-		if ( false === as_has_scheduled_action( static::SCHEDULE_ACTION_NAME) ) {
+		if ( false === as_has_scheduled_action( static::SCHEDULE_ACTION_NAME ) ) {
 			as_schedule_recurring_action(
 				$this->schedule_time(),
 				$this->schedule_interval(),
@@ -28,7 +28,6 @@ class Action_Scheduler {
 				true
 			);
 		}
-
 	}
 
 	public function process_new_batch() {

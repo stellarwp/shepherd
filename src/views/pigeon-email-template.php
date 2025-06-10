@@ -1,5 +1,4 @@
 <?php
-include 'pigeon-email-header.html';
+require 'pigeon-email-header.html';
 the_content();
-include 'pigeon-email-footer.html';
-?>
+require 'pigeon-email-footer.html';

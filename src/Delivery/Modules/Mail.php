@@ -3,15 +3,13 @@
 namespace StellarWP\Pigeon\Delivery\Modules;
 
 use StellarWP\Pigeon\Delivery\Envelope;
-use StellarWP\Pigeon\Entry\Base;
-use StellarWP\Pigeon\Entry\Model_Interface;
 use StellarWP\Pigeon\Models\Entry;
 use StellarWP\Pigeon\Schema\Tables\Entries;
 
 /**
  * E-mail Delivery Module
  *
- * @since   TBD
+ * @since TBD
  *
  * @package StellarWP/Pigeon
  */
@@ -36,13 +34,18 @@ class Mail implements Module_Interface {
 		}
 
 		$active    = Envelope::MODULE_ACTIVE_SIGNATURE;
-		$class     = Mail::class;
+		$class     = self::class;
 		$headers[] = "{$active}: $class";
 
 		$success = wp_mail( $to, $subject, $message, $headers, $attachments );
 
 		if ( $success ) {
-			$entry->set_data( [ 'status' => 'complete', 'completed_at' => gmdate( 'c' ) ] );
+			$entry->set_data(
+				[
+					'status'       => 'complete',
+					'completed_at' => gmdate( 'c' ),
+				] 
+			);
 
 			return;
 		}
@@ -103,12 +106,9 @@ class Mail implements Module_Interface {
 				$value = __CLASS__;
 				break;
 			default:
-				return "";
+				return '';
 		}
 
 		return "{$param}: $value";
 	}
 }
-
-
-

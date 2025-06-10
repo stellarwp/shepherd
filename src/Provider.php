@@ -27,7 +27,7 @@ class Provider extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return bool
 	 */
-	public function register() :bool {
+	public function register(): bool {
 		if ( $this->has_registered ) {
 			return false;
 		}

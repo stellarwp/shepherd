@@ -55,7 +55,8 @@ class Batch {
 		$entries_table = Entries::base_table_name();
 
 		$wpdb->query(
-			$wpdb->prepare( "
+			$wpdb->prepare(
+				"
 			UPDATE $entries_table
 			SET status = %s
 			WHERE entry_id IN ( %s )

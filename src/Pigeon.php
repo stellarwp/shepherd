@@ -74,8 +74,7 @@ class Pigeon {
 	 * @return bool
 	 */
 	public static function is_enabled() {
-		return
-			( defined( 'STELLARWP_PIGEON_ENABLE' ) && STELLARWP_PIGEON_ENABLE );
+		return ( defined( 'STELLARWP_PIGEON_ENABLE' ) && STELLARWP_PIGEON_ENABLE );
 	}
 
 	/**
