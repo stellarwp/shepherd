@@ -19,9 +19,6 @@ jobs:
       - name: Fix and Push phpcbf issues
         continue-on-error: true
         run: |
-          pwd
-          echo ${{ github.head_ref }}
-          ls -la
           vendor/bin/phpcbf ./
 
       - name: Commit & Push changes
