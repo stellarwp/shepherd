@@ -2,37 +2,61 @@
 
 namespace StellarWP\Pigeon;
 
-use StellarWP\Pigeon\Templates\DefaultTemplate;
-
+/**
+ * Main Service Provider
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Pigeon;
+ */
 class Provider extends \tad_DI52_ServiceProvider {
 
+	/**
+	 * Was this provider already registered
+	 *
+	 * @since TBD
+	 *
+	 * @var bool
+	 */
 	private $has_registered = false;
 
-	public function register() {
+	/**
+	 * Registers Pigeon's specific providers and starts core functionality
+	 *
+	 * @since TBD
+	 *
+	 * @return bool
+	 */
+	public function register() :bool {
 		if ( $this->has_registered ) {
 			return false;
 		}
 
-		$this->register_filters();
-		$this->register_actions();
+		$this->container->register( Delivery\Provider::class );
+		$this->container->register( Scheduling\Provider::class );
+		$this->container->register( Templates\Provider::class );
+
+		$this->register_hooks();
 		$this->has_registered = true;
+
 		return true;
 	}
 
 	/**
-	 * @return mixed
+	 * Registers entry points for Pigeon's core functionality
+	 *
+	 * @since TBD
 	 */
-	public function register_actions() {
-		add_action( 'init', [ $this, 'register_templates' ] );
-
+	public function register_hooks(): void {
+		add_action( 'init', [ $this, 'register_database' ], 2 );
 	}
 
-	public function register_filters() {
-
+	/**
+	 * Registers the necessary database structure
+	 *
+	 * @since TBD
+	 */
+	public function register_database(): void {
+		$this->container->make( Database::class )->register();
 	}
-
-	public function register_templates() {
-		tribe( DefaultTemplate::class )->register();
-	}
-
 }
