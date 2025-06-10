@@ -7,6 +7,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Composer install
         uses: php-actions/composer@v6
@@ -17,6 +19,9 @@ jobs:
       - name: Fix and Push phpcbf issues
         continue-on-error: true
         run: |
+          pwd
+          echo ${{ github.head_ref }}
+          ls -la
           vendor/bin/phpcbf ./
 
       - name: Commit & Push changes
