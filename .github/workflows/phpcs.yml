@@ -14,6 +14,13 @@ jobs:
           php_version: 7.4
           php_extensions: zip
 
+      - name: Fix and Push phpcbf issues
+        run: |
+          vendor/bin/phpcbf ./
+          git add .
+          git commit -m "Fix PHPCS issues"
+          git push
+
       - name: PHP Code Sniffer
         uses: php-actions/phpcs@v1
         with:
