@@ -7,10 +7,13 @@
  * @package StellarWP\Pigeon\Abstracts
  */
 
+declare( strict_types=1 );
+
 namespace StellarWP\Pigeon\Abstracts;
 
-use TEC\Common\StellarWP\Schema\Tables\Contracts\Table;
-use TEC\Common\StellarWP\DB\DB;
+use StellarWP\Schema\Tables\Contracts\Table;
+use StellarWP\DB\DB;
+use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
 
 /**
  * Class Table_Abstract
@@ -20,16 +23,87 @@ use TEC\Common\StellarWP\DB\DB;
  * @package StellarWP\Pigeon\Abstracts
  */
 abstract class Table_Abstract extends Table {
-	public const PHP_TYPE_INT    = 'int';
-	public const PHP_TYPE_STRING = 'string';
-	public const PHP_TYPE_BOOL   = 'bool';
-	public const PHP_TYPE_FLOAT  = 'float';
+	/**
+	 * The PHP type for an integer.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const PHP_TYPE_INT = 'int';
 
-	public const COLUMN_TYPE_BIGINT   = 'bigint';
-	public const COLUMN_TYPE_VARCHAR  = 'varchar';
+	/**
+	 * The PHP type for a string.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const PHP_TYPE_STRING = 'string';
+
+	/**
+	 * The PHP type for a float.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const PHP_TYPE_FLOAT = 'float';
+
+	/**
+	 * The PHP type for a boolean.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const PHP_TYPE_BOOL = 'bool';
+
+	/**
+	 * The column type for a bigint.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const COLUMN_TYPE_BIGINT = 'bigint';
+
+	/**
+	 * The column type for a varchar.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const COLUMN_TYPE_VARCHAR = 'varchar';
+
+	/**
+	 * The column type for a longtext.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
 	public const COLUMN_TYPE_LONGTEXT = 'longtext';
 
+	/**
+	 * The indexes for the table.
+	 *
+	 * @since TBD
+	 *
+	 * @var array<array<string, string>>
+	 */
 	public const INDEXES = [];
+
+	/**
+	 * Constructor.
+	 *
+	 * @since TBD
+	 */
+	public function __construct() {
+		$this->db        = DB::class;
+		$this->container = Pigeon_Main_Controller::get_container();
+	}
 
 	/**
 	 * An array of all the columns in the table.

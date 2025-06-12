@@ -1,13 +1,46 @@
 <?php
+/**
+ * Pigeon Tables Service Provider
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Pigeon\Tables;
+ */
+
+declare(strict_types=1);
 
 namespace StellarWP\Pigeon\Tables;
 
 use lucatume\DI52\ServiceProvider;
 use StellarWP\Schema\Register;
 
+/**
+ * Pigeon Tables Service Provider
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Pigeon\Tables;
+ */
 class Provider extends ServiceProvider {
-	public function register() {
+	/**
+	 * Registers the service provider bindings.
+	 *
+	 * @since TBD
+	 *
+	 * @return void The method does not return any value.
+	 */
+	public function register(): void {
 		Register::table( Tasks::class );
-		Register::table( Entries_Meta::class );
+	}
+
+	/**
+	 * Unregisters the service provider bindings.
+	 *
+	 * @since TBD
+	 *
+	 * @return void The method does not return any value.
+	 */
+	public function unregister(): void {
+		Register::remove_table( Tasks::class );
 	}
 }
