@@ -1,4 +1,11 @@
 <?php
+/**
+ * Pigeon's main service provider.
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Pigeon
+ */
 
 declare( strict_types=1 );
 
