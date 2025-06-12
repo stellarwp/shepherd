@@ -103,6 +103,12 @@ abstract class Table_Abstract extends Table {
 	public function __construct() {
 		$this->db        = DB::class;
 		$this->container = Pigeon_Main_Controller::get_container();
+
+		$hook_prefix = Pigeon_Main_Controller::get_hook_prefix();
+
+		// Modify table names to use the hook prefix.
+		self::$base_table_name = sprintf( self::$base_table_name, $hook_prefix );
+		self::$schema_slug     = sprintf( self::$schema_slug, $hook_prefix );
 	}
 
 	/**

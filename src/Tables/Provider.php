@@ -32,15 +32,4 @@ class Provider extends ServiceProvider {
 	public function register(): void {
 		Register::table( Tasks::class );
 	}
-
-	/**
-	 * Unregisters the service provider bindings.
-	 *
-	 * @since TBD
-	 *
-	 * @return void The method does not return any value.
-	 */
-	public function unregister(): void {
-		Register::remove_table( Tasks::class );
-	}
 }

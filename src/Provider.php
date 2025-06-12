@@ -73,23 +73,6 @@ class Provider extends ServiceProvider {
 	}
 
 	/**
-	 * Unregisters the provider.
-	 *
-	 * @since TBD
-	 *
-	 * @return void The method does not return any value.
-	 */
-	public function unregister(): void {
-		if ( ! self::$has_registered ) {
-			return;
-		}
-
-		$this->container->get( Tables_Provider::class )->unregister();
-
-		self::$has_registered = false;
-	}
-
-	/**
 	 * Gets the container.
 	 *
 	 * @since TBD
