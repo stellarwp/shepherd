@@ -1,6 +1,10 @@
-*               text
-.*              export-ignore
-composer.lock   text -diff
-phpstan.*       export-ignore
-phpunit.*       export-ignore
-tests           export-ignore
+*                 text
+.*                export-ignore
+composer.lock     text -diff
+phpstan.*         export-ignore
+phpunit.*         export-ignore
+tests             export-ignore
+codeception.*     export-ignore
+phpcs.xml         export-ignore
+phpstan.neon.dist export-ignore
+docs              export-ignore

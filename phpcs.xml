@@ -23,4 +23,5 @@
 	<!-- General exclusions -->
 	<exclude-pattern>*/tests/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/docs/*</exclude-pattern>
 </ruleset>

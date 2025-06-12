@@ -2,50 +2,23 @@
 
 [![CI](https://github.com/stellarwp/pigeon/workflows/CI/badge.svg)](https://github.com/stellarwp/pigeon/actions?query=branch%3Amain) [![Static Analysis](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml)
 
-A library for delivering transactional emails asynchronously in WordPress.
+A library for offloading tasks to be handled asynchronously in WordPress.
 
-## Installation
+## What is Pigeon?
 
-It's recommended that you install Pigeon as a project dependency via [Composer](https://getcomposer.org/):
+Pigeon is a library for offloading tasks to be handled asynchronously in WordPress. It's designed to be a lightweight and flexible solution for handling tasks that need to be processed in the background, such as sending emails, processing payments, or updating data in the database.
 
-```bash
-composer require stellarwp/pigeon
-```
+Pigeon is built on top of the [Action Scheduler](https://actionscheduler.org/) library, which provides a robust and flexible way to manage background tasks.
 
-## Getting started
+## Why prefer Pigeon over Action Scheduler?
 
-For a full understanding of what is available in this library and how to use it, definitely read through the full [documentation](#documentation). But for folks that want to get rolling with the basics quickly, try out the following.
+Pigeon is a wrapper of Action Scheduler. Whatever you can do with Action Scheduler, you can do with Pigeon.
 
-### Initializing the library
+Pigeon does offer out of the box the following features that are not available with Action Scheduler:
 
-### Creating a new Delivery Module
-
-Let's say you want a new custom table called `sandwiches` (with the default WP prefix, it'd be `wp_sandwiches`). You'll need a class file for the table. For the sake of this example, we'll be assuming this class is going into a `Tables/` directory and is reachable via the `Boom\Shakalaka\Tables` namespace.
-
-### That's it!
-
-The table will be automatically registered, created, and updated during the `plugins_loaded` action at priority `1000`! _(that priority number is filterable via the `stellarwp_schema_up_plugins_loaded_priority` filter)_
-
-## Documentation
-
-Here's some more advanced documentation to get you rolling on using this library at a deeper level:
-
-1. [Setting up Strauss](/docs/strauss-setup.md)
-1. [Schema management](/docs/schemas.md)
-1. [Table schemas](/docs/schemas-table.md)
-	1. [Versioning](/docs/schemas-table.md#versioning)
-	1. [Registering tables](/docs/schemas-table.md#registering-tables)
-	1. [Deregistering tables](/docs/schemas-table.md#deregistering-tables)
-	1. [Table collection](/docs/schemas-table.md#table-collection)
-	1. [Publicly accessible methods](/docs/schemas-table.md#publicly-accessible-methods)
-1. [Field schemas](/docs/schemas-field.md)
-	1. [Versioning](/docs/schemas-field.md#versioning)
-	1. [Registering fields](/docs/schemas-field.md#registering-field)
-	1. [Deregistering fields](/docs/schemas-field.md#deregistering-fields)
-	1. [Field collection](/docs/schemas-field.md#field-collection)
-	1. [Publicly accessible methods](/docs/schemas-field.md#publicly-accessible-methods)
-1. [Automated testing](/docs/automated-testing.md)
-
-## Acknowledgements
-
-Special props go to [@lucatume](https://github.com/lucatume) and [@stratease](https://github.com/stratease) for their initial work on this structure before it was extracted into a standalone library.
+- A simple API for offloading already defined tasks. Such as sending emails or generating PDFs. You can see more in the [tasks documentation](./docs/tasks.md)!
+- A retry system for failed tasks.
+- A debounce system for tasks that are called multiple times in a short period of time.
+- Supporting tasks dependencies.
+- Being able to recognize tasks being rate limited.
+- The arguments being passed to the task's handler can be significantly larger than what Action Scheduler allows. Action scheduler uses the column the arguments are stored in the database as an index. Pigeon instead uses a hash of the arguments as an index, and stores the arguments in a long text column.
