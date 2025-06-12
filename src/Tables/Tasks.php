@@ -24,7 +24,7 @@ class Tasks extends Table {
 	 *
 	 * @since TBD
 	 *
-	 * @var array<string, array<string, string>>
+	 * @var array<array<string, string>>
 	 */
 	public const INDEXES = [
 		[
@@ -87,7 +87,7 @@ class Tasks extends Table {
 	 *
 	 * @since TBD
 	 *
-	 * @var array<string, array<string, string>>
+	 * @return array<string, array<string, bool|int|string>>
 	 */
 	public static function get_columns(): array {
 		return [

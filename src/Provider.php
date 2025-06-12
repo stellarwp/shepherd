@@ -47,9 +47,9 @@ class Provider extends ServiceProvider {
 	 *
 	 * @since TBD
 	 *
-	 * @var Container
+	 * @var ?Container
 	 */
-	private static Container $static_container;
+	private static ?Container $static_container = null;
 
 	/**
 	 * Whether the provider has been registered.

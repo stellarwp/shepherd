@@ -116,7 +116,7 @@ abstract class Table_Abstract extends Table {
 	 *
 	 * @since TBD
 	 *
-	 * @var array<string, array<string, string>>
+	 * @return array<string, array<string, string>>
 	 */
 	abstract public static function get_columns(): array;
 
@@ -170,11 +170,11 @@ abstract class Table_Abstract extends Table {
 	 */
 	protected function get_definition() {
 		global $wpdb;
-		$table_name      = self::table_name( true );
+		$table_name      = static::table_name( true );
 		$charset_collate = $wpdb->get_charset_collate();
-		$uid_column      = self::uid_column();
+		$uid_column      = static::uid_column();
 
-		$columns = self::get_columns();
+		$columns = static::get_columns();
 
 		$columns_definitions = [];
 		foreach ( $columns as $column => $definition ) {
