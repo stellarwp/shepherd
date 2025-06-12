@@ -1,0 +1,33 @@
+name: 'PHPCS'
+on:
+  pull_request:
+jobs:
+  phpcs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Composer install
+        uses: php-actions/composer@v6
+        with:
+          php_version: 7.4
+          php_extensions: zip
+
+      - name: Fix and Push phpcbf issues
+        continue-on-error: true
+        run: |
+          vendor/bin/phpcbf ./
+
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+
+      - name: PHP Code Sniffer
+        run: |
+          vendor/bin/phpcs ./

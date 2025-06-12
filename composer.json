@@ -1,50 +1,84 @@
 {
+  "name": "stellarwp/pigeon",
+  "description": "A library for offloading tasks to background processes.",
+  "type": "library",
+  "license": "GPL-2.0",
+  "config": {
+    "platform": {
+      "php": "7.4"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
   "autoload": {
     "psr-4": {
       "StellarWP\\Pigeon\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "StellarWP\\Pigeon\\Tests\\": "tests/_support/Helper/"
+    }
+  },
+  "authors": [
+    {
+      "name": "StellarWP",
+      "email": "dev@stellarwp.com"
+    },
+    {
+      "name": "Dimitrios Pantazis",
+      "email": "dimi@stellarwp.com"
+    }
+  ],
+  "minimum-stability": "stable",
   "require": {
-    "lucatume/di52": "^3.0",
-    "stellarwp/db": "^1.0",
-    "stellarwp/schema": "^1.1"
+    "php": ">=7.4",
+    "lucatume/di52": "^4.0",
+    "stellarwp/db": "^1.1",
+    "stellarwp/schema": "^2.0",
+    "woocommerce/action-scheduler": "3.9.2"
   },
   "require-dev": {
-    "brianhenryie/strauss": "^0.13.0",
-    "bordoni/phpass": "0.3.5",
-    "automattic/vipwpcs": "^2.0",
-    "codeception/codeception": "^2.5.5",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-    "lucatume/function-mocker-le": "^1.0",
-    "lucatume/wp-browser": "^3.0.14",
-    "the-events-calendar/coding-standards": "dev-master",
-    "the-events-calendar/tec-testing-facilities": "dev-master",
-    "phpunit/phpunit": "~6.0",
-    "wp-cli/checksum-command": "1.0.5",
-    "wp-coding-standards/wpcs": "^2.1",
-    "lucatume/codeception-snapshot-assertions": "^0.2.4"
+    "stellarwp/coding-standards": "^2.1",
+    "codeception/module-asserts": "^2.0",
+    "codeception/module-cli": "^2.0",
+    "codeception/module-db": "^2.1",
+    "codeception/module-filesystem": "^2.0",
+    "codeception/module-phpbrowser": "^2.0",
+    "codeception/module-rest": "^2.0",
+    "codeception/module-webdriver": "^2.0",
+    "codeception/util-universalframework": "^1.0",
+    "lucatume/wp-browser": "^3.0.15",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "szepeviktor/phpstan-wordpress": "^2.0"
   },
   "scripts": {
-    "strauss": [
-      "vendor/bin/strauss"
+    "test:analysis": [
+      "phpstan analyse -c phpstan.neon.dist --memory-limit=512M"
     ],
-    "post-install-cmd": [
-      "@strauss"
-    ],
-    "post-update-cmd": [
-      "@strauss"
+    "compatibility:php-7.4": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 7.4",
+    "compatibility:php-8.0": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.0",
+    "compatibility:php-8.1": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.1",
+    "compatibility:php-8.2": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.2",
+    "compatibility:php-8.3": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.3",
+    "compatibility:php-8.4": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.4",
+    "compatibility": [
+      "@compatibility:php-7.4",
+      "@compatibility:php-8.0",
+      "@compatibility:php-8.1",
+      "@compatibility:php-8.2",
+      "@compatibility:php-8.3",
+      "@compatibility:php-8.4"
     ]
   },
-  "extra": {
-    "strauss": {
-      "namespace_prefix": "StellarWP\\Pigeon\\",
-      "classmap_prefix": "StellarWP_Pigeon_",
-      "constant_prefix": "STELLARWP_PIGEON_"
-    }
-  },
-  "config": {
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
-    }
+  "scripts-descriptions": {
+    "test:analysis": "Run static code analysis.",
+    "compatibility:php-7.4": "Run PHPCompatibilityWP compatibility checks for PHP 7.4.",
+    "compatibility:php-8.0": "Run PHPCompatibilityWP compatibility checks for PHP 8.0.",
+    "compatibility:php-8.1": "Run PHPCompatibilityWP compatibility checks for PHP 8.1.",
+    "compatibility:php-8.2": "Run PHPCompatibilityWP compatibility checks for PHP 8.2.",
+    "compatibility:php-8.3": "Run PHPCompatibilityWP compatibility checks for PHP 8.3.",
+    "compatibility:php-8.4": "Run PHPCompatibilityWP compatibility checks for PHP 8.4."
   }
 }

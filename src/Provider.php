@@ -1,38 +1,131 @@
 <?php
+/**
+ * Pigeon's main service provider.
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Pigeon
+ */
+
+declare( strict_types=1 );
 
 namespace StellarWP\Pigeon;
 
-use StellarWP\Pigeon\Templates\DefaultTemplate;
+use lucatume\DI52\ServiceProvider;
+use lucatume\DI52\Container;
+use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
+use RuntimeException;
 
-class Provider extends \tad_DI52_ServiceProvider {
+/**
+ * Main Service Provider
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Pigeon;
+ */
+class Provider extends ServiceProvider {
+	/**
+	 * The version of the plugin.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const VERSION = '0.0.1';
 
-	private $has_registered = false;
+	/**
+	 * The hook prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	protected static string $hook_prefix;
 
-	public function register() {
-		if ( $this->has_registered ) {
-			return false;
+	/**
+	 * The container.
+	 *
+	 * @since TBD
+	 *
+	 * @var ?Container
+	 */
+	private static ?Container $static_container = null;
+
+	/**
+	 * Whether the provider has been registered.
+	 *
+	 * @since TBD
+	 *
+	 * @var bool
+	 */
+	private static bool $has_registered = false;
+
+	/**
+	 * Registers Pigeon's specific providers and starts core functionality
+	 *
+	 * @since TBD
+	 *
+	 * @return void The method does not return any value.
+	 */
+	public function register(): void {
+		if ( self::$has_registered ) {
+			return;
 		}
 
-		$this->register_filters();
-		$this->register_actions();
-		$this->has_registered = true;
-		return true;
+		self::$static_container = $this->container;
+
+		$this->container->register( Tables_Provider::class );
+
+		self::$has_registered = true;
 	}
 
 	/**
-	 * @return mixed
+	 * Gets the container.
+	 *
+	 * @since TBD
+	 *
+	 * @return Container
 	 */
-	public function register_actions() {
-		add_action( 'init', [ $this, 'register_templates' ] );
+	public static function get_container(): Container {
+		if ( ! self::$static_container ) {
+			self::$static_container = new Container();
+		}
 
+		return self::$static_container;
 	}
 
-	public function register_filters() {
+	/**
+	 * Gets the hook prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @throws RuntimeException If the hook prefix is not set.
+	 *
+	 * @return string
+	 */
+	public static function get_hook_prefix(): string {
+		if ( ! static::$hook_prefix ) {
+			$class = __CLASS__;
+			throw new RuntimeException( "You must specify a hook prefix for your project with {$class}::set_hook_prefix()" );
+		}
 
+		return static::$hook_prefix;
 	}
 
-	public function register_templates() {
-		tribe( DefaultTemplate::class )->register();
-	}
+	/**
+	 * Sets the hook prefix.
+	 *
+	 * @param string $prefix The prefix to add to hooks.
+	 *
+	 * @throws RuntimeException If the hook prefix is empty.
+	 *
+	 * @return void
+	 */
+	public static function set_hook_prefix( string $prefix ): void {
+		if ( ! $prefix ) {
+			throw new RuntimeException( 'The hook prefix cannot be empty.' );
+		}
 
+		static::$hook_prefix = $prefix;
+	}
 }
