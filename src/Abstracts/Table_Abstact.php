@@ -20,13 +20,13 @@ use TEC\Common\StellarWP\DB\DB;
  * @package StellarWP\Pigeon\Abstracts
  */
 abstract class Table_Abstract extends Table {
-	public const PHP_TYPE_INT = 'int';
+	public const PHP_TYPE_INT    = 'int';
 	public const PHP_TYPE_STRING = 'string';
-	public const PHP_TYPE_BOOL = 'bool';
-	public const PHP_TYPE_FLOAT = 'float';
+	public const PHP_TYPE_BOOL   = 'bool';
+	public const PHP_TYPE_FLOAT  = 'float';
 
-	public const COLUMN_TYPE_BIGINT = 'bigint';
-	public const COLUMN_TYPE_VARCHAR = 'varchar';
+	public const COLUMN_TYPE_BIGINT   = 'bigint';
+	public const COLUMN_TYPE_VARCHAR  = 'varchar';
 	public const COLUMN_TYPE_LONGTEXT = 'longtext';
 
 	public const INDEXES = [];
