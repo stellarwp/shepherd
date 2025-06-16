@@ -12,9 +12,12 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon;
 
 use lucatume\DI52\ServiceProvider;
-use lucatume\DI52\Container;
+use StellarWP\Pigeon\Contracts\Container;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
 use RuntimeException;
+use StellarWP\Pigeon\Contracts\Task;
+use StellarWP\Schema\Config;
+use StellarWP\DB\DB;
 
 /**
  * Main Service Provider
@@ -22,6 +25,7 @@ use RuntimeException;
  * @since TBD
  *
  * @package StellarWP\Pigeon;
+ * @property Container $container
  */
 class Provider extends ServiceProvider {
 	/**
@@ -68,15 +72,28 @@ class Provider extends ServiceProvider {
 	 * @return void The method does not return any value.
 	 */
 	public function register(): void {
-		if ( self::$has_registered ) {
+		if ( self::is_registered() ) {
 			return;
 		}
 
 		self::$static_container = $this->container;
 
+		Config::set_container( $this->container );
+		Config::set_db( DB::class );
 		$this->container->register( Tables_Provider::class );
 
 		self::$has_registered = true;
+	}
+
+	/**
+	 * Dispatches a task to be processed later.
+	 *
+	 * @since TBD
+	 *
+	 * @param Task $task The task to dispatch.
+	 */
+	public function dispatch( Task $task ): void {
+		$task->schedule();
 	}
 
 	/**
@@ -92,6 +109,17 @@ class Provider extends ServiceProvider {
 		}
 
 		return self::$static_container;
+	}
+
+	/**
+	 * Checks if Pigeon is registered.
+	 *
+	 * @since TBD
+	 *
+	 * @return bool
+	 */
+	public static function is_registered(): bool {
+		return self::$has_registered;
 	}
 
 	/**

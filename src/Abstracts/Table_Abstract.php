@@ -112,6 +112,32 @@ abstract class Table_Abstract extends Table {
 	}
 
 	/**
+	 * Returns the base table name.
+	 *
+	 * This method is overridden to use the hook prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The base table name.
+	 */
+	public static function base_table_name(): string {
+		return sprintf( static::$base_table_name, Pigeon_Main_Controller::get_hook_prefix() );
+	}
+
+	/**
+	 * The schema slug.
+	 *
+	 * This method is overridden to use the hook prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The schema slug.
+	 */
+	public static function get_schema_slug(): string {
+		return sprintf( static::$schema_slug, Pigeon_Main_Controller::get_hook_prefix() );
+	}
+
+	/**
 	 * An array of all the columns in the table.
 	 *
 	 * @since TBD
