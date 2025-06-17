@@ -182,8 +182,6 @@ abstract class Task_Abstract implements Task {
 	 * @since TBD
 	 *
 	 * @param array<mixed> $args The task's arguments.
-	 *
-	 * @throws InvalidArgumentException If the task's arguments are invalid.
 	 */
 	protected function validate_args( array $args ): void {}
 
