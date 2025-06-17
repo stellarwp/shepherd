@@ -187,6 +187,8 @@ class Regulator extends ServiceProvider {
 	 * @param string $task_args_hash The task arguments hash.
 	 *
 	 * @throws RuntimeException If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
+	 * @throws Exception If the task fails to be processed.
+	 * @throws Throwable If the task fails to be processed.
 	 */
 	public function process_task( string $task_class, string $task_args_hash = '' ): void {
 		if ( ! class_exists( $task_class ) ) {
@@ -214,7 +216,11 @@ class Regulator extends ServiceProvider {
 		try {
 			$task->process();
 		} catch ( Exception $e ) {
+			// We need to later handle this.
+			throw $e;
 		} catch ( Throwable $e ) {
+			// We need to later handle this.
+			throw $e;
 		}
 	}
 }
