@@ -52,6 +52,10 @@ class Email extends Task_Abstract {
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.wp_mail_wp_mail
 		$result = wp_mail( ...$this->args );
 
+		if ( ! $result ) {
+			throw new PigeonTaskException( __( 'Failed to send email.', 'stellarwp-pigeon' ) );
+		}
+
 		if ( is_wp_error( $result ) ) {
 			$message = sprintf(
 				/* translators: %s: The error message. */
@@ -62,10 +66,6 @@ class Email extends Task_Abstract {
 			);
 
 			throw new PigeonTaskException( $message );
-		}
-
-		if ( ! $result ) {
-			throw new PigeonTaskException( __( 'Failed to send email.', 'stellarwp-pigeon' ) );
 		}
 	}
 
