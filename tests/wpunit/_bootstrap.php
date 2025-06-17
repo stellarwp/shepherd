@@ -4,7 +4,7 @@ use StellarWP\Pigeon\Contracts\Container;
 use StellarWP\Pigeon\Tables\Tasks;
 use StellarWP\Pigeon\Provider;
 
-Provider::set_hook_prefix( 'foobar' );
+Provider::set_hook_prefix( tests_pigeon_get_hook_prefix() );
 
 tests_pigeon_drop_tables();
 
@@ -34,4 +34,13 @@ tests_add_filter(
  */
 function tests_pigeon_drop_tables() {
 	tests_pigeon_get_container()->get( Tasks::class )->drop();
+}
+
+/**
+ * Get the hook prefix.
+ *
+ * @return string
+ */
+function tests_pigeon_get_hook_prefix(): string {
+	return 'foobar';
 }
