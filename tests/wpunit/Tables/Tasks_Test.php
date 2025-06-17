@@ -12,7 +12,7 @@ class Tasks_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function the_table_name_should_be_using_the_prefix(): void {
+	public function it_should_be_using_the_prefix(): void {
 		$name = Tasks::base_table_name();
 		$this->assertStringContainsString( Provider::get_hook_prefix(), $name );
 

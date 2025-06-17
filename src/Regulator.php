@@ -16,6 +16,9 @@ use StellarWP\Pigeon\Contracts\Container;
 use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Tables\Tasks as Tasks_Table;
 use RuntimeException;
+use Exception;
+use Throwable;
+use StellarWP\DB\DB;
 
 /**
  * Pigeon's regulator.
@@ -133,6 +136,8 @@ class Regulator extends ServiceProvider {
 		}
 
 		try {
+			DB::beginTransaction();
+
 			$action_id = as_schedule_single_action(
 				time() + $delay,
 				$this->process_task_hook,
@@ -157,7 +162,10 @@ class Regulator extends ServiceProvider {
 			if ( ! $result ) {
 				throw new RuntimeException( 'Failed to insert the task into the database.' );
 			}
+
+			DB::commit();
 		} catch ( RuntimeException $e ) {
+			DB::rollback();
 			/**
 			 * Fires when a task fails to be scheduled or inserted into the database.
 			 *
@@ -182,7 +190,7 @@ class Regulator extends ServiceProvider {
 	 */
 	public function process_task( string $task_class, string $task_args_hash = '' ): void {
 		if ( ! class_exists( $task_class ) ) {
-			return;
+			throw new RuntimeException( 'The task class does not exist.' );
 		}
 
 		if ( ! $this->current_action_id ) {
@@ -202,6 +210,13 @@ class Regulator extends ServiceProvider {
 		$args = json_decode( $task['args'], true );
 
 		$task = new $task_class( ...$args );
-		$task->process();
+
+		try {
+			$task->process();
+		} catch ( Exception $e ) {
+			//
+		} catch ( Throwable $e ) {
+			//
+		}
 	}
 }
