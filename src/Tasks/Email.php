@@ -59,7 +59,7 @@ class Email extends Task_Abstract {
 		if ( is_wp_error( $result ) ) {
 			$message = sprintf(
 				/* translators: %s: The error message. */
-				__( 'Failed to send email with message: %s, code: %s and data: %s', 'stellarwp-pigeon' ),
+				__( 'Failed to send email with message: %1$s, code: %2$s and data: %3$s', 'stellarwp-pigeon' ),
 				$result->get_error_message(),
 				$result->get_error_code(),
 				wp_json_encode( $result->get_error_data(), JSON_PRETTY_PRINT )
