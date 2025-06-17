@@ -14,7 +14,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: 7.4
-          php_extensions: zip
+          php_extensions: zip mysqli
 
       - name: Fix and Push phpcbf issues
         continue-on-error: true

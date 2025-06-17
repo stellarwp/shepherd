@@ -25,5 +25,6 @@ tests/*.cert
 tests/*.key
 
 DOCKER_ENV
+Dockerfile-*
 output.log
 docker_tag
