@@ -10,6 +10,7 @@
 namespace StellarWP\Pigeon\Tables;
 
 use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
+use StellarWP\DB\DB;
 
 /**
  * Tasks table schema.
@@ -118,5 +119,18 @@ class Tasks extends Table {
 				'nullable' => true,
 			],
 		];
+	}
+
+	/**
+	 * Gets a task by its action ID.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $action_id The action ID.
+	 *
+	 * @return array<string, mixed>|null The task, or null if not found.
+	 */
+	public static function get_by_action_id( int $action_id ): ?array {
+		return self::fetch_first_where( DB::prepare( 'WHERE action_id = %d', $action_id ), ARRAY_A );
 	}
 }

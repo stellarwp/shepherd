@@ -15,7 +15,6 @@ use lucatume\DI52\ServiceProvider;
 use StellarWP\Pigeon\Contracts\Container;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
 use RuntimeException;
-use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Schema\Config;
 use StellarWP\DB\DB;
 
@@ -81,19 +80,9 @@ class Provider extends ServiceProvider {
 		Config::set_container( $this->container );
 		Config::set_db( DB::class );
 		$this->container->register( Tables_Provider::class );
+		$this->container->register( Regulator::class );
 
 		self::$has_registered = true;
-	}
-
-	/**
-	 * Dispatches a task to be processed later.
-	 *
-	 * @since TBD
-	 *
-	 * @param Task $task The task to dispatch.
-	 */
-	public function dispatch( Task $task ): void {
-		$task->schedule();
 	}
 
 	/**

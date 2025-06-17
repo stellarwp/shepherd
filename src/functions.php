@@ -12,15 +12,15 @@ namespace StellarWP\Pigeon;
 use RuntimeException;
 
 /**
- * Get the Pigeon main controller.
+ * Get the Pigeon's Regulator instance.
  *
  * @since TBD
  *
- * @return Provider The Pigeon main controller.
+ * @return Regulator The Pigeon's regulator.
  *
  * @throws RuntimeException If Pigeon is not registered.
  */
-function pigeon(): Provider {
+function pigeon(): Regulator {
 	if ( ! Provider::is_registered() ) {
 		throw new RuntimeException( 'Pigeon is not registered.' );
 	}
@@ -31,7 +31,7 @@ function pigeon(): Provider {
 		return $pigeon;
 	}
 
-	$pigeon = Provider::get_container()->get( Provider::class );
+	$pigeon = Provider::get_container()->get( Regulator::class );
 
 	return $pigeon;
 }

@@ -14,6 +14,7 @@ namespace StellarWP\Pigeon\Abstracts;
 use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
+use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
 
 /**
  * Class Table_Abstract
@@ -23,6 +24,8 @@ use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
  * @package StellarWP\Pigeon\Abstracts
  */
 abstract class Table_Abstract extends Table {
+	use Custom_Table_Query_Methods;
+
 	/**
 	 * The PHP type for an integer.
 	 *
