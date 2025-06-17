@@ -11,6 +11,8 @@ namespace StellarWP\Pigeon\Tables;
 
 use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
 use StellarWP\DB\DB;
+use StellarWP\Pigeon\Contracts\Task;
+use InvalidArgumentException;
 
 /**
  * Tasks table schema.
@@ -118,6 +120,14 @@ class Tasks extends Table {
 				'php_type' => self::PHP_TYPE_STRING,
 				'nullable' => true,
 			],
+			'current_try'       => [
+				'type'     => self::COLUMN_TYPE_BIGINT,
+				'php_type' => self::PHP_TYPE_INT,
+				'length'   => 20,
+				'unsigned' => true,
+				'nullable' => false,
+				'default'  => 0,
+			],
 		];
 	}
 
@@ -126,11 +136,31 @@ class Tasks extends Table {
 	 *
 	 * @since TBD
 	 *
-	 * @param int $action_id The action ID.
+	 * @param int    $action_id  The action ID.
+	 * @param string $task_class The task class.
 	 *
-	 * @return array<string, mixed>|null The task, or null if not found.
+	 * @return ?Task The task, or null if not found.
+	 *
+	 * @throws InvalidArgumentException If the task class does not implement the Task interface.
 	 */
-	public static function get_by_action_id( int $action_id ): ?array {
-		return self::fetch_first_where( DB::prepare( 'WHERE action_id = %d', $action_id ), ARRAY_A );
+	public static function get_by_action_id( int $action_id, string $task_class ): ?Task {
+		$task_array = self::fetch_first_where( DB::prepare( 'WHERE action_id = %d', $action_id ), ARRAY_A );
+
+		if ( empty( $task_array[ self::$uid_column ] ) ) {
+			return null;
+		}
+
+		$task = new $task_class( ...json_decode( $task_array['args'], true ) );
+
+		if ( ! $task instanceof Task ) {
+			throw new InvalidArgumentException( 'The task class does not implement the Task interface.' );
+		}
+
+		$task->set_id( $task_array[ self::$uid_column ] );
+		$task->set_action_id( $task_array['action_id'] );
+		$task->set_current_try( $task_array['current_try'] );
+		$task->set_args_hash( $task_array['args_hash'] );
+
+		return $task;
 	}
 }

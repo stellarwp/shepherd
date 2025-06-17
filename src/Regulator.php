@@ -19,6 +19,7 @@ use RuntimeException;
 use Exception;
 use Throwable;
 use StellarWP\DB\DB;
+use StellarWP\Pigeon\Exceptions\PigeonTaskException;
 
 /**
  * Pigeon's regulator.
@@ -186,9 +187,10 @@ class Regulator extends ServiceProvider {
 	 * @param string $task_class     The task class.
 	 * @param string $task_args_hash The task arguments hash.
 	 *
-	 * @throws RuntimeException If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
-	 * @throws Exception If the task fails to be processed.
-	 * @throws Throwable If the task fails to be processed.
+	 * @throws RuntimeException    If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
+	 * @throws PigeonTaskException If the task fails to be processed.
+	 * @throws Exception           If the task fails to be processed.
+	 * @throws Throwable           If the task fails to be processed.
 	 */
 	public function process_task( string $task_class, string $task_args_hash = '' ): void {
 		if ( ! class_exists( $task_class ) ) {
@@ -199,22 +201,21 @@ class Regulator extends ServiceProvider {
 			throw new RuntimeException( 'No action ID found.' );
 		}
 
-		$task = Tasks_Table::get_by_action_id( $this->current_action_id );
+		$task = Tasks_Table::get_by_action_id( $this->current_action_id, $task_class );
 
-		if ( empty( $task['id'] ) ) {
+		if ( ! $task ) {
 			throw new RuntimeException( 'No Pigeon task found with action ID ' . $this->current_action_id . '.' );
 		}
 
-		if ( $task['args_hash'] !== $task_args_hash ) {
-			throw new RuntimeException( 'The task arguments hash does not match the expected hash.' );
-		}
-
-		$args = json_decode( $task['args'], true );
-
-		$task = new $task_class( ...$args );
-
 		try {
 			$task->process();
+		} catch ( PigeonTaskException $e ) {
+			if ( $task->should_retry() ) {
+				$this->dispatch( $task, $task->get_retry_delay() );
+				return;
+			}
+			// We need to later handle this.
+			throw $e;
 		} catch ( Exception $e ) {
 			// We need to later handle this.
 			throw $e;

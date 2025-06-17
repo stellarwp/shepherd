@@ -15,6 +15,8 @@ use InvalidArgumentException;
 use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Provider;
 use JsonSerializable;
+use StellarWP\Pigeon\Traits\Retryable;
+use StellarWP\Pigeon\Traits\Debouncable;
 
 /**
  * Pigeon's task abstract.
@@ -24,6 +26,9 @@ use JsonSerializable;
  * @package StellarWP\Pigeon\Abstracts;
  */
 abstract class Task_Abstract implements Task {
+	use Retryable;
+	use Debouncable;
+
 	/**
 	 * The task's group.
 	 *
@@ -50,6 +55,42 @@ abstract class Task_Abstract implements Task {
 	 * @var int
 	 */
 	protected const PRIORITY = 10;
+
+	/**
+	 * The task's ID.
+	 *
+	 * @since TBD
+	 *
+	 * @var int
+	 */
+	protected int $id;
+
+	/**
+	 * The task's current try.
+	 *
+	 * @since TBD
+	 *
+	 * @var int
+	 */
+	protected int $current_try;
+
+	/**
+	 * The task's action ID.
+	 *
+	 * @since TBD
+	 *
+	 * @var int
+	 */
+	protected int $action_id;
+
+	/**
+	 * The task's arguments hash.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	protected string $args_hash;
 
 	/**
 	 * The task's constructor arguments.
@@ -80,8 +121,71 @@ abstract class Task_Abstract implements Task {
 			}
 		}
 
+		$this->validate_args( $args );
+
 		$this->args = $args;
 	}
+
+	/**
+	 * Sets the task's ID.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $id The task's ID.
+	 */
+	public function set_id( int $id ): void {
+		$this->id = $id;
+	}
+
+	/**
+	 * Sets the task's current try.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $current_try The task's current try.
+	 */
+	public function set_current_try( int $current_try ): void {
+		$this->current_try = $current_try;
+	}
+
+	/**
+	 * Sets the task's action ID.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $action_id The task's action ID.
+	 */
+	public function set_action_id( int $action_id ): void {
+		$this->action_id = $action_id;
+	}
+
+	/**
+	 * Sets the task's arguments hash.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $args_hash The task's arguments hash.
+	 *
+	 * @throws InvalidArgumentException If the task arguments hash does not match the expected hash.
+	 */
+	public function set_args_hash( string $args_hash = '' ): void {
+		if ( $args_hash && $args_hash !== md5( wp_json_encode( $this->args ) ) ) {
+			throw new InvalidArgumentException( 'The task arguments hash does not match the expected hash.' );
+		}
+
+		$this->args_hash = $args_hash;
+	}
+
+	/**
+	 * Validates the task's arguments.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<mixed> $args The task's arguments.
+	 *
+	 * @throws InvalidArgumentException If the task's arguments are invalid.
+	 */
+	protected function validate_args( array $args ): void {}
 
 	/**
 	 * Gets the task's arguments.
