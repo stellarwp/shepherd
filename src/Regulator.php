@@ -214,9 +214,7 @@ class Regulator extends ServiceProvider {
 		try {
 			$task->process();
 		} catch ( Exception $e ) {
-			//
 		} catch ( Throwable $e ) {
-			//
 		}
 	}
 }
