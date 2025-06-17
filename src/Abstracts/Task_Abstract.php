@@ -127,6 +127,6 @@ abstract class Task_Abstract implements Task {
 	 * @return int The task's priority.
 	 */
 	public function get_priority(): int {
-		return static::PRIORITY;
+		return max( 0, min( 255, static::PRIORITY ) );
 	}
 }
