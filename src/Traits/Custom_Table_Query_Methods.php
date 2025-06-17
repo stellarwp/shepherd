@@ -101,13 +101,13 @@ trait Custom_Table_Query_Methods {
 	 *
 	 * @param array<mixed> $entries The entries to update.
 	 *
-	 * @return bool|int The number of rows affected, or `false` on failure.
+	 * @return bool Whether the update was successful.
 	 */
 	public static function update_many( array $entries ): bool {
 		$uid_column = self::uid_column();
 
 		$queries = [];
-		$columns = static::get_columns();
+		$columns = array_keys( static::get_columns() );
 		foreach ( $entries as $entry ) {
 			$uid = $entry[ $uid_column ] ?? '';
 
@@ -146,8 +146,8 @@ trait Custom_Table_Query_Methods {
 	 *
 	 * @since TBD
 	 *
-	 * @param array<int> $ids    The IDs of the rows to delete.
-	 * @param string     $column The column to use for the delete query.
+	 * @param array<int|string> $ids    The IDs of the rows to delete.
+	 * @param string            $column The column to use for the delete query.
 	 *
 	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
@@ -195,9 +195,7 @@ trait Custom_Table_Query_Methods {
 		$prepared_values  = implode(
 			', ',
 			array_map(
-				static function ( array $entry ) use ( $columns ) {
-					return '(' . implode( ', ', array_map( static fn( $e ) => DB::prepare( '%s', $e ), $entry ) ) . ')';
-				},
+				static fn ( array $entry ) => '(' . implode( ', ', array_map( static fn( $e ) => DB::prepare( '%s', $e ), $entry ) ) . ')',
 				$entries
 			)
 		);
@@ -275,7 +273,7 @@ trait Custom_Table_Query_Methods {
 		$orderby = $args['orderby'] ?? self::uid_column();
 		$order   = strtoupper( $args['order'] ?? 'ASC' );
 
-		if ( ! in_array( $orderby, static::get_columns(), true ) ) {
+		if ( ! in_array( $orderby, array_keys( static::get_columns() ), true ) ) {
 			$orderby = self::uid_column();
 		}
 
@@ -359,7 +357,7 @@ trait Custom_Table_Query_Methods {
 			}
 		}
 
-		$columns = static::get_columns();
+		$columns = array_keys( static::get_columns() );
 
 		foreach ( $args as $arg ) {
 			if ( ! is_array( $arg ) ) {
@@ -424,9 +422,9 @@ trait Custom_Table_Query_Methods {
 
 		$join_condition = array_map( 'trim', explode( '=', $join_condition, 2 ) );
 
-		$secondary_table_columns = $join_table::get_columns();
+		$secondary_table_columns = array_keys( $join_table::get_columns() );
 
-		$both_table_columns = array_merge( static::get_columns(), $secondary_table_columns );
+		$both_table_columns = array_merge( array_keys( static::get_columns() ), $secondary_table_columns );
 
 		if ( ! in_array( $join_condition[0], $both_table_columns, true ) || ! in_array( $join_condition[1], $both_table_columns, true ) ) {
 			throw new InvalidArgumentException( 'The join condition must contain valid columns.' );
