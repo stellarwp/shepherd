@@ -55,7 +55,7 @@ interface Task {
 	 *
 	 * @param string $args_hash The task's arguments hash.
 	 */
-	public function set_args_hash( string $args_hash ): void;
+	public function set_args_hash( string $args_hash = '' ): void;
 
 	/**
 	 * Sets the task's action ID.
@@ -74,6 +74,42 @@ interface Task {
 	 * @param int $current_try The task's current try.
 	 */
 	public function set_current_try( int $current_try ): void;
+
+	/**
+	 * Gets the task's ID.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The task's ID.
+	 */
+	public function get_id(): int;
+
+	/**
+	 * Gets the task's current try.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The task's current try.
+	 */
+	public function get_current_try(): int;
+
+	/**
+	 * Gets the task's action ID.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The task's action ID.
+	 */
+	public function get_action_id(): int;
+
+	/**
+	 * Gets the task's arguments hash.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The task's arguments hash.
+	 */
+	public function get_args_hash(): string;
 
 	/**
 	 * Gets the task's arguments.

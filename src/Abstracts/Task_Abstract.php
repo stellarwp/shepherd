@@ -63,7 +63,7 @@ abstract class Task_Abstract implements Task {
 	 *
 	 * @var int
 	 */
-	protected int $id;
+	private int $id = 0;
 
 	/**
 	 * The task's current try.
@@ -72,7 +72,7 @@ abstract class Task_Abstract implements Task {
 	 *
 	 * @var int
 	 */
-	protected int $current_try;
+	private int $current_try = 0;
 
 	/**
 	 * The task's action ID.
@@ -81,7 +81,7 @@ abstract class Task_Abstract implements Task {
 	 *
 	 * @var int
 	 */
-	protected int $action_id;
+	private int $action_id = 0;
 
 	/**
 	 * The task's arguments hash.
@@ -90,7 +90,7 @@ abstract class Task_Abstract implements Task {
 	 *
 	 * @var string
 	 */
-	protected string $args_hash;
+	private string $args_hash;
 
 	/**
 	 * The task's constructor arguments.
@@ -99,7 +99,7 @@ abstract class Task_Abstract implements Task {
 	 *
 	 * @var array<mixed>
 	 */
-	protected array $args;
+	private array $args;
 
 	/**
 	 * The task's constructor.
@@ -121,9 +121,11 @@ abstract class Task_Abstract implements Task {
 			}
 		}
 
-		$this->validate_args( $args );
-
 		$this->args = $args;
+
+		$this->validate_args();
+
+		$this->set_args_hash( md5( wp_json_encode( $this->args ) ) );
 	}
 
 	/**
@@ -177,13 +179,48 @@ abstract class Task_Abstract implements Task {
 	}
 
 	/**
-	 * Validates the task's arguments.
+	 * Gets the task's ID.
 	 *
 	 * @since TBD
 	 *
-	 * @param array<mixed> $args The task's arguments.
+	 * @return int The task's ID.
 	 */
-	protected function validate_args( array $args ): void {}
+	public function get_id(): int {
+		return $this->id;
+	}
+
+	/**
+	 * Gets the task's current try.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The task's current try.
+	 */
+	public function get_current_try(): int {
+		return $this->current_try;
+	}
+
+	/**
+	 * Gets the task's action ID.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The task's action ID.
+	 */
+	public function get_action_id(): int {
+		return $this->action_id;
+	}
+
+	/**
+	 * Gets the task's arguments hash.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The task's arguments hash.
+	 */
+	public function get_args_hash(): string {
+		return $this->args_hash;
+	}
 
 	/**
 	 * Gets the task's arguments.
@@ -231,4 +268,11 @@ abstract class Task_Abstract implements Task {
 	public function get_priority(): int {
 		return max( 0, min( 255, static::PRIORITY ) );
 	}
+
+	/**
+	 * Validates the task's arguments.
+	 *
+	 * @since TBD
+	 */
+	protected function validate_args(): void {}
 }

@@ -50,22 +50,10 @@ class Email extends Task_Abstract {
 	 */
 	public function process(): void {
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.wp_mail_wp_mail
-		$result = wp_mail( ...$this->args );
+		$result = wp_mail( ...$this->get_args() );
 
 		if ( ! $result ) {
 			throw new PigeonTaskException( __( 'Failed to send email.', 'stellarwp-pigeon' ) );
-		}
-
-		if ( is_wp_error( $result ) ) {
-			$message = sprintf(
-				/* translators: %s: The error message. */
-				__( 'Failed to send email with message: %1$s, code: %2$s and data: %3$s', 'stellarwp-pigeon' ),
-				$result->get_error_message(),
-				$result->get_error_code(),
-				wp_json_encode( $result->get_error_data(), JSON_PRETTY_PRINT )
-			);
-
-			throw new PigeonTaskException( $message );
 		}
 	}
 
@@ -74,11 +62,10 @@ class Email extends Task_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param array<mixed> $args The email task's arguments.
-	 *
 	 * @throws InvalidArgumentException If the email task's arguments are invalid.
 	 */
-	protected function validate_args( array $args ): void {
+	protected function validate_args(): void {
+		$args = $this->get_args();
 		if ( count( $args ) < 3 ) {
 			throw new InvalidArgumentException( __( 'Email task requires at least 3 arguments.', 'stellarwp-pigeon' ) );
 		}

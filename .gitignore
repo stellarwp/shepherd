@@ -24,6 +24,7 @@ tests/*.pem
 tests/*.cert
 tests/*.key
 
+.DS_Store
 DOCKER_ENV
 Dockerfile-*
 output.log
