@@ -10,8 +10,6 @@ class Task_Test extends WPTestCase {
 	protected function get_task( ...$args ): Task {
 		return new class( ...$args ) implements Task {
 
-			public function __construct( ...$args ) {}
-
 			public function process(): void {}
 
 			public function set_id( int $id ): void {}

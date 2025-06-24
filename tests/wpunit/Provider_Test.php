@@ -5,7 +5,7 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Contracts\Container;
+use StellarWP\ContainerContract\ContainerInterface;
 
 class Provider_Test extends WPTestCase {
 	/**
@@ -14,8 +14,8 @@ class Provider_Test extends WPTestCase {
 	public function it_should_get_the_container(): void {
 		$container = tests_pigeon_get_container();
 
-		$this->assertInstanceOf( Container::class, $container );
-		$this->assertInstanceOf( Container::class, Provider::get_container() );
+		$this->assertInstanceOf( ContainerInterface::class, $container );
+		$this->assertInstanceOf( ContainerInterface::class, Provider::get_container() );
 		$this->assertSame( $container, Provider::get_container() );
 	}
 
