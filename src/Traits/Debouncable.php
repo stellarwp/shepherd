@@ -37,9 +37,20 @@ trait Debouncable {
 	 *
 	 * @since TBD
 	 *
-	 * @return int The debounce delay.
+	 * @return int The debounce delay in seconds.
 	 */
 	public function get_debounce_delay(): int {
+		return 0;
+	}
+
+	/**
+	 * Gets the debounce delay on failure.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The debounce delay on failure in seconds.
+	 */
+	public function get_debounce_delay_on_failure(): int {
 		return 0;
 	}
 }

@@ -15,6 +15,8 @@ use StellarWP\Pigeon\Abstracts\Task_Abstract;
 use StellarWP\Pigeon\Exceptions\PigeonTaskException;
 use InvalidArgumentException;
 
+// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
+
 /**
  * Pigeon's email task.
  *
@@ -89,5 +91,16 @@ class Email extends Task_Abstract {
 		if ( ! is_string( $args[2] ) ) {
 			throw new InvalidArgumentException( __( 'Email body must be a string.', 'stellarwp-pigeon' ) );
 		}
+	}
+
+	/**
+	 * Gets the email task's hook prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The email task's hook prefix.
+	 */
+	public function get_task_prefix(): string {
+		return 'pigeon_email_';
 	}
 }

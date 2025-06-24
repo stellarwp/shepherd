@@ -178,4 +178,24 @@ interface Task {
 	 * @return int The task's debounce delay in seconds.
 	 */
 	public function get_debounce_delay(): int;
+
+	/**
+	 * Gets the task's debounce delay on failure.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The task's debounce delay on failure in seconds.
+	 */
+	public function get_debounce_delay_on_failure(): int;
+
+	/**
+	 * Gets the task's hook prefix.
+	 *
+	 * SHOULD BE a maximum of 15 characters.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The task's prefix.
+	 */
+	public function get_task_prefix(): string;
 }

@@ -75,6 +75,35 @@ trait Custom_Table_Query_Methods {
 	}
 
 	/**
+	 * Updates a single row in the table.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<mixed> $entry The entry to update.
+	 *
+	 * @return bool Whether the update was successful.
+	 */
+	public static function update_single( array $entry ): bool {
+		return self::update_many( [ $entry ] );
+	}
+
+	/**
+	 * Inserts or updates a single row in the table.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<mixed> $entry The entry to upsert.
+	 *
+	 * @return bool Whether the upsert was successful.
+	 */
+	public static function upsert( array $entry ): bool {
+		$uid_column = self::uid_column();
+		$uid        = $entry[ $uid_column ] ?? false;
+
+		return $uid ? self::update_single( $entry ) : self::insert( $entry );
+	}
+
+	/**
 	 * Inserts multiple rows into the table.
 	 *
 	 * @since TBD

@@ -112,10 +112,10 @@ class Tasks extends Table {
 			'args_hash'         => [
 				'type'     => self::COLUMN_TYPE_VARCHAR,
 				'php_type' => self::PHP_TYPE_STRING,
-				'length'   => 128,
+				'length'   => 191,
 				'nullable' => false,
 			],
-			'args'              => [
+			'data'              => [
 				'type'     => self::COLUMN_TYPE_LONGTEXT,
 				'php_type' => self::PHP_TYPE_STRING,
 				'nullable' => true,
@@ -136,21 +136,28 @@ class Tasks extends Table {
 	 *
 	 * @since TBD
 	 *
-	 * @param int    $action_id  The action ID.
-	 * @param string $task_class The task class.
+	 * @param int $action_id  The action ID.
 	 *
 	 * @return ?Task The task, or null if not found.
 	 *
 	 * @throws InvalidArgumentException If the task class does not implement the Task interface.
 	 */
-	public static function get_by_action_id( int $action_id, string $task_class ): ?Task {
+	public static function get_by_action_id( int $action_id ): ?Task {
 		$task_array = self::fetch_first_where( DB::prepare( 'WHERE action_id = %d', $action_id ), ARRAY_A );
 
 		if ( empty( $task_array[ self::$uid_column ] ) ) {
 			return null;
 		}
 
-		$task = new $task_class( ...json_decode( $task_array['args'], true ) );
+		$task_data = json_decode( $task_array['data'] ?? '[]', true );
+
+		$task_class = $task_data['task_class'] ?? '';
+
+		if ( ! $task_class || ! class_exists( $task_class ) ) {
+			throw new InvalidArgumentException( 'The task class does not exist.' );
+		}
+
+		$task = new $task_class( ...( $task_data['args'] ?? [] ) );
 
 		if ( ! $task instanceof Task ) {
 			throw new InvalidArgumentException( 'The task class does not implement the Task interface.' );
@@ -159,7 +166,6 @@ class Tasks extends Table {
 		$task->set_id( $task_array[ self::$uid_column ] );
 		$task->set_action_id( $task_array['action_id'] );
 		$task->set_current_try( $task_array['current_try'] );
-		$task->set_args_hash( $task_array['args_hash'] );
 
 		return $task;
 	}

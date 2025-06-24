@@ -12,6 +12,7 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon\Abstracts;
 
 use InvalidArgumentException;
+use RuntimeException;
 use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Provider;
 use JsonSerializable;
@@ -125,7 +126,7 @@ abstract class Task_Abstract implements Task {
 
 		$this->validate_args();
 
-		$this->set_args_hash( md5( wp_json_encode( $this->args ) ) );
+		$this->set_args_hash( $this->args ? md5( wp_json_encode( $this->args ) ) : '' );
 	}
 
 	/**
@@ -169,13 +170,20 @@ abstract class Task_Abstract implements Task {
 	 * @param string $args_hash The task's arguments hash.
 	 *
 	 * @throws InvalidArgumentException If the task arguments hash does not match the expected hash.
+	 * @throws RuntimeException If the task prefix is longer than 15 characters.
 	 */
 	public function set_args_hash( string $args_hash = '' ): void {
 		if ( $args_hash && $args_hash !== md5( wp_json_encode( $this->args ) ) ) {
 			throw new InvalidArgumentException( 'The task arguments hash does not match the expected hash.' );
 		}
 
-		$this->args_hash = $args_hash;
+		$task_prefix = $this->get_task_prefix();
+
+		if ( strlen( $task_prefix ) > 15 ) {
+			throw new RuntimeException( 'The task prefix must be a maximum of 15 characters.' );
+		}
+
+		$this->args_hash = $task_prefix . md5( wp_json_encode( array_merge( [ static::class ], $this->args ) ) );
 	}
 
 	/**
