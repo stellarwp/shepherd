@@ -185,8 +185,12 @@ class Regulator extends Provider_Abstract {
 
 			$tasks = Tasks_Table::get_by_args_hash( $args_hash );
 			if ( count( $tasks ) !== 1 ) {
-				$action_ids = array_map( fn( Task $task ) => $task->get_action_id(), $tasks );
-				throw new RuntimeException( 'Multiple tasks found with the same arguments hash.' );
+				$action_ids      = array_map( fn( Task $task ) => $task->get_action_id(), $tasks );
+				$pending_actions = Action_Scheduler_Methods::get_pending_actions_by_ids( $action_ids );
+
+				if ( count( $pending_actions ) > 1 ) {
+					throw new RuntimeException( 'Multiple tasks found with the same arguments hash.' );
+				}
 			}
 
 			DB::commit();
