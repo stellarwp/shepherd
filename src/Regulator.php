@@ -138,11 +138,11 @@ class Regulator extends Provider_Abstract {
 		try {
 			DB::beginTransaction();
 
-			if ( as_has_scheduled_action( $this->process_task_hook, [ $args_hash ], $group ) ) {
+			if ( Action_Scheduler_Methods::has_scheduled_action( $this->process_task_hook, [ $args_hash ], $group ) ) {
 				throw new PigeonTaskAlreadyExistsException( 'The task is already scheduled.' );
 			}
 
-			$action_id = as_schedule_single_action(
+			$action_id = Action_Scheduler_Methods::schedule_single_action(
 				time() + $delay,
 				$this->process_task_hook,
 				[ $args_hash ],
@@ -181,6 +181,12 @@ class Regulator extends Provider_Abstract {
 			if ( ! $task_id ) {
 				$task_id = DB::last_insert_id();
 				$task->set_id( $task_id );
+			}
+
+			$tasks = Tasks_Table::get_by_args_hash( $args_hash );
+			if ( count( $tasks ) !== 1 ) {
+				$action_ids = array_map( fn( Task $task ) => $task->get_action_id(), $tasks );
+				throw new RuntimeException( 'Multiple tasks found with the same arguments hash.' );
 			}
 
 			DB::commit();

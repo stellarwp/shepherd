@@ -149,6 +149,43 @@ class Tasks extends Table {
 			return null;
 		}
 
+		return self::get_task_from_array( $task_array );
+	}
+
+	/**
+	 * Gets a task by its arguments hash.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $args_hash The arguments hash.
+	 *
+	 * @return Task[] The tasks, or an empty array if no tasks are found.
+	 */
+	public static function get_by_args_hash( string $args_hash ): array {
+		$results = [];
+		foreach ( self::fetch_all_where( DB::prepare( 'WHERE args_hash = %s', $args_hash ), ARRAY_A ) as $task_array ) {
+			if ( empty( $task_array[ self::$uid_column ] ) ) {
+				continue;
+			}
+
+			$results[] = self::get_task_from_array( $task_array );
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Gets a task from an array.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<string, mixed> $task_array The task array.
+	 *
+	 * @return Task The task.
+	 *
+	 * @throws InvalidArgumentException If the task class does not exist or does not implement the Task interface.
+	 */
+	private static function get_task_from_array( array $task_array ): Task {
 		$task_data = json_decode( $task_array['data'] ?? '[]', true );
 
 		$task_class = $task_data['task_class'] ?? '';
