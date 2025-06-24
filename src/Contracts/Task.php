@@ -157,7 +157,7 @@ interface Task {
 	 *
 	 * @since TBD
 	 *
-	 * @return int The task's retry delay.
+	 * @return int The task's retry delay in seconds.
 	 */
 	public function get_retry_delay(): int;
 
@@ -175,7 +175,7 @@ interface Task {
 	 *
 	 * @since TBD
 	 *
-	 * @return int The task's debounce delay.
+	 * @return int The task's debounce delay in seconds.
 	 */
 	public function get_debounce_delay(): int;
 }

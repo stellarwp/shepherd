@@ -24,15 +24,6 @@ use InvalidArgumentException;
  */
 class Email extends Task_Abstract {
 	/**
-	 * Whether the email task is retryable.
-	 *
-	 * @since TBD
-	 *
-	 * @var bool
-	 */
-	protected static bool $retryable = true;
-
-	/**
 	 * The maximum number of retries.
 	 *
 	 * @since TBD
@@ -40,6 +31,23 @@ class Email extends Task_Abstract {
 	 * @var int
 	 */
 	protected static int $max_retries = 5;
+
+	/**
+	 * The email task's constructor.
+	 *
+	 * @since TBD
+	 *
+	 * @param string   $to_email    The email address to send the email to.
+	 * @param string   $subject     The email subject.
+	 * @param string   $body        The email body.
+	 * @param string[] $headers     Optional. Additional headers.
+	 * @param string[] $attachments Optional. Paths to files to attach.
+	 *
+	 * @throws InvalidArgumentException If the email task's arguments are invalid.
+	 */
+	public function __construct( string $to_email, string $subject, string $body, array $headers = [], array $attachments = [] ) {
+		parent::__construct( $to_email, $subject, $body, $headers, $attachments );
+	}
 
 	/**
 	 * Processes the email task.

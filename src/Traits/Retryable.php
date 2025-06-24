@@ -13,15 +13,6 @@ namespace StellarWP\Pigeon\Traits;
 
 trait Retryable {
 	/**
-	 * Whether the task is retryable.
-	 *
-	 * @since TBD
-	 *
-	 * @var bool
-	 */
-	protected static bool $retryable = false;
-
-	/**
 	 * The maximum number of retries.
 	 *
 	 * If the task is retryable, and the maximum number of retries is reached, the task will be marked as failed.
@@ -42,7 +33,7 @@ trait Retryable {
 	 * @return bool Whether the task is retryable.
 	 */
 	public function is_retryable(): bool {
-		return static::$retryable;
+		return static::$max_retries !== 1;
 	}
 
 	/**
@@ -65,7 +56,7 @@ trait Retryable {
 	 *
 	 * @since TBD
 	 *
-	 * @return int The retry delay.
+	 * @return int The retry delay in seconds.
 	 */
 	public function get_retry_delay(): int {
 		return 0;

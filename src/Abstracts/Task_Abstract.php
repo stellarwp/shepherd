@@ -110,7 +110,7 @@ abstract class Task_Abstract implements Task {
 	 *
 	 * @throws InvalidArgumentException If the task's constructor arguments are callable.
 	 */
-	final public function __construct( ...$args ) {
+	public function __construct( ...$args ) {
 		foreach ( $args as $arg ) {
 			if ( is_callable( $arg ) ) {
 				throw new InvalidArgumentException( 'Task constructor arguments must NOT be closures.' );
