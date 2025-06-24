@@ -1,6 +1,6 @@
 <?php
 
-use StellarWP\Pigeon\Contracts\Container;
+use StellarWP\Pigeon\Tests\Container;
 use StellarWP\Pigeon\Tables\Tasks;
 use StellarWP\Pigeon\Provider;
 
@@ -9,7 +9,8 @@ Provider::set_hook_prefix( tests_pigeon_get_hook_prefix() );
 tests_pigeon_drop_tables();
 
 // Bootstrap Pigeon.
-tests_pigeon_get_container()->register( Provider::class );
+tests_pigeon_get_container()->singleton( Provider::class );
+tests_pigeon_get_container()->get( Provider::class )->register();
 
 function tests_pigeon_get_container(): Container {
 	static $container = null;

@@ -11,8 +11,6 @@ declare( strict_types=1 );
 
 namespace StellarWP\Pigeon\Contracts;
 
-use InvalidArgumentException;
-
 /**
  * Pigeon's task contract.
  *
@@ -21,17 +19,6 @@ use InvalidArgumentException;
  * @package StellarWP\Pigeon
  */
 interface Task {
-	/**
-	 * The task's constructor.
-	 *
-	 * @since TBD
-	 *
-	 * @param mixed ...$args The task's constructor arguments.
-	 *
-	 * @throws InvalidArgumentException If the task's constructor arguments are callable.
-	 */
-	public function __construct( ...$args );
-
 	/**
 	 * Processes the task.
 	 *

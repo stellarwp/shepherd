@@ -11,8 +11,8 @@ declare( strict_types=1 );
 
 namespace StellarWP\Pigeon;
 
-use lucatume\DI52\ServiceProvider;
-use StellarWP\Pigeon\Contracts\Container;
+use StellarWP\Pigeon\Abstracts\Provider_Abstract;
+use StellarWP\ContainerContract\ContainerInterface as Container;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
 use RuntimeException;
 use StellarWP\Schema\Config;
@@ -24,9 +24,8 @@ use StellarWP\DB\DB;
  * @since TBD
  *
  * @package StellarWP\Pigeon;
- * @property Container $container
  */
-class Provider extends ServiceProvider {
+class Provider extends Provider_Abstract {
 	/**
 	 * The version of the plugin.
 	 *
@@ -79,8 +78,10 @@ class Provider extends ServiceProvider {
 
 		Config::set_container( $this->container );
 		Config::set_db( DB::class );
-		$this->container->register( Tables_Provider::class );
-		$this->container->register( Regulator::class );
+		$this->container->singleton( Tables_Provider::class );
+		$this->container->singleton( Regulator::class );
+		$this->container->get( Tables_Provider::class )->register();
+		$this->container->get( Regulator::class )->register();
 
 		self::$has_registered = true;
 	}
@@ -91,10 +92,12 @@ class Provider extends ServiceProvider {
 	 * @since TBD
 	 *
 	 * @return Container
+	 *
+	 * @throws RuntimeException If the container has not been set.
 	 */
 	public static function get_container(): Container {
 		if ( ! self::$static_container ) {
-			self::$static_container = new Container();
+			throw new RuntimeException( 'The container has not been set.' );
 		}
 
 		return self::$static_container;

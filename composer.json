@@ -37,7 +37,6 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
-    "lucatume/di52": "^4.0",
     "stellarwp/db": "^1.1",
     "stellarwp/schema": "^2.0",
     "woocommerce/action-scheduler": "3.9.2"
@@ -54,7 +53,8 @@
     "codeception/util-universalframework": "^1.0",
     "lucatume/wp-browser": "^3.5.7",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "szepeviktor/phpstan-wordpress": "^2.0"
+    "szepeviktor/phpstan-wordpress": "^2.0",
+    "lucatume/di52": "^4.0"
   },
   "scripts": {
     "test:analysis": [

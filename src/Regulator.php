@@ -11,8 +11,8 @@ declare( strict_types=1 );
 
 namespace StellarWP\Pigeon;
 
-use lucatume\DI52\ServiceProvider;
-use StellarWP\Pigeon\Contracts\Container;
+use StellarWP\Pigeon\Abstracts\Provider_Abstract;
+use StellarWP\ContainerContract\ContainerInterface as Container;
 use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Tables\Tasks as Tasks_Table;
 use RuntimeException;
@@ -27,9 +27,8 @@ use StellarWP\Pigeon\Exceptions\PigeonTaskException;
  * @since TBD
  *
  * @package StellarWP\Pigeon;
- * @property Container $container
  */
-class Regulator extends ServiceProvider {
+class Regulator extends Provider_Abstract {
 	/**
 	 * The process task hook.
 	 *
@@ -132,12 +131,13 @@ class Regulator extends ServiceProvider {
 		$task_class = get_class( $task );
 		$args_hash  = $args ? md5( wp_json_encode( $args ) ) : '';
 
-		if ( as_has_scheduled_action( $this->process_task_hook, [ $task_class, $args_hash ], $group ) ) {
-			return;
-		}
-
 		try {
 			DB::beginTransaction();
+
+			if ( as_has_scheduled_action( $this->process_task_hook, [ $task_class, $args_hash ], $group ) ) {
+				DB::rollback();
+				return;
+			}
 
 			$action_id = as_schedule_single_action(
 				time() + $delay,
