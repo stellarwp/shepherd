@@ -223,14 +223,12 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param string $task_args_hash The task arguments hash.
-	 *
 	 * @throws RuntimeException    If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
 	 * @throws PigeonTaskException If the task fails to be processed.
 	 * @throws Exception           If the task fails to be processed.
 	 * @throws Throwable           If the task fails to be processed.
 	 */
-	public function process_task( string $task_args_hash ): void {
+	public function process_task(): void {
 		if ( ! $this->current_action_id ) {
 			throw new RuntimeException( 'No action ID found.' );
 		}
