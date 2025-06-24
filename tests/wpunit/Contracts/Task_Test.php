@@ -71,6 +71,14 @@ class Task_Test extends WPTestCase {
 			public function get_debounce_delay(): int {
 				return 0;
 			}
+
+			public function get_debounce_delay_on_failure(): int {
+				return 0;
+			}
+
+			public function get_task_prefix(): string {
+				return '';
+			}
 		};
 	}
 
@@ -96,5 +104,7 @@ class Task_Test extends WPTestCase {
 		$task->get_retry_delay();
 		$task->is_debouncable();
 		$task->get_debounce_delay();
+		$task->get_debounce_delay_on_failure();
+		$task->get_task_prefix();
 	}
 }

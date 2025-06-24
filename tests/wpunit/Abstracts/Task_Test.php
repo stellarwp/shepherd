@@ -11,6 +11,10 @@ class Task_Test extends WPTestCase {
 	protected function get_task( ...$args ): Task {
 		return new class( ...$args ) extends Task_Abstract {
 			public function process(): void {}
+
+			public function get_task_prefix(): string {
+				return 'test_';
+			}
 		};
 	}
 
@@ -43,7 +47,7 @@ class Task_Test extends WPTestCase {
 		$this->assertSame( 3, $task->get_id() );
 		$this->assertSame( 1, $task->get_action_id() );
 		$this->assertSame( 2, $task->get_current_try() );
-		$this->assertSame( md5( wp_json_encode( [ get_class( $task ), 'test1', 3, 'test2' ] ) ), $task->get_args_hash() );
+		$this->assertSame( $task->get_task_prefix() . md5( wp_json_encode( [ get_class( $task ), 'test1', 3, 'test2' ] ) ), $task->get_args_hash() );
 
 		$this->assertFalse( $task->is_retryable() );
 		$this->assertFalse( $task->should_retry() );
