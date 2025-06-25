@@ -3,6 +3,7 @@
 use StellarWP\Pigeon\Tests\Container;
 use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Pigeon\Tables\Tasks;
+use StellarWP\Pigeon\Tables\Task_Logs;
 use StellarWP\Pigeon\Provider;
 use StellarWP\DB\DB;
 
@@ -30,6 +31,7 @@ tests_add_filter(
 function tests_pigeon_drop_tables() {
 	$tables = [
 		Tasks::base_table_name(),
+		Task_Logs::base_table_name(),
 	];
 
 	foreach ( $tables as $table ) {

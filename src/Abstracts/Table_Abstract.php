@@ -98,6 +98,12 @@ abstract class Table_Abstract extends Table {
 	 */
 	public const COLUMN_TYPE_TIMESTAMP = 'timestamp';
 
+	public const SQL_RESERVED_DEFAULTS = [
+		'CURRENT_TIMESTAMP',
+		'CURRENT_DATE',
+		'CURRENT_TIME',
+	];
+
 	/**
 	 * The indexes for the table.
 	 *
@@ -233,7 +239,7 @@ abstract class Table_Abstract extends Table {
 			}
 
 			if ( ! empty( $definition['default'] ) ) {
-				$column_sql .= ' DEFAULT' . ( in_array( $definition['php_type'], [ self::PHP_TYPE_INT, self::PHP_TYPE_BOOL, self::PHP_TYPE_FLOAT ], true ) ? $definition['default'] : "'{$definition['default']}'" );
+				$column_sql .= ' DEFAULT ' . ( in_array( $definition['default'], self::SQL_RESERVED_DEFAULTS, true ) || in_array( $definition['php_type'], [ self::PHP_TYPE_INT, self::PHP_TYPE_BOOL, self::PHP_TYPE_FLOAT ], true ) ? $definition['default'] : "'{$definition['default']}'" );
 			}
 
 			$columns_definitions[] = $column_sql;
