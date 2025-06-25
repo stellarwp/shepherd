@@ -163,7 +163,13 @@ class Regulator extends Provider_Abstract {
 			$task->save();
 
 			if ( $previous_action_id ) {
-				$this->log_rescheduled( $task->get_id(), [ 'action_id' => $action_id, 'previous_action_id' => $previous_action_id ] );
+				$this->log_rescheduled(
+					$task->get_id(),
+					[
+						'action_id'          => $action_id,
+						'previous_action_id' => $previous_action_id,
+					] 
+				);
 			} else {
 				$this->log_created( $task->get_id(), [ 'action_id' => $action_id ] );
 			}
