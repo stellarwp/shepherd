@@ -38,6 +38,10 @@ class Tasks extends Table {
 			'name'    => 'args_hash',
 			'columns' => 'args_hash',
 		],
+		[
+			'name'    => 'class_hash',
+			'columns' => 'class_hash',
+		],
 	];
 
 	/**
@@ -107,6 +111,12 @@ class Tasks extends Table {
 				'php_type' => self::PHP_TYPE_INT,
 				'length'   => 20,
 				'unsigned' => true,
+				'nullable' => false,
+			],
+			'class_hash'        => [
+				'type'     => self::COLUMN_TYPE_VARCHAR,
+				'php_type' => self::PHP_TYPE_STRING,
+				'length'   => 191,
 				'nullable' => false,
 			],
 			'args_hash'         => [

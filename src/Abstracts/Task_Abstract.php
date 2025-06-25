@@ -12,7 +12,6 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon\Abstracts;
 
 use InvalidArgumentException;
-use RuntimeException;
 use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Provider;
 use JsonSerializable;
@@ -26,7 +25,7 @@ use StellarWP\Pigeon\Traits\Debouncable;
  *
  * @package StellarWP\Pigeon\Abstracts;
  */
-abstract class Task_Abstract implements Task {
+abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	use Retryable;
 	use Debouncable;
 
@@ -58,51 +57,6 @@ abstract class Task_Abstract implements Task {
 	protected const PRIORITY = 10;
 
 	/**
-	 * The task's ID.
-	 *
-	 * @since TBD
-	 *
-	 * @var int
-	 */
-	private int $id = 0;
-
-	/**
-	 * The task's current try.
-	 *
-	 * @since TBD
-	 *
-	 * @var int
-	 */
-	private int $current_try = 0;
-
-	/**
-	 * The task's action ID.
-	 *
-	 * @since TBD
-	 *
-	 * @var int
-	 */
-	private int $action_id = 0;
-
-	/**
-	 * The task's arguments hash.
-	 *
-	 * @since TBD
-	 *
-	 * @var string
-	 */
-	private string $args_hash;
-
-	/**
-	 * The task's constructor arguments.
-	 *
-	 * @since TBD
-	 *
-	 * @var array<mixed>
-	 */
-	private array $args;
-
-	/**
 	 * The task's constructor.
 	 *
 	 * @since TBD
@@ -122,123 +76,10 @@ abstract class Task_Abstract implements Task {
 			}
 		}
 
-		$this->args = $args;
-
+		$this->set_args( $args );
 		$this->validate_args();
-
-		$this->set_args_hash( $this->args ? md5( wp_json_encode( $this->args ) ) : '' );
-	}
-
-	/**
-	 * Sets the task's ID.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $id The task's ID.
-	 */
-	public function set_id( int $id ): void {
-		$this->id = $id;
-	}
-
-	/**
-	 * Sets the task's current try.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $current_try The task's current try.
-	 */
-	public function set_current_try( int $current_try ): void {
-		$this->current_try = $current_try;
-	}
-
-	/**
-	 * Sets the task's action ID.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $action_id The task's action ID.
-	 */
-	public function set_action_id( int $action_id ): void {
-		$this->action_id = $action_id;
-	}
-
-	/**
-	 * Sets the task's arguments hash.
-	 *
-	 * @since TBD
-	 *
-	 * @param string $args_hash The task's arguments hash.
-	 *
-	 * @throws InvalidArgumentException If the task arguments hash does not match the expected hash.
-	 * @throws RuntimeException If the task prefix is longer than 15 characters.
-	 */
-	public function set_args_hash( string $args_hash = '' ): void {
-		if ( $args_hash && $args_hash !== md5( wp_json_encode( $this->args ) ) ) {
-			throw new InvalidArgumentException( 'The task arguments hash does not match the expected hash.' );
-		}
-
-		$task_prefix = $this->get_task_prefix();
-
-		if ( strlen( $task_prefix ) > 15 ) {
-			throw new RuntimeException( 'The task prefix must be a maximum of 15 characters.' );
-		}
-
-		$this->args_hash = $task_prefix . md5( wp_json_encode( array_merge( [ static::class ], $this->args ) ) );
-	}
-
-	/**
-	 * Gets the task's ID.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's ID.
-	 */
-	public function get_id(): int {
-		return $this->id;
-	}
-
-	/**
-	 * Gets the task's current try.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's current try.
-	 */
-	public function get_current_try(): int {
-		return $this->current_try;
-	}
-
-	/**
-	 * Gets the task's action ID.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's action ID.
-	 */
-	public function get_action_id(): int {
-		return $this->action_id;
-	}
-
-	/**
-	 * Gets the task's arguments hash.
-	 *
-	 * @since TBD
-	 *
-	 * @return string The task's arguments hash.
-	 */
-	public function get_args_hash(): string {
-		return $this->args_hash;
-	}
-
-	/**
-	 * Gets the task's arguments.
-	 *
-	 * @since TBD
-	 *
-	 * @return array The task's arguments.
-	 */
-	public function get_args(): array {
-		return $this->args;
+		$this->set_class_hash();
+		$this->set_data();
 	}
 
 	/**

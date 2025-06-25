@@ -14,7 +14,7 @@ class Task_Test extends WPTestCase {
 
 			public function set_id( int $id ): void {}
 
-			public function set_args_hash( string $args_hash = '' ): void {}
+			public function set_args_hash(): void {}
 
 			public function set_action_id( int $action_id ): void {}
 
@@ -92,7 +92,7 @@ class Task_Test extends WPTestCase {
 
 		$task->process();
 		$task->set_id( 1 );
-		$task->set_args_hash( 'test1' );
+		$task->set_args_hash();
 		$task->set_action_id( 1 );
 		$task->set_current_try( 1 );
 		$task->get_args();

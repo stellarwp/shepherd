@@ -31,5 +31,6 @@ class Provider extends Provider_Abstract {
 	 */
 	public function register(): void {
 		Register::table( Tasks::class );
+		Register::table( Task_Logs::class );
 	}
 }

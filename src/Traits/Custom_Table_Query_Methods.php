@@ -171,6 +171,20 @@ trait Custom_Table_Query_Methods {
 	}
 
 	/**
+	 * Deletes a single row from the table.
+	 *
+	 * @since TBD
+	 *
+	 * @param int    $uid    The ID of the row to delete.
+	 * @param string $column The column to use for the delete query.
+	 *
+	 * @return bool Whether the delete was successful.
+	 */
+	public static function delete( int $uid, string $column = '' ): bool {
+		return self::delete_many( [ $uid ], $column );
+	}
+
+	/**
 	 * Deletes multiple rows from the table.
 	 *
 	 * @since TBD

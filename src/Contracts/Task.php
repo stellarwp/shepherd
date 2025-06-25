@@ -18,94 +18,13 @@ namespace StellarWP\Pigeon\Contracts;
  *
  * @package StellarWP\Pigeon
  */
-interface Task {
+interface Task extends Task_Model {
 	/**
 	 * Processes the task.
 	 *
 	 * @since TBD
 	 */
 	public function process(): void;
-
-	/**
-	 * Sets the task's ID.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $id The task's ID.
-	 */
-	public function set_id( int $id ): void;
-
-	/**
-	 * Sets the task's arguments hash.
-	 *
-	 * @since TBD
-	 *
-	 * @param string $args_hash The task's arguments hash.
-	 */
-	public function set_args_hash( string $args_hash = '' ): void;
-
-	/**
-	 * Sets the task's action ID.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $action_id The task's action ID.
-	 */
-	public function set_action_id( int $action_id ): void;
-
-	/**
-	 * Sets the task's current try.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $current_try The task's current try.
-	 */
-	public function set_current_try( int $current_try ): void;
-
-	/**
-	 * Gets the task's ID.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's ID.
-	 */
-	public function get_id(): int;
-
-	/**
-	 * Gets the task's current try.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's current try.
-	 */
-	public function get_current_try(): int;
-
-	/**
-	 * Gets the task's action ID.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's action ID.
-	 */
-	public function get_action_id(): int;
-
-	/**
-	 * Gets the task's arguments hash.
-	 *
-	 * @since TBD
-	 *
-	 * @return string The task's arguments hash.
-	 */
-	public function get_args_hash(): string;
-
-	/**
-	 * Gets the task's arguments.
-	 *
-	 * @since TBD
-	 *
-	 * @return array The task's arguments.
-	 */
-	public function get_args(): array;
 
 	/**
 	 * Gets the task's group.
@@ -187,15 +106,4 @@ interface Task {
 	 * @return int The task's debounce delay on failure in seconds.
 	 */
 	public function get_debounce_delay_on_failure(): int;
-
-	/**
-	 * Gets the task's hook prefix.
-	 *
-	 * SHOULD BE a maximum of 15 characters.
-	 *
-	 * @since TBD
-	 *
-	 * @return string The task's prefix.
-	 */
-	public function get_task_prefix(): string;
 }

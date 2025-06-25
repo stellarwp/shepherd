@@ -39,7 +39,6 @@ class Task_Test extends WPTestCase {
 		$this->assertIsInt( $task->get_current_try() );
 		$this->assertIsString( $task->get_args_hash() );
 
-		$task->set_args_hash( md5( wp_json_encode( [ 'test1', 3, 'test2' ] ) ) );
 		$task->set_action_id( 1 );
 		$task->set_current_try( 2 );
 		$task->set_id( 3 );

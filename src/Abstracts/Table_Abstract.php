@@ -90,6 +90,15 @@ abstract class Table_Abstract extends Table {
 	public const COLUMN_TYPE_LONGTEXT = 'longtext';
 
 	/**
+	 * The column type for a timestamp.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const COLUMN_TYPE_TIMESTAMP = 'timestamp';
+
+	/**
 	 * The indexes for the table.
 	 *
 	 * @since TBD

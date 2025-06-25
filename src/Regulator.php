@@ -130,10 +130,8 @@ class Regulator extends Provider_Abstract {
 	 * @throws PigeonTaskAlreadyExistsException If the task is already scheduled.
 	 */
 	protected function dispatch_callback( Task $task, int $delay ): void {
-		$args       = $task->get_args();
-		$group      = $task->get_group();
-		$task_class = get_class( $task );
-		$args_hash  = $task->get_args_hash();
+		$group     = $task->get_group();
+		$args_hash = $task->get_args_hash();
 
 		try {
 			DB::beginTransaction();
@@ -155,43 +153,9 @@ class Regulator extends Provider_Abstract {
 				throw new RuntimeException( 'Failed to schedule the task.' );
 			}
 
-			$task_id   = $task->get_id();
-			$uid_array = $task_id ? [ 'id' => $task_id ] : [];
+			$task->set_action_id( $action_id );
 
-			$result = Tasks_Table::upsert(
-				array_merge(
-					[
-						'action_id' => $action_id,
-						'args_hash' => $args_hash,
-						'data'      => wp_json_encode(
-							[
-								'args'       => $args,
-								'task_class' => $task_class,
-							]
-						),
-					],
-					$uid_array
-				)
-			);
-
-			if ( ! $result ) {
-				throw new RuntimeException( 'Failed to insert the task into the database.' );
-			}
-
-			if ( ! $task_id ) {
-				$task_id = DB::last_insert_id();
-				$task->set_id( $task_id );
-			}
-
-			$tasks = Tasks_Table::get_by_args_hash( $args_hash );
-			if ( count( $tasks ) !== 1 ) {
-				$action_ids      = array_map( fn( Task $task ) => $task->get_action_id(), $tasks );
-				$pending_actions = Action_Scheduler_Methods::get_pending_actions_by_ids( $action_ids );
-
-				if ( count( $pending_actions ) > 1 ) {
-					throw new RuntimeException( 'Multiple tasks found with the same arguments hash.' );
-				}
-			}
+			$task->save();
 
 			DB::commit();
 		} catch ( RuntimeException $e ) {
