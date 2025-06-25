@@ -16,6 +16,7 @@ use StellarWP\DB\DB;
 use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
 use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
+use DateTimeInterface;
 
 /**
  * Class Table_Abstract
@@ -62,6 +63,15 @@ abstract class Table_Abstract extends Table {
 	 * @var string
 	 */
 	public const PHP_TYPE_BOOL = 'bool';
+
+	/**
+	 * The PHP type for a datetime.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const PHP_TYPE_DATETIME = DateTimeInterface::class;
 
 	/**
 	 * The column type for a bigint.
@@ -213,7 +223,7 @@ abstract class Table_Abstract extends Table {
 	 * @return string The table creation SQL, in the format supported
 	 *                by the `dbDelta` function.
 	 */
-	protected function get_definition() {
+	public function get_definition() {
 		global $wpdb;
 		$table_name      = static::table_name( true );
 		$charset_collate = $wpdb->get_charset_collate();

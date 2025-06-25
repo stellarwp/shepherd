@@ -19,6 +19,7 @@ use DateTimeInterface;
 use StellarWP\Pigeon\Abstracts\Table_Abstract;
 use Psr\Log\LogLevel;
 use InvalidArgumentException;
+use DateTime;
 
 /**
  * The Pigeon log model abstract.
@@ -64,7 +65,7 @@ class Log extends Model_Abstract implements Log_Model {
 	 */
 	public const VALID_TYPES = [
 		'created',
-		'starting',
+		'started',
 		'finished',
 		'failed',
 		'rescheduled',
@@ -88,7 +89,7 @@ class Log extends Model_Abstract implements Log_Model {
 	 *
 	 * @var DateTimeInterface
 	 */
-	protected DateTimeInterface $date;
+	protected ?DateTimeInterface $date = null;
 
 	/**
 	 * The level.
@@ -203,7 +204,7 @@ class Log extends Model_Abstract implements Log_Model {
 	 * @return DateTimeInterface The date.
 	 */
 	public function get_date(): DateTimeInterface {
-		return $this->date;
+		return $this->date ?? new DateTime();
 	}
 
 	/**

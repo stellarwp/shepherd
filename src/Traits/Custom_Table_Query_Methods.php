@@ -12,6 +12,7 @@ namespace StellarWP\Pigeon\Traits;
 use Generator;
 use StellarWP\DB\DB;
 use InvalidArgumentException;
+use DateTimeInterface;
 
 /**
  * Trait Custom_Table_Query_Methods.
@@ -158,6 +159,10 @@ trait Custom_Table_Query_Methods {
 					continue;
 				}
 
+				if ( $value instanceof DateTimeInterface ) {
+					$value = $value->format( 'Y-m-d H:i:s' );
+				}
+
 				$set_statement[] = DB::prepare( "`{$column}` = %s", $value );
 			}
 
@@ -241,7 +246,7 @@ trait Custom_Table_Query_Methods {
 		$prepared_values  = implode(
 			', ',
 			array_map(
-				static fn ( array $entry ) => '(' . implode( ', ', array_map( static fn( $e ) => DB::prepare( '%s', $e ), $entry ) ) . ')',
+				static fn ( array $entry ) => '(' . implode( ', ', array_map( static fn( $e ) => DB::prepare( '%s', $e instanceof DateTimeInterface ? $e->format( 'Y-m-d H:i:s' ) : $e ), $entry ) ) . ')',
 				$entries
 			)
 		);

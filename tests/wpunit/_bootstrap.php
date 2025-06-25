@@ -1,5 +1,4 @@
 <?php
-
 use StellarWP\Pigeon\Tests\Container;
 use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Pigeon\Tables\Tasks;

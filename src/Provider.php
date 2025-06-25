@@ -75,6 +75,8 @@ class Provider extends Provider_Abstract {
 			return;
 		}
 
+		$this->require_action_scheduler();
+
 		self::$static_container = $this->container;
 
 		Schema_Config::set_container( $this->container );
@@ -86,6 +88,41 @@ class Provider extends Provider_Abstract {
 		$this->container->get( Regulator::class )->register();
 
 		self::$has_registered = true;
+	}
+
+	/**
+	 * Requires Action Scheduler.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	private function require_action_scheduler(): void {
+		require_once __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php';
+	}
+
+	/**
+	 * Sets the container.
+	 *
+	 * @since TBD
+	 *
+	 * @param ?Container $container The container.
+	 *
+	 * @return void
+	 */
+	public static function set_container( ?Container $container ): void {
+		self::$static_container = $container;
+	}
+
+	/**
+	 * Resets the registered state.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	public static function reset(): void {
+		self::$has_registered = false;
 	}
 
 	/**

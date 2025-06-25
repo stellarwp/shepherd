@@ -94,11 +94,21 @@ class Config {
 	 *
 	 * @since TBD
 	 *
-	 * @param Logger $logger The logger.
+	 * @param ?Logger $logger The logger.
 	 *
 	 * @return void
 	 */
-	public static function set_logger( Logger $logger ): void {
+	public static function set_logger( ?Logger $logger ): void {
 		static::$logger = $logger;
+	}
+
+	/**
+	 * Resets the config.
+	 *
+	 * @return void
+	 */
+	public static function reset(): void {
+		static::$hook_prefix = '';
+		static::$logger      = null;
 	}
 }

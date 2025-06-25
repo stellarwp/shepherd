@@ -115,7 +115,7 @@ class Task_Logs extends Table {
 			],
 			'date'              => [
 				'type'     => self::COLUMN_TYPE_TIMESTAMP,
-				'php_type' => self::PHP_TYPE_STRING,
+				'php_type' => self::PHP_TYPE_DATETIME,
 				'nullable' => false,
 				'default'  => 'CURRENT_TIMESTAMP',
 			],
