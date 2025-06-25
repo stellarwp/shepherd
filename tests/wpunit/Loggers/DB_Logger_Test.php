@@ -19,6 +19,7 @@ class DB_Logger_Test extends WPTestCase {
 	public function it_should_be_a_logger(): void {
 		$logger = new DB_Logger();
 		$this->assertInstanceOf( Logger::class, $logger );
+		$this->assertInstanceOf( Logger::class, Config::get_logger() );
 	}
 
 	/**
