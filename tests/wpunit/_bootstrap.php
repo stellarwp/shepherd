@@ -5,9 +5,10 @@ use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Pigeon\Tables\Tasks;
 use StellarWP\Pigeon\Tables\Task_Logs;
 use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 use StellarWP\DB\DB;
 
-Provider::set_hook_prefix( tests_pigeon_get_hook_prefix() );
+Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
 
 $container = tests_pigeon_get_container();
 

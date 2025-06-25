@@ -39,7 +39,8 @@
     "php": ">=7.4",
     "stellarwp/db": "^1.1",
     "stellarwp/schema": "^2.0",
-    "woocommerce/action-scheduler": "3.9.2"
+    "woocommerce/action-scheduler": "3.9.2",
+    "psr/log": "^1.1"
   },
   "require-dev": {
     "stellarwp/coding-standards": "^2.1",

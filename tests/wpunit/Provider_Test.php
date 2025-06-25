@@ -30,6 +30,6 @@ class Provider_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_evaluate_hook_prefix(): void {
-		$this->assertEquals( tests_pigeon_get_hook_prefix(), Provider::get_hook_prefix() );
+		$this->assertEquals( tests_pigeon_get_hook_prefix(), Config::get_hook_prefix() );
 	}
 }

@@ -13,6 +13,8 @@ namespace StellarWP\Pigeon\Tables;
 
 use StellarWP\Pigeon\Abstracts\Provider_Abstract;
 use StellarWP\Schema\Register;
+use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Pigeon\Loggers\DB_Logger;
 
 /**
  * Pigeon Tables Service Provider
@@ -31,6 +33,9 @@ class Provider extends Provider_Abstract {
 	 */
 	public function register(): void {
 		Register::table( Tasks::class );
-		Register::table( Task_Logs::class );
+
+		if ( $this->container->get( Logger::class ) instanceof DB_Logger ) {
+			Register::table( Task_Logs::class );
+		}
 	}
 }

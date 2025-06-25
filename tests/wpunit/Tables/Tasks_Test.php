@@ -6,7 +6,7 @@ namespace StellarWP\Pigeon\Tables;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 
 class Tasks_Test extends WPTestCase {
 	/**
@@ -14,7 +14,7 @@ class Tasks_Test extends WPTestCase {
 	 */
 	public function it_should_be_using_the_prefix(): void {
 		$name = Tasks::base_table_name();
-		$this->assertStringContainsString( Provider::get_hook_prefix(), $name );
+		$this->assertStringContainsString( Config::get_hook_prefix(), $name );
 
 		$query = DB::prepare( 'SHOW TABLES LIKE %s', DB::prefix( $name ) );
 		$tables = DB::get_results( $query );

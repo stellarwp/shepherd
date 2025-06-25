@@ -21,6 +21,7 @@ use Throwable;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Exceptions\PigeonTaskException;
 use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
+use StellarWP\Pigeon\Traits\Loggable;
 
 /**
  * Pigeon's regulator.
@@ -30,6 +31,8 @@ use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
  * @package StellarWP\Pigeon;
  */
 class Regulator extends Provider_Abstract {
+	use Loggable;
+
 	/**
 	 * The process task hook.
 	 *
@@ -57,7 +60,7 @@ class Regulator extends Provider_Abstract {
 	 */
 	public function __construct( Container $container ) {
 		parent::__construct( $container );
-		$this->process_task_hook = sprintf( $this->process_task_hook, Provider::get_hook_prefix() );
+		$this->process_task_hook = sprintf( $this->process_task_hook, Config::get_hook_prefix() );
 	}
 
 	/**
@@ -140,6 +143,8 @@ class Regulator extends Provider_Abstract {
 				throw new PigeonTaskAlreadyExistsException( 'The task is already scheduled.' );
 			}
 
+			$previous_action_id = $task->get_action_id();
+
 			$action_id = Action_Scheduler_Methods::schedule_single_action(
 				time() + $delay,
 				$this->process_task_hook,
@@ -157,6 +162,12 @@ class Regulator extends Provider_Abstract {
 
 			$task->save();
 
+			if ( $previous_action_id ) {
+				$this->log_rescheduled( $task->get_id(), [ 'action_id' => $action_id, 'previous_action_id' => $previous_action_id ] );
+			} else {
+				$this->log_created( $task->get_id(), [ 'action_id' => $action_id ] );
+			}
+
 			DB::commit();
 		} catch ( RuntimeException $e ) {
 			DB::rollback();
@@ -168,7 +179,7 @@ class Regulator extends Provider_Abstract {
 			 * @param Task             $task The task that failed to be scheduled or inserted into the database.
 			 * @param RuntimeException $e    The exception that was thrown.
 			 */
-			do_action( 'pigeon_' . Provider::get_hook_prefix() . '_task_scheduling_failed', $task, $e );
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_scheduling_failed', $task, $e );
 		} catch ( PigeonTaskAlreadyExistsException $e ) {
 			DB::rollback();
 			/**
@@ -178,7 +189,7 @@ class Regulator extends Provider_Abstract {
 			 *
 			 * @param Task $task The task that is already scheduled.
 			 */
-			do_action( 'pigeon_' . Provider::get_hook_prefix() . '_task_already_scheduled', $task );
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_already_scheduled', $task );
 		}
 	}
 
@@ -203,21 +214,62 @@ class Regulator extends Provider_Abstract {
 			throw new RuntimeException( 'No Pigeon task found with action ID ' . $this->current_action_id . '.' );
 		}
 
+		$log_data = [
+			'class'       => get_class( $task ),
+			'args'        => $task->get_args(),
+			'action_id'   => $this->current_action_id,
+			'current_try' => $task->get_current_try(),
+		];
+
 		try {
+			if ( $task->get_current_try() > 1 ) {
+				$this->log_retrying( $task->get_id(), $log_data );
+			} else {
+				$this->log_starting( $task->get_id(), $log_data );
+			}
+
 			$task->process();
+
+			$this->log_finished( $task->get_id(), $log_data );
 		} catch ( PigeonTaskException $e ) {
-			if ( $task->should_retry() ) {
-				$this->dispatch( $task, $task->is_debouncable() ? $task->get_debounce_delay_on_failure() : $task->get_retry_delay() );
+			if ( $this->should_retry( $task ) ) {
 				return;
 			}
-			// We need to later handle this.
+
+			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		} catch ( Exception $e ) {
-			// We need to later handle this.
+			if ( $this->should_retry( $task ) ) {
+				return;
+			}
+
+			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		} catch ( Throwable $e ) {
-			// We need to later handle this.
+			if ( $this->should_retry( $task ) ) {
+				return;
+			}
+
+			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		}
+	}
+
+	/**
+	 * Determines if the task should be retried.
+	 *
+	 * @since TBD
+	 *
+	 * @param Task $task The task.
+	 * @return bool Whether the task should be retried.
+	 */
+	protected function should_retry( Task $task ): bool {
+		if ( ! $task->should_retry() ) {
+			return false;
+		}
+
+		$task->set_current_try( $task->get_current_try() + 1 );
+		$this->dispatch( $task, $task->is_debouncable() ? $task->get_debounce_delay_on_failure() : $task->get_retry_delay() );
+		return true;
 	}
 }

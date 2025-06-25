@@ -14,6 +14,7 @@ namespace StellarWP\Pigeon\Abstracts;
 use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
 
 /**
@@ -122,7 +123,7 @@ abstract class Table_Abstract extends Table {
 		$this->db        = DB::class;
 		$this->container = Pigeon_Main_Controller::get_container();
 
-		$hook_prefix = Pigeon_Main_Controller::get_hook_prefix();
+		$hook_prefix = Config::get_hook_prefix();
 
 		// Modify table names to use the hook prefix.
 		self::$base_table_name = sprintf( self::$base_table_name, $hook_prefix );
@@ -139,7 +140,7 @@ abstract class Table_Abstract extends Table {
 	 * @return string The base table name.
 	 */
 	public static function base_table_name(): string {
-		return sprintf( static::$base_table_name, Pigeon_Main_Controller::get_hook_prefix() );
+		return sprintf( static::$base_table_name, Config::get_hook_prefix() );
 	}
 
 	/**
@@ -152,7 +153,7 @@ abstract class Table_Abstract extends Table {
 	 * @return string The schema slug.
 	 */
 	public static function get_schema_slug(): string {
-		return sprintf( static::$schema_slug, Pigeon_Main_Controller::get_hook_prefix() );
+		return sprintf( static::$schema_slug, Config::get_hook_prefix() );
 	}
 
 	/**

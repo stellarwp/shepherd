@@ -29,10 +29,11 @@ trait Custom_Table_Query_Methods {
 	 * @param int    $batch_size   The number of rows to fetch per batch.
 	 * @param string $output       The output type of the query, one of OBJECT, ARRAY_A, or ARRAY_N.
 	 * @param string $where_clause The optional WHERE clause to use.
+	 * @param string $order_by     The optional ORDER BY clause to use.
 	 *
 	 * @return Generator<array<string, mixed>> The rows from the table.
 	 */
-	public static function fetch_all( int $batch_size = 50, string $output = OBJECT, string $where_clause = '' ): Generator {
+	public static function fetch_all( int $batch_size = 50, string $output = OBJECT, string $where_clause = '', string $order_by = '' ): Generator {
 		$fetched = 0;
 		$total   = null;
 		$offset  = 0;
@@ -43,9 +44,11 @@ trait Custom_Table_Query_Methods {
 
 			$uid_column = self::uid_column();
 
+			$order_by = $order_by ?: $uid_column . ' ASC';
+
 			$batch = DB::get_results(
 				DB::prepare(
-					"SELECT {$sql_calc_found_rows} * FROM %i {$where_clause} ORDER BY {$uid_column} LIMIT %d, %d",
+					"SELECT {$sql_calc_found_rows} * FROM %i {$where_clause} ORDER BY {$order_by} LIMIT %d, %d",
 					static::table_name( true ),
 					$offset,
 					$batch_size
@@ -254,11 +257,12 @@ trait Custom_Table_Query_Methods {
 	 * @param string $where_clause The WHERE clause to use.
 	 * @param int    $batch_size   The number of rows to fetch per batch.
 	 * @param string $output       The output type of the query, one of OBJECT, ARRAY_A, or ARRAY_N.
+	 * @param string $order_by     The optional ORDER BY clause to use.
 	 *
 	 * @return Generator<array<string, mixed>> The rows from the table.
 	 */
-	public static function fetch_all_where( string $where_clause, int $batch_size = 50, string $output = OBJECT ): Generator {
-		return static::fetch_all( $batch_size, $output, $where_clause );
+	public static function fetch_all_where( string $where_clause, int $batch_size = 50, string $output = OBJECT, string $order_by = '' ): Generator {
+		return static::fetch_all( $batch_size, $output, $where_clause, $order_by );
 	}
 
 	/**

@@ -15,8 +15,9 @@ use StellarWP\Pigeon\Abstracts\Provider_Abstract;
 use StellarWP\ContainerContract\ContainerInterface as Container;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
 use RuntimeException;
-use StellarWP\Schema\Config;
+use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
+use StellarWP\Pigeon\Contracts\Logger;
 
 /**
  * Main Service Provider
@@ -76,8 +77,9 @@ class Provider extends Provider_Abstract {
 
 		self::$static_container = $this->container;
 
-		Config::set_container( $this->container );
-		Config::set_db( DB::class );
+		Schema_Config::set_container( $this->container );
+		Schema_Config::set_db( DB::class );
+		$this->container->singleton( Logger::class, Config::get_logger() );
 		$this->container->singleton( Tables_Provider::class );
 		$this->container->singleton( Regulator::class );
 		$this->container->get( Tables_Provider::class )->register();
@@ -112,40 +114,5 @@ class Provider extends Provider_Abstract {
 	 */
 	public static function is_registered(): bool {
 		return self::$has_registered;
-	}
-
-	/**
-	 * Gets the hook prefix.
-	 *
-	 * @since TBD
-	 *
-	 * @throws RuntimeException If the hook prefix is not set.
-	 *
-	 * @return string
-	 */
-	public static function get_hook_prefix(): string {
-		if ( ! static::$hook_prefix ) {
-			$class = __CLASS__;
-			throw new RuntimeException( "You must specify a hook prefix for your project with {$class}::set_hook_prefix()" );
-		}
-
-		return static::$hook_prefix;
-	}
-
-	/**
-	 * Sets the hook prefix.
-	 *
-	 * @param string $prefix The prefix to add to hooks.
-	 *
-	 * @throws RuntimeException If the hook prefix is empty.
-	 *
-	 * @return void
-	 */
-	public static function set_hook_prefix( string $prefix ): void {
-		if ( ! $prefix ) {
-			throw new RuntimeException( 'The hook prefix cannot be empty.' );
-		}
-
-		static::$hook_prefix = $prefix;
 	}
 }

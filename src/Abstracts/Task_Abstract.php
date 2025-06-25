@@ -13,7 +13,7 @@ namespace StellarWP\Pigeon\Abstracts;
 
 use InvalidArgumentException;
 use StellarWP\Pigeon\Contracts\Task;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 use JsonSerializable;
 use StellarWP\Pigeon\Traits\Retryable;
 use StellarWP\Pigeon\Traits\Debouncable;
@@ -90,7 +90,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 * @return string The task's group.
 	 */
 	public function get_group(): string {
-		return sprintf( static::GROUP, Provider::get_hook_prefix() );
+		return sprintf( static::GROUP, Config::get_hook_prefix() );
 	}
 
 	/**
