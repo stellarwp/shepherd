@@ -28,7 +28,7 @@ use StellarWP\Pigeon\Traits\Loggable;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon;
+ * @package StellarWP\Pigeon
  */
 class Regulator extends Provider_Abstract {
 	use Loggable;
@@ -168,7 +168,7 @@ class Regulator extends Provider_Abstract {
 					[
 						'action_id'          => $action_id,
 						'previous_action_id' => $previous_action_id,
-					] 
+					]
 				);
 			} else {
 				$this->log_created( $task->get_id(), [ 'action_id' => $action_id ] );

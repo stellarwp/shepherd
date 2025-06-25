@@ -4,7 +4,7 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts;
+ * @package StellarWP\Pigeon\Contracts
  */
 
 declare( strict_types=1 );
@@ -18,7 +18,7 @@ use DateTimeInterface;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts;
+ * @package StellarWP\Pigeon\Contracts
  */
 interface Log_Model extends Model {
 	/**

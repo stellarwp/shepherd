@@ -4,7 +4,7 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon;
+ * @package StellarWP\Pigeon
  */
 
 declare( strict_types=1 );
@@ -25,7 +25,7 @@ use InvalidArgumentException;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon;
+ * @package StellarWP\Pigeon
  */
 class Log extends Model_Abstract implements Log_Model {
 	/**
@@ -123,7 +123,6 @@ class Log extends Model_Abstract implements Log_Model {
 	 * @since TBD
 	 *
 	 * @param int $task_id The task ID.
-	 * @return void The method does not return any value.
 	 */
 	public function set_task_id( int $task_id ): void {
 		$this->task_id = $task_id;
@@ -135,7 +134,6 @@ class Log extends Model_Abstract implements Log_Model {
 	 * @since TBD
 	 *
 	 * @param DateTimeInterface $date The date.
-	 * @return void The method does not return any value.
 	 */
 	public function set_date( DateTimeInterface $date ): void {
 		$this->date = $date;
@@ -147,7 +145,6 @@ class Log extends Model_Abstract implements Log_Model {
 	 * @since TBD
 	 *
 	 * @param string $level The level.
-	 * @return void The method does not return any value.
 	 *
 	 * @throws InvalidArgumentException If the log level is invalid.
 	 */
@@ -165,7 +162,6 @@ class Log extends Model_Abstract implements Log_Model {
 	 * @since TBD
 	 *
 	 * @param string $type The type.
-	 * @return void The method does not return any value.
 	 *
 	 * @throws InvalidArgumentException If the log type is invalid.
 	 */
@@ -183,7 +179,6 @@ class Log extends Model_Abstract implements Log_Model {
 	 * @since TBD
 	 *
 	 * @param string $entry The entry.
-	 * @return void The method does not return any value.
 	 */
 	public function set_entry( string $entry ): void {
 		$this->entry = trim( $entry );

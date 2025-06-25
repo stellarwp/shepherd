@@ -4,7 +4,7 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts;
+ * @package StellarWP\Pigeon\Contracts
  */
 
 declare( strict_types=1 );
@@ -19,7 +19,7 @@ use StellarWP\Pigeon\Log;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts;
+ * @package StellarWP\Pigeon\Contracts
  */
 interface Logger extends LoggerInterface {
 	/**
