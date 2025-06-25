@@ -114,7 +114,7 @@ abstract class Model_Abstract implements Model {
 	 */
 	public function to_array(): array {
 		$table_interface = $this->get_table_interface();
-		$columns         = $table_interface::get_columns();
+		$columns         = array_keys( $table_interface::get_columns() );
 
 		$model = [];
 		foreach ( $columns as $column ) {
@@ -127,27 +127,6 @@ abstract class Model_Abstract implements Model {
 
 		if ( empty( $model[ $uid_column ] ) ) {
 			unset( $model[ $uid_column ] );
-		}
-
-		return $model;
-	}
-
-	/**
-	 * Converts an array to a model.
-	 *
-	 * @since TBD
-	 *
-	 * @param array $data The model data.
-	 *
-	 * @return self The model.
-	 */
-	public static function from_array( array $data ): self {
-		$model = new static();
-
-		foreach ( $data as $column => $value ) {
-			$method = 'set_' . $column;
-
-			$model->$method( $value );
 		}
 
 		return $model;

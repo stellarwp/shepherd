@@ -48,7 +48,7 @@ trait Retryable {
 			return true;
 		}
 
-		return $this->current_try < static::$max_retries;
+		return $this->get_current_try() < static::$max_retries;
 	}
 
 	/**

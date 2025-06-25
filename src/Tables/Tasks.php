@@ -173,7 +173,7 @@ class Tasks extends Table {
 	 */
 	public static function get_by_args_hash( string $args_hash ): array {
 		$results = [];
-		foreach ( self::fetch_all_where( DB::prepare( 'WHERE args_hash = %s', $args_hash ), ARRAY_A ) as $task_array ) {
+		foreach ( self::fetch_all_where( DB::prepare( 'WHERE args_hash = %s', $args_hash ), 50, ARRAY_A ) as $task_array ) {
 			if ( empty( $task_array[ self::$uid_column ] ) ) {
 				continue;
 			}

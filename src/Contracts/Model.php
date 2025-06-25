@@ -74,15 +74,4 @@ interface Model {
 	 * @return array The model as an array.
 	 */
 	public function to_array(): array;
-
-	/**
-	 * Converts an array to a model.
-	 *
-	 * @since TBD
-	 *
-	 * @param array $data The model data.
-	 *
-	 * @return self The model.
-	 */
-	public static function from_array( array $data ): self;
 }
