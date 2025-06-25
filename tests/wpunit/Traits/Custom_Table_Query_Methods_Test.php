@@ -6,8 +6,6 @@ namespace StellarWP\Pigeon\Traits;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Pigeon\Abstracts\Table_Abstract;
-use StellarWP\Pigeon\Config;
-use StellarWP\DB\DB;
 use StellarWP\Schema\Register;
 
 class Dummy_Query_Table extends Table_Abstract {
@@ -16,6 +14,10 @@ class Dummy_Query_Table extends Table_Abstract {
 	protected static $base_table_name = 'pigeon_query_table_%s';
 	protected static $schema_slug = 'pigeon-query-table-%s';
 	protected static $uid_column = 'id';
+
+	const SCHEMA_VERSION = '0.0.1-dev';
+
+	protected static $group = 'stellarwp_pigeon';
 
 	public static function get_columns(): array {
 		return [
@@ -75,7 +77,7 @@ class Custom_Table_Query_Methods_Test extends WPTestCase {
 		Dummy_Query_Table::insert( [ 'name' => 'John Doe', 'email' => 'john@test.com' ] );
 		$row = Dummy_Query_Table::fetch_first_where( "WHERE name = 'John Doe'" );
 
-		Dummy_Query_Table::delete( $row->id );
+		Dummy_Query_Table::delete( (int) $row->id );
 		$this->assertNull( Dummy_Query_Table::fetch_first_where( "WHERE id = {$row->id}" ) );
 	}
 
