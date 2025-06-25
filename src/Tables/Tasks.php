@@ -10,6 +10,9 @@
 namespace StellarWP\Pigeon\Tables;
 
 use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
+use StellarWP\DB\DB;
+use StellarWP\Pigeon\Contracts\Task;
+use InvalidArgumentException;
 
 /**
  * Tasks table schema.
@@ -34,6 +37,10 @@ class Tasks extends Table {
 		[
 			'name'    => 'args_hash',
 			'columns' => 'args_hash',
+		],
+		[
+			'name'    => 'class_hash',
+			'columns' => 'class_hash',
 		],
 	];
 
@@ -106,17 +113,107 @@ class Tasks extends Table {
 				'unsigned' => true,
 				'nullable' => false,
 			],
+			'class_hash'        => [
+				'type'     => self::COLUMN_TYPE_VARCHAR,
+				'php_type' => self::PHP_TYPE_STRING,
+				'length'   => 191,
+				'nullable' => false,
+			],
 			'args_hash'         => [
 				'type'     => self::COLUMN_TYPE_VARCHAR,
 				'php_type' => self::PHP_TYPE_STRING,
-				'length'   => 128,
+				'length'   => 191,
 				'nullable' => false,
 			],
-			'args'              => [
+			'data'              => [
 				'type'     => self::COLUMN_TYPE_LONGTEXT,
 				'php_type' => self::PHP_TYPE_STRING,
 				'nullable' => true,
 			],
+			'current_try'       => [
+				'type'     => self::COLUMN_TYPE_BIGINT,
+				'php_type' => self::PHP_TYPE_INT,
+				'length'   => 20,
+				'unsigned' => true,
+				'nullable' => false,
+				'default'  => 0,
+			],
 		];
+	}
+
+	/**
+	 * Gets a task by its action ID.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $action_id  The action ID.
+	 *
+	 * @return ?Task The task, or null if not found.
+	 *
+	 * @throws InvalidArgumentException If the task class does not implement the Task interface.
+	 */
+	public static function get_by_action_id( int $action_id ): ?Task {
+		$task_array = self::fetch_first_where( DB::prepare( 'WHERE action_id = %d', $action_id ), ARRAY_A );
+
+		if ( empty( $task_array[ self::$uid_column ] ) ) {
+			return null;
+		}
+
+		return self::get_task_from_array( $task_array );
+	}
+
+	/**
+	 * Gets a task by its arguments hash.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $args_hash The arguments hash.
+	 *
+	 * @return Task[] The tasks, or an empty array if no tasks are found.
+	 */
+	public static function get_by_args_hash( string $args_hash ): array {
+		$results = [];
+		foreach ( self::fetch_all_where( DB::prepare( 'WHERE args_hash = %s', $args_hash ), 50, ARRAY_A ) as $task_array ) {
+			if ( empty( $task_array[ self::$uid_column ] ) ) {
+				continue;
+			}
+
+			$results[] = self::get_task_from_array( $task_array );
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Gets a task from an array.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<string, mixed> $task_array The task array.
+	 *
+	 * @return Task The task.
+	 *
+	 * @throws InvalidArgumentException If the task class does not exist or does not implement the Task interface.
+	 */
+	private static function get_task_from_array( array $task_array ): Task {
+		$task_data = json_decode( $task_array['data'] ?? '[]', true );
+
+		$task_class = $task_data['task_class'] ?? '';
+
+		if ( ! $task_class || ! class_exists( $task_class ) ) {
+			throw new InvalidArgumentException( 'The task class does not exist.' );
+		}
+
+		$task = new $task_class( ...( $task_data['args'] ?? [] ) );
+
+		if ( ! $task instanceof Task ) {
+			throw new InvalidArgumentException( 'The task class does not implement the Task interface.' );
+		}
+
+		$task->set_id( $task_array[ self::$uid_column ] );
+		$task->set_action_id( $task_array['action_id'] );
+		$task->set_current_try( $task_array['current_try'] );
+
+		return $task;
 	}
 }

@@ -14,6 +14,8 @@ namespace StellarWP\Pigeon\Abstracts;
 use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
+use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
 
 /**
  * Class Table_Abstract
@@ -23,6 +25,8 @@ use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
  * @package StellarWP\Pigeon\Abstracts
  */
 abstract class Table_Abstract extends Table {
+	use Custom_Table_Query_Methods;
+
 	/**
 	 * The PHP type for an integer.
 	 *
@@ -87,6 +91,21 @@ abstract class Table_Abstract extends Table {
 	public const COLUMN_TYPE_LONGTEXT = 'longtext';
 
 	/**
+	 * The column type for a timestamp.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const COLUMN_TYPE_TIMESTAMP = 'timestamp';
+
+	public const SQL_RESERVED_DEFAULTS = [
+		'CURRENT_TIMESTAMP',
+		'CURRENT_DATE',
+		'CURRENT_TIME',
+	];
+
+	/**
 	 * The indexes for the table.
 	 *
 	 * @since TBD
@@ -104,11 +123,37 @@ abstract class Table_Abstract extends Table {
 		$this->db        = DB::class;
 		$this->container = Pigeon_Main_Controller::get_container();
 
-		$hook_prefix = Pigeon_Main_Controller::get_hook_prefix();
+		$hook_prefix = Config::get_hook_prefix();
 
 		// Modify table names to use the hook prefix.
 		self::$base_table_name = sprintf( self::$base_table_name, $hook_prefix );
 		self::$schema_slug     = sprintf( self::$schema_slug, $hook_prefix );
+	}
+
+	/**
+	 * Returns the base table name.
+	 *
+	 * This method is overridden to use the hook prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The base table name.
+	 */
+	public static function base_table_name(): string {
+		return sprintf( static::$base_table_name, Config::get_hook_prefix() );
+	}
+
+	/**
+	 * The schema slug.
+	 *
+	 * This method is overridden to use the hook prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The schema slug.
+	 */
+	public static function get_schema_slug(): string {
+		return sprintf( static::$schema_slug, Config::get_hook_prefix() );
 	}
 
 	/**
@@ -195,7 +240,7 @@ abstract class Table_Abstract extends Table {
 			}
 
 			if ( ! empty( $definition['default'] ) ) {
-				$column_sql .= ' DEFAULT' . ( in_array( $definition['php_type'], [ self::PHP_TYPE_INT, self::PHP_TYPE_BOOL, self::PHP_TYPE_FLOAT ], true ) ? $definition['default'] : "'{$definition['default']}'" );
+				$column_sql .= ' DEFAULT ' . ( in_array( $definition['default'], self::SQL_RESERVED_DEFAULTS, true ) || in_array( $definition['php_type'], [ self::PHP_TYPE_INT, self::PHP_TYPE_BOOL, self::PHP_TYPE_FLOAT ], true ) ? $definition['default'] : "'{$definition['default']}'" );
 			}
 
 			$columns_definitions[] = $column_sql;
