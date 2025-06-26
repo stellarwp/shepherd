@@ -615,6 +615,8 @@ trait Custom_Table_Query_Methods {
 		return static::get_first_by( static::uid_column(), $id );
 	}
 
+	// phpcs:disable Squiz.Commenting.FunctionComment.InvalidNoReturn, Generic.CodeAnalysis.UnusedFunctionParameter.Found
+
 	/**
 	 * Gets a model from an array.
 	 *
@@ -629,4 +631,6 @@ trait Custom_Table_Query_Methods {
 	protected static function get_model_from_array( array $model_array ): Model {
 		throw new RuntimeException( 'Implement this method in the child class.' );
 	}
+
+	// phpcs:enable Squiz.Commenting.FunctionComment.InvalidNoReturn, Generic.CodeAnalysis.UnusedFunctionParameter.Found
 }
