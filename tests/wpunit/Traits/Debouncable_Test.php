@@ -14,9 +14,9 @@ class Debouncable_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_be_debouncable_by_default() {
+	public function it_should_not_be_debouncable_by_default() {
 		$dummy = new Dummy_Debouncable();
-		$this->assertTrue( $dummy->is_debouncable() );
+		$this->assertFalse( $dummy->is_debouncable() );
 	}
 
 	/**

@@ -51,7 +51,7 @@ class Task_Test extends WPTestCase {
 		$this->assertFalse( $task->is_retryable() );
 		$this->assertFalse( $task->should_retry() );
 		$this->assertSame( 0, $task->get_retry_delay() );
-		$this->assertTrue( $task->is_debouncable() );
+		$this->assertFalse( $task->is_debouncable() );
 		$this->assertSame( 0, $task->get_debounce_delay() );
 	}
 }

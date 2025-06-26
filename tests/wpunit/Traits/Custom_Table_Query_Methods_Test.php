@@ -7,6 +7,7 @@ namespace StellarWP\Pigeon\Traits;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Pigeon\Abstracts\Table_Abstract;
 use StellarWP\Schema\Register;
+use StellarWP\Pigeon\Contracts\Model;
 
 class Dummy_Query_Table extends Table_Abstract {
 	use Custom_Table_Query_Methods;
@@ -25,6 +26,9 @@ class Dummy_Query_Table extends Table_Abstract {
 			'name' => [ 'type' => self::COLUMN_TYPE_VARCHAR, 'length' => 255, 'php_type' => self::PHP_TYPE_STRING ],
 			'email' => [ 'type' => self::COLUMN_TYPE_VARCHAR, 'length' => 255, 'php_type' => self::PHP_TYPE_STRING ],
 		];
+	}
+
+	protected static function get_model_from_array( array $model_array ): Model {
 	}
 }
 

@@ -6,6 +6,7 @@ namespace StellarWP\Pigeon\Abstracts;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Contracts\Model;
 use StellarWP\DB\DB;
 
 class Dummy_Table extends Table_Abstract {
@@ -18,6 +19,9 @@ class Dummy_Table extends Table_Abstract {
 			'id'   => [ 'type' => self::COLUMN_TYPE_BIGINT, 'length' => 20, 'unsigned' => true, 'auto_increment' => true ],
 			'name' => [ 'type' => self::COLUMN_TYPE_VARCHAR, 'length' => 255 ],
 		];
+	}
+
+	protected static function get_model_from_array( array $model_array ): Model {
 	}
 }
 
