@@ -15,6 +15,7 @@ jobs:
         with:
           php_version: 7.4
           php_extensions: zip mysqli
+          args: --ignore-platform-reqs
 
       - name: Fix and Push phpcbf issues
         continue-on-error: true
