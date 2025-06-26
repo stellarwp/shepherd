@@ -12,7 +12,6 @@ namespace StellarWP\Pigeon\Traits;
 use Generator;
 use StellarWP\DB\DB;
 use InvalidArgumentException;
-use RuntimeException;
 use DateTimeInterface;
 use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
 use StellarWP\Pigeon\Contracts\Model;
