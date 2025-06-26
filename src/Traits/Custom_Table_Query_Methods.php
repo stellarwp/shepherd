@@ -506,20 +506,20 @@ trait Custom_Table_Query_Methods {
 	}
 
 	/**
-	 * Gets all tasks by a column.
+	 * Gets all models by a column.
 	 *
 	 * @since TBD
 	 *
-	 * @param string $column The column to get the tasks by.
-	 * @param mixed  $value  The value to get the tasks by.
-	 * @param int    $limit  The limit of tasks to return.
+	 * @param string $column The column to get the models by.
+	 * @param mixed  $value  The value to get the models by.
+	 * @param int    $limit  The limit of models to return.
 	 *
-	 * @return Task[] The tasks, or an empty array if no tasks are found.
+	 * @return Model[] The models, or an empty array if no models are found.
 	 *
 	 * @throws InvalidArgumentException If the column does not exist.
 	 */
 	public static function get_all_by( string $column, $value, int $limit = 50 ): ?array {
-		[ $value, $placeholder ] = static::prepare_value_for_query( $column, $value );
+		[ $value, $placeholder ] = self::prepare_value_for_query( $column, $value );
 
 		$results = [];
 		foreach ( static::fetch_all_where( DB::prepare( "WHERE {$column} = {$placeholder}", $value ), $limit, ARRAY_A ) as $task_array ) {
@@ -546,7 +546,7 @@ trait Custom_Table_Query_Methods {
 	 * @throws InvalidArgumentException If the column does not exist.
 	 */
 	public static function get_first_by( string $column, $value ): ?Model {
-		[ $value, $placeholder ] = static::prepare_value_for_query( $column, $value );
+		[ $value, $placeholder ] = self::prepare_value_for_query( $column, $value );
 
 		$task_array = static::fetch_first_where( DB::prepare( "WHERE {$column} = {$placeholder}", $value ), ARRAY_A );
 
