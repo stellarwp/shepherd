@@ -152,6 +152,7 @@ class Tasks extends Table {
 	 * @throws InvalidArgumentException If the task class does not implement the Task interface.
 	 */
 	public static function get_by_action_id( int $action_id ): ?Task {
+		/** @var Task|null */
 		return self::get_first_by( 'action_id', $action_id );
 	}
 
@@ -165,6 +166,7 @@ class Tasks extends Table {
 	 * @return Task[] The tasks, or an empty array if no tasks are found.
 	 */
 	public static function get_by_args_hash( string $args_hash ): array {
+		/** @var Task[]|null */
 		return self::get_all_by( 'args_hash', $args_hash );
 	}
 
