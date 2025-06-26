@@ -136,7 +136,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 		$this->data = wp_json_encode(
 			[
 				'args'       => $this->args,
-				'task_class' => $this->class_hash,
+				'task_class' => static::class,
 			]
 		);
 	}

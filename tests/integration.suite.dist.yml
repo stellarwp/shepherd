@@ -15,3 +15,5 @@ modules:
             domain: "%WP_DOMAIN%"
             adminEmail: admin@%WP_DOMAIN%
             title: 'Pigeon Integration Tests'
+            configFile: tests/config.php
+            theme: kadence

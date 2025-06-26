@@ -52,6 +52,15 @@ class Regulator extends Provider_Abstract {
 	protected int $current_action_id = 0;
 
 	/**
+	 * The scheduled tasks.
+	 *
+	 * @since TBD
+	 *
+	 * @var array
+	 */
+	protected array $scheduled_tasks = [];
+
+	/**
 	 * The regulator's constructor.
 	 *
 	 * @since TBD
@@ -103,13 +112,15 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
+	 *
+	 * @return self The regulator instance.
 	 */
-	public function dispatch( Task $task, int $delay = 0 ): void {
+	public function dispatch( Task $task, int $delay = 0 ): self {
 		$delay = $task->is_debouncable() ? $delay + $task->get_debounce_delay() : $delay;
 
 		if ( did_action( 'init' ) || doing_action( 'init' ) ) {
 			$this->dispatch_callback( $task, $delay );
-			return;
+			return $this;
 		}
 
 		add_action(
@@ -119,6 +130,8 @@ class Regulator extends Provider_Abstract {
 			},
 			10
 		);
+
+		return $this;
 	}
 
 	/**
@@ -160,7 +173,7 @@ class Regulator extends Provider_Abstract {
 
 			$task->set_action_id( $action_id );
 
-			$task->save();
+			$this->scheduled_tasks[] = $task->save();
 
 			if ( $previous_action_id ) {
 				$this->log_rescheduled(
@@ -200,21 +213,62 @@ class Regulator extends Provider_Abstract {
 	}
 
 	/**
+	 * Gets the last scheduled task ID.
+	 *
+	 * @since TBD
+	 *
+	 * @return ?int The last scheduled task ID.
+	 */
+	public function get_last_scheduled_task_id(): ?int {
+		return empty( $this->scheduled_tasks ) ? null : end( $this->scheduled_tasks );
+	}
+
+	/**
+	 * Gets the process task hook.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The process task hook.
+	 */
+	public function get_hook(): string {
+		return $this->process_task_hook;
+	}
+
+	/**
+	 * Busts the runtime cached tasks.
+	 *
+	 * @since TBD
+	 */
+	public function bust_runtime_cached_tasks(): void {
+		$this->scheduled_tasks = [];
+	}
+
+	/**
 	 * Processes a task.
 	 *
 	 * @since TBD
+	 *
+	 * @param string $args_hash The arguments hash.
 	 *
 	 * @throws RuntimeException    If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
 	 * @throws PigeonTaskException If the task fails to be processed.
 	 * @throws Exception           If the task fails to be processed.
 	 * @throws Throwable           If the task fails to be processed.
 	 */
-	public function process_task(): void {
+	public function process_task( string $args_hash ): void {
+		$task = null;
+
 		if ( ! $this->current_action_id ) {
-			throw new RuntimeException( 'No action ID found.' );
+			$task = Tasks_Table::get_by_args_hash( $args_hash );
+
+			if ( ! $task ) {
+				throw new RuntimeException( 'No Pigeon task found with args hash ' . $args_hash . '.' );
+			}
+
+			$task = array_shift( $task );
 		}
 
-		$task = Tasks_Table::get_by_action_id( $this->current_action_id );
+		$task ??= Tasks_Table::get_by_action_id( $this->current_action_id );
 
 		if ( ! $task ) {
 			throw new RuntimeException( 'No Pigeon task found with action ID ' . $this->current_action_id . '.' );

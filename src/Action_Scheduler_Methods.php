@@ -58,6 +58,29 @@ class Action_Scheduler_Methods {
 	}
 
 	/**
+	 * Gets an action by its ID.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $action_id The action ID.
+	 *
+	 * @return ActionScheduler_Action The action.
+	 *
+	 * @throws RuntimeException If the action is not found.
+	 */
+	public static function get_action_by_id( int $action_id ): ActionScheduler_Action {
+		$store = ActionScheduler::store();
+
+		$action = $store->fetch_action( $action_id );
+
+		if ( ! $action instanceof ActionScheduler_Action ) {
+			throw new RuntimeException( 'Action not found.' );
+		}
+
+		return $action;
+	}
+
+	/**
 	 * Gets actions by their IDs.
 	 *
 	 * @since TBD

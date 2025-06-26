@@ -12,7 +12,10 @@ namespace StellarWP\Pigeon\Traits;
 use Generator;
 use StellarWP\DB\DB;
 use InvalidArgumentException;
+use RuntimeException;
 use DateTimeInterface;
+use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
+use StellarWP\Pigeon\Contracts\Model;
 
 /**
  * Trait Custom_Table_Query_Methods.
@@ -43,7 +46,7 @@ trait Custom_Table_Query_Methods {
 			// On first iteration, we need to set the SQL_CALC_FOUND_ROWS flag.
 			$sql_calc_found_rows = 0 === $fetched ? 'SQL_CALC_FOUND_ROWS' : '';
 
-			$uid_column = self::uid_column();
+			$uid_column = static::uid_column();
 
 			$order_by = $order_by ?: $uid_column . ' ASC';
 
@@ -75,7 +78,7 @@ trait Custom_Table_Query_Methods {
 	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
 	public static function insert( array $entry ) {
-		return self::insert_many( [ $entry ] );
+		return static::insert_many( [ $entry ] );
 	}
 
 	/**
@@ -88,7 +91,7 @@ trait Custom_Table_Query_Methods {
 	 * @return bool Whether the update was successful.
 	 */
 	public static function update_single( array $entry ): bool {
-		return self::update_many( [ $entry ] );
+		return static::update_many( [ $entry ] );
 	}
 
 	/**
@@ -101,10 +104,10 @@ trait Custom_Table_Query_Methods {
 	 * @return bool Whether the upsert was successful.
 	 */
 	public static function upsert( array $entry ): bool {
-		$uid_column = self::uid_column();
+		$uid_column = static::uid_column();
 		$uid        = $entry[ $uid_column ] ?? false;
 
-		return $uid ? self::update_single( $entry ) : self::insert( $entry );
+		return $uid ? static::update_single( $entry ) : static::insert( $entry );
 	}
 
 	/**
@@ -117,7 +120,7 @@ trait Custom_Table_Query_Methods {
 	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
 	public static function insert_many( array $entries ) {
-		[ $prepared_columns, $prepared_values ] = self::prepare_statements_values( $entries );
+		[ $prepared_columns, $prepared_values ] = static::prepare_statements_values( $entries );
 
 		return DB::query(
 			DB::prepare(
@@ -137,7 +140,7 @@ trait Custom_Table_Query_Methods {
 	 * @return bool Whether the update was successful.
 	 */
 	public static function update_many( array $entries ): bool {
-		$uid_column = self::uid_column();
+		$uid_column = static::uid_column();
 
 		$queries = [];
 		$columns = array_keys( static::get_columns() );
@@ -189,7 +192,7 @@ trait Custom_Table_Query_Methods {
 	 * @return bool Whether the delete was successful.
 	 */
 	public static function delete( int $uid, string $column = '' ): bool {
-		return self::delete_many( [ $uid ], $column );
+		return static::delete_many( [ $uid ], $column );
 	}
 
 	/**
@@ -216,7 +219,7 @@ trait Custom_Table_Query_Methods {
 
 		$prepared_ids = implode( ', ', $ids );
 
-		$column = $column ?: self::uid_column();
+		$column = $column ?: static::uid_column();
 
 		return DB::query(
 			DB::prepare(
@@ -322,20 +325,20 @@ trait Custom_Table_Query_Methods {
 
 		$offset = ( $page - 1 ) * $per_page;
 
-		$orderby = $args['orderby'] ?? self::uid_column();
+		$orderby = $args['orderby'] ?? static::uid_column();
 		$order   = strtoupper( $args['order'] ?? 'ASC' );
 
 		if ( ! in_array( $orderby, array_keys( static::get_columns() ), true ) ) {
-			$orderby = self::uid_column();
+			$orderby = static::uid_column();
 		}
 
 		if ( ! in_array( $order, [ 'ASC', 'DESC' ], true ) ) {
 			$order = 'ASC';
 		}
 
-		$where = self::build_where_from_args( $args );
+		$where = static::build_where_from_args( $args );
 
-		[ $join, $secondary_columns ] = $is_join ? self::get_join_parts( $join_table, $join_condition, $selectable_joined_columns ) : [ '', '' ];
+		[ $join, $secondary_columns ] = $is_join ? static::get_join_parts( $join_table, $join_condition, $selectable_joined_columns ) : [ '', '' ];
 
 		return DB::get_results(
 			DB::prepare(
@@ -358,7 +361,7 @@ trait Custom_Table_Query_Methods {
 	 * @return int The total number of items in the table.
 	 */
 	public static function get_total_items( array $args = [] ): int {
-		$where = self::build_where_from_args( $args );
+		$where = static::build_where_from_args( $args );
 
 		return (int) DB::get_var(
 			DB::prepare(
@@ -500,5 +503,130 @@ trait Custom_Table_Query_Methods {
 			DB::prepare( "JOIN %i b ON {$join_condition}", $join_table::table_name( true ) ),
 			$clean_secondary_columns,
 		];
+	}
+
+	/**
+	 * Gets all tasks by a column.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $column The column to get the tasks by.
+	 * @param mixed  $value  The value to get the tasks by.
+	 * @param int    $limit  The limit of tasks to return.
+	 *
+	 * @return Task[] The tasks, or an empty array if no tasks are found.
+	 *
+	 * @throws InvalidArgumentException If the column does not exist.
+	 */
+	public static function get_all_by( string $column, $value, int $limit = 50 ): ?array {
+		[ $value, $placeholder ] = static::prepare_value_for_query( $column, $value );
+
+		$results = [];
+		foreach ( static::fetch_all_where( DB::prepare( "WHERE {$column} = {$placeholder}", $value ), $limit, ARRAY_A ) as $task_array ) {
+			if ( empty( $task_array[ static::uid_column() ] ) ) {
+				continue;
+			}
+
+			$results[] = static::get_model_from_array( $task_array );
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Gets the first model by a column.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $column The column to get the model by.
+	 * @param mixed  $value  The value to get the model by.
+	 *
+	 * @return Model|null The model, or `null` if no model is found.
+	 *
+	 * @throws InvalidArgumentException If the column does not exist.
+	 */
+	public static function get_first_by( string $column, $value ): ?Model {
+		[ $value, $placeholder ] = static::prepare_value_for_query( $column, $value );
+
+		$task_array = static::fetch_first_where( DB::prepare( "WHERE {$column} = {$placeholder}", $value ), ARRAY_A );
+
+		if ( empty( $task_array[ static::uid_column() ] ) ) {
+			return null;
+		}
+
+		return static::get_model_from_array( $task_array );
+	}
+
+	/**
+	 * Prepares a value for a query.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $column The column to prepare the value for.
+	 * @param mixed  $value  The value to prepare.
+	 *
+	 * @return array<mixed, string> The prepared value and placeholder.
+	 *
+	 * @throws InvalidArgumentException If the column does not exist.
+	 */
+	private static function prepare_value_for_query( string $column, $value ): array {
+		$columns = static::get_columns();
+
+		if ( ! isset( $columns[ $column ] ) ) {
+			throw new InvalidArgumentException( "Column $column does not exist." );
+		}
+
+		$column_type = $columns[ $column ]['php_type'];
+
+		switch ( $column_type ) {
+			case Table::PHP_TYPE_INT:
+			case Table::PHP_TYPE_BOOL:
+				$value       = (int) $value;
+				$placeholder = '%d';
+				break;
+			case Table::PHP_TYPE_STRING:
+			case Table::PHP_TYPE_DATETIME:
+				$value       = $value instanceof DateTimeInterface ? $value->format( 'Y-m-d H:i:s' ) : (string) $value;
+				$placeholder = '%s';
+				break;
+			case Table::PHP_TYPE_FLOAT:
+				$value       = (float) $value;
+				$placeholder = '%f';
+				break;
+			default:
+				throw new InvalidArgumentException( "Unsupported column type: $column_type." );
+		}
+
+		return [ $value, $placeholder ];
+	}
+
+	/**
+	 * Gets a model by its ID.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $id The ID.
+	 *
+	 * @return ?Model The model, or null if not found.
+	 *
+	 * @throws InvalidArgumentException If the model class does not implement the Model interface.
+	 */
+	public static function get_by_id( int $id ): ?Model {
+		return static::get_first_by( static::uid_column(), $id );
+	}
+
+	/**
+	 * Gets a model from an array.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<string, mixed> $model_array The model array.
+	 *
+	 * @return Model The model.
+	 *
+	 * @throws RuntimeException If the method is not implemented in the child class.
+	 */
+	protected static function get_model_from_array( array $model_array ): Model {
+		throw new RuntimeException( 'Implement this method in the child class.' );
 	}
 }

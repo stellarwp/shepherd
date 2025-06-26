@@ -23,6 +23,13 @@ function tests_pigeon_drop_tables() {
 			DB::prepare( 'DROP TABLE IF EXISTS %i', DB::prefix( $table ) )
 		);
 	}
+
+	$as_tables = DB::get_results( DB::prepare( 'SHOW TABLES LIKE %s', DB::prefix( 'actionscheduler_%' ) ) );
+
+	foreach ( $as_tables as $table ) {
+		$prop = array_values( get_object_vars( $table ) )['0'];
+		DB::query( DB::prepare( 'TRUNCATE TABLE %i', $prop ) );
+	}
 }
 
 /**
