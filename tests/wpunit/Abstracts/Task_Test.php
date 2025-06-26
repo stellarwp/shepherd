@@ -31,7 +31,6 @@ class Task_Test extends WPTestCase {
 
 		$this->assertSame( [ 'test1', 3, 'test2' ], $task->get_args() );
 		$this->assertSame( "pigeon_{$prefix}_queue_default", $task->get_group() );
-		$this->assertFalse( $task->is_unique() );
 		$this->assertSame( 10, $task->get_priority() );
 
 		$this->assertIsInt( $task->get_id() );

@@ -36,15 +36,6 @@ interface Task extends Task_Model {
 	public function get_group(): string;
 
 	/**
-	 * Checks if the task is unique.
-	 *
-	 * @since TBD
-	 *
-	 * @return bool Whether the task is unique.
-	 */
-	public function is_unique(): bool;
-
-	/**
 	 * Gets the task's priority.
 	 *
 	 * @since TBD

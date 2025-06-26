@@ -61,6 +61,17 @@ class Regulator extends Provider_Abstract {
 	protected array $scheduled_tasks = [];
 
 	/**
+	 * The tasks that failed to be processed.
+	 *
+	 * This is used to track tasks that failed to be processed so that they can be retried.
+	 *
+	 * @since TBD
+	 *
+	 * @var Task[]
+	 */
+	protected array $failed_tasks = [];
+
+	/**
 	 * The regulator's constructor.
 	 *
 	 * @since TBD
@@ -83,8 +94,24 @@ class Regulator extends Provider_Abstract {
 		add_action( 'action_scheduler_after_execute', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_execution_ignored', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_failed_execution', [ $this, 'untrack_action' ], 1, 0 );
+		add_action( 'action_scheduler_failed_execution', [ $this, 'handle_reschedule_of_failed_task' ], 0, 0 );
 	}
 
+	/**
+	 * Handles the rescheduling of a failed task.
+	 *
+	 * @since TBD
+	 */
+	public function handle_reschedule_of_failed_task(): void {
+		if ( empty( $this->failed_tasks ) ) {
+			return;
+		}
+
+		foreach ( $this->failed_tasks as $offset => $task ) {
+			$this->dispatch( $task, $task->is_debouncable() ? $task->get_debounce_delay_on_failure() : $task->get_retry_delay() );
+			unset( $this->failed_tasks[ $offset ] );
+		}
+	}
 	/**
 	 * Track specified action.
 	 *
@@ -163,7 +190,7 @@ class Regulator extends Provider_Abstract {
 				$this->process_task_hook,
 				[ $args_hash ],
 				$group,
-				$task->is_unique(),
+				false,
 				$task->get_priority()
 			);
 
@@ -293,21 +320,21 @@ class Regulator extends Provider_Abstract {
 			$this->log_finished( $task->get_id(), $log_data );
 		} catch ( PigeonTaskException $e ) {
 			if ( $this->should_retry( $task ) ) {
-				return;
+				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		} catch ( Exception $e ) {
 			if ( $this->should_retry( $task ) ) {
-				return;
+				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		} catch ( Throwable $e ) {
 			if ( $this->should_retry( $task ) ) {
-				return;
+				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
@@ -329,7 +356,9 @@ class Regulator extends Provider_Abstract {
 		}
 
 		$task->set_current_try( $task->get_current_try() + 1 );
-		$this->dispatch( $task, $task->is_debouncable() ? $task->get_debounce_delay_on_failure() : $task->get_retry_delay() );
+
+		$this->failed_tasks[] = $task;
+
 		return true;
 	}
 }

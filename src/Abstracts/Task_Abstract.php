@@ -39,15 +39,6 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	protected const GROUP = 'pigeon_%s_queue_default';
 
 	/**
-	 * Whether the task is unique.
-	 *
-	 * @since TBD
-	 *
-	 * @var bool
-	 */
-	protected const UNIQUE = false;
-
-	/**
 	 * The task's priority.
 	 *
 	 * @since TBD
@@ -91,20 +82,6 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 */
 	public function get_group(): string {
 		return sprintf( static::GROUP, Config::get_hook_prefix() );
-	}
-
-	/**
-	 * Whether the task is unique.
-	 *
-	 * **IMPORTANT:** This should be set to true only when we want ONLY one
-	 * scheduled task of this particular class at a time regardless of their arguments.
-	 *
-	 * @since TBD
-	 *
-	 * @return bool Whether the task is unique.
-	 */
-	public function is_unique(): bool {
-		return static::UNIQUE;
 	}
 
 	/**

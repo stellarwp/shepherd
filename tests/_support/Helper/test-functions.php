@@ -58,6 +58,15 @@ function tests_pigeon_get_container(): ContainerInterface {
 }
 
 /**
+ * Gets a DateTime instance for the current time.
+ *
+ * @return DateTimeInterface
+ */
+function tests_pigeon_get_dt(): DateTimeInterface {
+	return new DateTime( '2025-06-13 17:25:00', new DateTimeZone( 'UTC' ) );
+}
+
+/**
  * Bootstraps the common test environment.
  *
  * @return void

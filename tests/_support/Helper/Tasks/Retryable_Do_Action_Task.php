@@ -9,7 +9,7 @@ class Retryable_Do_Action_Task extends Task_Abstract {
 	protected static int $max_retries = 2;
 
 	public function get_task_prefix(): string {
-		return 'retry_do_action_';
+		return 'retry_action_';
 	}
 
 	public function get_task_name(): string {

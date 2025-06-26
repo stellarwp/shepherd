@@ -70,10 +70,6 @@ class Task_Test extends WPTestCase {
 				return '';
 			}
 
-			public function is_unique(): bool {
-				return false;
-			}
-
 			public function get_priority(): int {
 				return 0;
 			}
@@ -131,7 +127,6 @@ class Task_Test extends WPTestCase {
 		$task->set_current_try( 1 );
 		$task->get_args();
 		$task->get_group();
-		$task->is_unique();
 		$task->get_priority();
 		$task->is_retryable();
 		$task->should_retry();
