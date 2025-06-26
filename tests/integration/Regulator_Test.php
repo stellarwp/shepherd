@@ -33,7 +33,7 @@ class Regulator_Test extends WPTestCase {
 	/**
 	 * @before
 	 */
-	public function freeze_time(): void {
+	public function freeze(): void {
 		$this->freeze_time( tests_pigeon_get_dt() );
 	}
 
