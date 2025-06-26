@@ -1,6 +1,8 @@
 # Pigeon Message Delivery
 
-[![CI](https://github.com/stellarwp/pigeon/workflows/CI/badge.svg)](https://github.com/stellarwp/pigeon/actions?query=branch%3Amain) [![Static Analysis](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml)
+[![WPunit](https://github.com/stellarwp/pigeon/actions/workflows/tests-php.yml/badge.svg)](https://github.com/stellarwp/pigeon/actions/workflows/tests-php.yml?query=branch%3Amain)
+[![Static Analysis](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml?query=branch%3Amain)
+[![Compatibility](https://github.com/stellarwp/pigeon/actions/workflows/compatibility.yml/badge.svg)](https://github.com/stellarwp/pigeon/actions/workflows/compatibility.yml?query=branch%3Amain)
 
 A library for offloading tasks to be handled asynchronously in WordPress.
 
