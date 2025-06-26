@@ -541,7 +541,7 @@ trait Custom_Table_Query_Methods {
 	 * @param string $column The column to get the model by.
 	 * @param mixed  $value  The value to get the model by.
 	 *
-	 * @return Model|null The model, or `null` if no model is found.
+	 * @return ?Model The model, or `null` if no model is found.
 	 *
 	 * @throws InvalidArgumentException If the column does not exist.
 	 */
