@@ -625,12 +625,8 @@ trait Custom_Table_Query_Methods {
 	 * @param array<string, mixed> $model_array The model array.
 	 *
 	 * @return Model The model.
-	 *
-	 * @throws RuntimeException If the method is not implemented in the child class.
 	 */
-	protected static function get_model_from_array( array $model_array ): Model {
-		throw new RuntimeException( 'Implement this method in the child class.' );
-	}
+	abstract protected static function get_model_from_array( array $model_array ): Model;
 
 	// phpcs:enable Squiz.Commenting.FunctionComment.InvalidNoReturn, Generic.CodeAnalysis.UnusedFunctionParameter.Found
 }

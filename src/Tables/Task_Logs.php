@@ -163,4 +163,25 @@ class Task_Logs extends Table {
 
 		return $results;
 	}
+
+	/**
+	 * Gets a log from an array.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<string, mixed> $model_array The model array.
+	 *
+	 * @return Log The log.
+	 */
+	protected static function get_model_from_array( array $model_array ): Log {
+		$log = new Log();
+		$log->set_id( $model_array['id'] );
+		$log->set_task_id( $model_array['task_id'] );
+		$log->set_date( DateTime::createFromFormat( 'Y-m-d H:i:s', $model_array['date'] ) );
+		$log->set_level( $model_array['level'] );
+		$log->set_type( $model_array['type'] );
+		$log->set_entry( $model_array['entry'] );
+
+		return $log;
+	}
 }

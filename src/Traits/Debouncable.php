@@ -19,7 +19,7 @@ trait Debouncable {
 	 *
 	 * @var bool
 	 */
-	protected static bool $debouncable = true;
+	protected static bool $debouncable = false;
 
 	/**
 	 * Gets the debouncable status.
