@@ -7,10 +7,7 @@ namespace StellarWP\Pigeon\Loggers;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Pigeon\Contracts\Logger;
 use StellarWP\Pigeon\Log;
-use StellarWP\Pigeon\Tables\Task_Logs;
 use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Tests\Container;
-use StellarWP\Pigeon\Provider;
 
 class DB_Logger_Test extends WPTestCase {
 	/**
