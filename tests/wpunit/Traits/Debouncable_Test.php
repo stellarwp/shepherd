@@ -30,8 +30,8 @@ class Debouncable_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_have_zero_delay_on_failure_by_default() {
+	public function it_should_have_thirty_delay_on_failure_by_default() {
 		$dummy = new Dummy_Debouncable();
-		$this->assertEquals( 0, $dummy->get_debounce_delay_on_failure() );
+		$this->assertEquals( 30, $dummy->get_debounce_delay_on_failure() );
 	}
 }

@@ -69,24 +69,24 @@ trait With_Log_Snapshot {
 			$json
 		);
 
-		$this->assertMatchesJsonSnapshot( wp_json_encode( $log_array, JSON_SNAPSHOT_OPTIONS ) );
+		$this->assertMatchesJsonSnapshot( $json );
 	}
 
 	/**
-     * Asserts the current JSON string matches the one stored in the snapshot file.
-     *
-     * If the snapshot file is not present the assertion will be skipped and the snapshot file will be generated.
-     *
-     * @param string        $current     The current JSON string.
-     * @param callable|null $dataVisitor A callable to manipulate the file contents before the assertion. The arguments
-     *                                   will be an the expected and the current values (strings).
-     */
-    protected function assertMatchesJsonSnapshot($current, callable $dataVisitor = null)
-    {
-        $jsonSnapshot = new PigeonJsonSnapshot($current);
-        if ($dataVisitor !== null) {
-            $jsonSnapshot->setDataVisitor($dataVisitor);
-        }
-        $jsonSnapshot->assert();
-    }
+	 * Asserts the current JSON string matches the one stored in the snapshot file.
+	 *
+	 * If the snapshot file is not present the assertion will be skipped and the snapshot file will be generated.
+	 *
+	 * @param string        $current     The current JSON string.
+	 * @param callable|null $dataVisitor A callable to manipulate the file contents before the assertion. The arguments
+	 *                                   will be an the expected and the current values (strings).
+	 */
+	protected function assertMatchesJsonSnapshot($current, callable $dataVisitor = null)
+	{
+		$jsonSnapshot = new PigeonJsonSnapshot($current);
+		if ($dataVisitor !== null) {
+			$jsonSnapshot->setDataVisitor($dataVisitor);
+		}
+		$jsonSnapshot->assert();
+	}
 }

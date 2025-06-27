@@ -55,8 +55,8 @@
             "timezone_type": 3,
             "timezone": "UTC"
         },
-        "level": "error",
-        "type": "failed",
-        "entry": "{\"message\":\"Task {TASK_ID} failed.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Retryable_Do_Action_Task\",\"args\":[],\"action_id\":{ACTION_ID_2},\"current_try\":2,\"exception\":\"Mock Action failure\"}}"
+        "level": "info",
+        "type": "finished",
+        "entry": "{\"message\":\"Task {TASK_ID} finished.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Retryable_Do_Action_Task\",\"args\":[],\"action_id\":{ACTION_ID_2},\"current_try\":2}}"
     }
 ]

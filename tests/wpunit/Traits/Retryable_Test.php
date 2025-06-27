@@ -75,8 +75,8 @@ class Retryable_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_have_zero_retry_delay_by_default() {
+	public function it_should_have_thirty_retry_delay_by_default() {
 		$dummy = new Dummy_Retryable();
-		$this->assertEquals( 0, $dummy->get_retry_delay() );
+		$this->assertEquals( 30, $dummy->get_retry_delay() );
 	}
 }

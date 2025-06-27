@@ -146,8 +146,12 @@ class Regulator_Test extends WPTestCase {
 		// 1st try
 		$this->assertTaskExecutesFailsAndReschedules( $last_scheduled_task_id );
 
+		$this->assertSame( 0, did_action( $dummy_task->get_task_name() ) );
+
 		// 2nd try
 		$this->assertTaskExecutesFails( $last_scheduled_task_id );
+
+		$this->assertSame( 0, did_action( $dummy_task->get_task_name() ) );
 
 		$logs = $this->get_logger()->retrieve_logs( $last_scheduled_task_id );
 
@@ -157,6 +161,58 @@ class Regulator_Test extends WPTestCase {
 		$this->assertSame( 'rescheduled', $logs[2]->get_type() );
 		$this->assertSame( 'retrying', $logs[3]->get_type() );
 		$this->assertSame( 'failed', $logs[4]->get_type() );
+
+		$this->assertMatchesLogSnapshot( $logs );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_retry_task_and_succeed(): void {
+		$pigeon = pigeon();
+		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+
+		$dummy_task = new Retryable_Do_Action_Task();
+		$pigeon->dispatch( $dummy_task );
+
+		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+
+		$this->assertIsInt( $last_scheduled_task_id );
+
+		$this->assertTaskHasActionPending( $last_scheduled_task_id );
+
+		$this->assertTaskIsScheduledForExecutionAt( $last_scheduled_task_id, time() );
+
+		$this->set_fn_return( 'do_action', function ( $action, ...$args ) use ( $dummy_task ) {
+			if ( $action === $dummy_task->get_task_name() ) {
+				throw new Exception( 'Mock Action failure' );
+			}
+
+			return do_action( $action, ...$args );
+		}, true );
+
+		$this->assertSame( 0, did_action( $dummy_task->get_task_name() ) );
+
+		// 1st try
+		$this->assertTaskExecutesFailsAndReschedules( $last_scheduled_task_id );
+
+		$this->assertSame( 0, did_action( $dummy_task->get_task_name() ) );
+
+		$this->unset_uopz_returns();
+
+		// 2nd try
+		$this->assertTaskExecutesWithoutErrors( $last_scheduled_task_id );
+
+		$this->assertSame( 1, did_action( $dummy_task->get_task_name() ) );
+
+		$logs = $this->get_logger()->retrieve_logs( $last_scheduled_task_id );
+
+		$this->assertCount( 5, $logs );
+		$this->assertSame( 'created', $logs[0]->get_type() );
+		$this->assertSame( 'started', $logs[1]->get_type() );
+		$this->assertSame( 'rescheduled', $logs[2]->get_type() );
+		$this->assertSame( 'retrying', $logs[3]->get_type() );
+		$this->assertSame( 'finished', $logs[4]->get_type() );
 
 		$this->assertMatchesLogSnapshot( $logs );
 	}
