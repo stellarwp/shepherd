@@ -4,15 +4,12 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon\Tests\Tasks;
 
 use StellarWP\Pigeon\Abstracts\Task_Abstract;
-use Exception;
 
-class Retryable_Do_Action_Task extends Task_Abstract {
-	protected static int $max_retries = 2;
-
-	protected static int $processed = 0;
+class Internal_Counting_Task extends Task_Abstract {
+	public static int $processed = 0;
 
 	public function get_task_prefix(): string {
-		return 'retry_action_';
+		return 'inter_count_';
 	}
 
 	public function get_task_name(): string {
@@ -21,10 +18,6 @@ class Retryable_Do_Action_Task extends Task_Abstract {
 
 	public function process(): void {
 		static::$processed++;
-
-		if ( static::$processed === 1 ) {
-			throw new Exception( 'Mock Action failure' );
-		}
 
 		do_action( $this->get_task_name() );
 	}

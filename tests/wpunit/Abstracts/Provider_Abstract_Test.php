@@ -18,9 +18,7 @@ class Provider_Abstract_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_not_be_deferred_by_default() {
-		/** @var ContainerInterface $container */
-		$container = $this->createMock( ContainerInterface::class );
-		$provider = new Dummy_Provider( $container );
+		$provider = new Dummy_Provider( tests_pigeon_get_container() );
 		$this->assertFalse( $provider->isDeferred() );
 	}
 
@@ -28,9 +26,7 @@ class Provider_Abstract_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_return_empty_array_for_provides_by_default() {
-		/** @var ContainerInterface $container */
-		$container = $this->createMock( ContainerInterface::class );
-		$provider = new Dummy_Provider( $container );
+		$provider = new Dummy_Provider( tests_pigeon_get_container() );
 		$this->assertEquals( [], $provider->provides() );
 	}
 }

@@ -15,8 +15,6 @@ use InvalidArgumentException;
 use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Config;
 use JsonSerializable;
-use StellarWP\Pigeon\Traits\Retryable;
-use StellarWP\Pigeon\Traits\Debouncable;
 
 /**
  * Pigeon's task abstract.
@@ -26,27 +24,6 @@ use StellarWP\Pigeon\Traits\Debouncable;
  * @package StellarWP\Pigeon\Abstracts;
  */
 abstract class Task_Abstract extends Task_Model_Abstract implements Task {
-	use Retryable;
-	use Debouncable;
-
-	/**
-	 * The task's group.
-	 *
-	 * @since TBD
-	 *
-	 * @var string
-	 */
-	protected const GROUP = 'pigeon_%s_queue_default';
-
-	/**
-	 * The task's priority.
-	 *
-	 * @since TBD
-	 *
-	 * @var int
-	 */
-	protected const PRIORITY = 10;
-
 	/**
 	 * The task's constructor.
 	 *
@@ -81,18 +58,20 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 * @return string The task's group.
 	 */
 	public function get_group(): string {
-		return sprintf( static::GROUP, Config::get_hook_prefix() );
+		return sprintf( 'pigeon_%s_queue_default', Config::get_hook_prefix() );
 	}
 
 	/**
 	 * Gets the task's priority.
+	 *
+	 * Action scheduler will not accept anything less than 0 or greater than 255.
 	 *
 	 * @since TBD
 	 *
 	 * @return int The task's priority.
 	 */
 	public function get_priority(): int {
-		return max( 0, min( 255, static::PRIORITY ) );
+		return 10;
 	}
 
 	/**
@@ -101,4 +80,28 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 * @since TBD
 	 */
 	protected function validate_args(): void {}
+
+	/**
+	 * Gets the maximum number of retries.
+	 *
+	 * 0 means the task is not retryable, while less than 0 means the task is retryable indefinitely.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The maximum number of retries.
+	 */
+	public function get_max_retries(): int {
+		return 0;
+	}
+
+	/**
+	 * Gets the retry delay.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The retry delay in seconds.
+	 */
+	public function get_retry_delay(): int {
+		return 30 * ( 2 ** ( $this->get_current_try() - 1 ) );
+	}
 }

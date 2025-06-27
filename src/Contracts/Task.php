@@ -45,22 +45,15 @@ interface Task extends Task_Model {
 	public function get_priority(): int;
 
 	/**
-	 * Checks if the task is retryable.
+	 * Gets the maximum number of retries.
+	 *
+	 * 0 means the task is not retryable, while less than 0 means the task is retryable indefinitely.
 	 *
 	 * @since TBD
 	 *
-	 * @return bool Whether the task is retryable.
+	 * @return int The maximum number of retries.
 	 */
-	public function is_retryable(): bool;
-
-	/**
-	 * Checks if the task should be retried.
-	 *
-	 * @since TBD
-	 *
-	 * @return bool Whether the task should be retried.
-	 */
-	public function should_retry(): bool;
+	public function get_max_retries(): int;
 
 	/**
 	 * Gets the task's retry delay.
@@ -70,31 +63,4 @@ interface Task extends Task_Model {
 	 * @return int The task's retry delay in seconds.
 	 */
 	public function get_retry_delay(): int;
-
-	/**
-	 * Checks if the task is debouncable.
-	 *
-	 * @since TBD
-	 *
-	 * @return bool Whether the task is debouncable.
-	 */
-	public function is_debouncable(): bool;
-
-	/**
-	 * Gets the task's debounce delay.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's debounce delay in seconds.
-	 */
-	public function get_debounce_delay(): int;
-
-	/**
-	 * Gets the task's debounce delay on failure.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The task's debounce delay on failure in seconds.
-	 */
-	public function get_debounce_delay_on_failure(): int;
 }

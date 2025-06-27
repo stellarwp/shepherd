@@ -81,7 +81,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	 *
 	 * @var int
 	 */
-	private int $current_try = 1;
+	private int $current_try = 0;
 
 	/**
 	 * The task's constructor arguments.

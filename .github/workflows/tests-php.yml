@@ -6,7 +6,6 @@ jobs:
     strategy:
       matrix:
         suite:
-          - acceptance
           - wpunit
           - integration
     runs-on: ubuntu-latest

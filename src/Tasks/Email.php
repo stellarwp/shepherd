@@ -65,6 +65,8 @@ class Email extends Task_Abstract {
 		if ( ! $result ) {
 			throw new PigeonTaskException( __( 'Failed to send email.', 'stellarwp-pigeon' ) );
 		}
+
+		do_action( 'pigeon_email_sent', $this->get_id() );
 	}
 
 	/**

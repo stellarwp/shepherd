@@ -108,7 +108,7 @@ class Regulator extends Provider_Abstract {
 		}
 
 		foreach ( $this->failed_tasks as $offset => $task ) {
-			$this->dispatch( $task, $task->is_debouncable() ? $task->get_debounce_delay_on_failure() : $task->get_retry_delay() );
+			$this->dispatch( $task, $task->get_retry_delay() );
 			unset( $this->failed_tasks[ $offset ] );
 		}
 	}
@@ -143,8 +143,6 @@ class Regulator extends Provider_Abstract {
 	 * @return self The regulator instance.
 	 */
 	public function dispatch( Task $task, int $delay = 0 ): self {
-		$delay = $task->is_debouncable() ? $delay + $task->get_debounce_delay() : $delay;
-
 		if ( did_action( 'init' ) || doing_action( 'init' ) ) {
 			$this->dispatch_callback( $task, $delay );
 			return $this;
@@ -360,7 +358,11 @@ class Regulator extends Provider_Abstract {
 	 * @return bool Whether the task should be retried.
 	 */
 	protected function should_retry( Task $task ): bool {
-		if ( ! $task->should_retry() ) {
+		if ( 0 === $task->get_max_retries() ) {
+			return false;
+		}
+
+		if ( $task->get_current_try() >= $task->get_max_retries() ) {
 			return false;
 		}
 
