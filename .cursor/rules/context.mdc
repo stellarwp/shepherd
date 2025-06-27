@@ -1,10 +1,9 @@
 ---
 description: General project principles and coding standards.
 globs:
-  - "src/**/*.php"
-  - "tests/**/*.php"
+alwaysApply: false
 ---
-- **WordPress Standards**: Always adhere to [WordPress coding standards](https://developer.wordpress.org/coding-standards/) for both PHP and JavaScript.
+- **WordPress Standards**: Always adhere to [WordPress coding standards](mdc:https:/developer.wordpress.org/coding-standards) for both PHP and JavaScript.
 - **Existing Patterns**: Follow the existing code structure, naming conventions, and architectural patterns found in the codebase. Consistency is key.
 - **Bail Early**: Use early returns in functions and methods to improve readability and reduce cognitive load.
 ---
@@ -16,12 +15,7 @@ globs:
 - All tasks **must** extend `StellarWP\Pigeon\Abstracts\Task_Abstract`.
 - Task arguments must be passed to `parent::__construct()` to ensure they are correctly stored.
 - The core logic of a task resides in the `process()` method.
-- To trigger a retry, a task **must** throw a `StellarWP\Pigeon\Exceptions\PigeonTaskException`. Other exceptions will result in a permanent failure.
-
-### Implementing Features
-- **Retries**: To make a task retryable, override the `get_max_retries()` method. A return value of `n` means the task will be attempted a total of `n + 1` times.
-- **Debouncing**: To debounce a task, override `is_debouncable()` to return `true` and `get_debounce_delay()` to set the delay period in seconds.
-- **Uniqueness**: By default, tasks are unique. To allow multiple identical tasks in the queue, override `is_unique()` to return `false`.
+- To trigger a retry, a task **must** overwrite the `get_max_retries` method.
 ---
 description: Best practices and requirements for writing integration tests.
 globs:

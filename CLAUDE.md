@@ -17,9 +17,9 @@ Pigeon is a lightweight and powerful background processing library for WordPress
 The fundamental unit of work in Pigeon is a "Task".
 
 - **Implementation**: All tasks are PHP classes that **must** extend `StellarWP\Pigeon\Abstracts\Task_Abstract`.
-- **Arguments**: A task's arguments are passed to its constructor and **must** be forwarded to `parent::__construct(...)`. This allows Pigeon to serialize and store them.
+- **Arguments**: A task's arguments are passed to its constructor and **must** be forwarded to `parent::__construct(...)`. This allows Pigeon to store them.
 - **Execution Logic**: The main logic of a task is placed within the `process()` method.
-- **Failure Handling**: To signal a retryable failure, a task should throw a `StellarWP\Pigeon\Exceptions\PigeonTaskException`.
+- **Failure Handling**: To signal a retryable failure, a task should override the `get_max_retries()` method to return the number of desired retries.
 
 ### The Regulator
 
@@ -39,8 +39,6 @@ Pigeon features a detailed logging system that records the entire lifecycle of a
 ### Advanced Task Features
 
 - **Retries**: A task can be made retryable by overriding the `get_max_retries()` method to return the number of desired retries.
-- **Debouncing**: A task can be debounced by overriding `is_debouncable()` to return `true` and specifying a delay in `get_debounce_delay()`.
-- **Uniqueness**: By default, tasks are unique based on their class and arguments. Dispatching an identical task that's already scheduled will be ignored. This can be changed by overriding `is_unique()`.
 
 ## 3. Testing Philosophy
 
