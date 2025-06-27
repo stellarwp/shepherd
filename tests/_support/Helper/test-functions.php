@@ -33,6 +33,27 @@ function tests_pigeon_drop_tables() {
 }
 
 /**
+ * Raises the auto increment for the tables.
+ *
+ * @return void
+ */
+function tests_pigeon_raise_auto_increment(): void {
+	DB::query( DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = 86740', DB::prefix( 'actionscheduler_actions' ) ) );
+	DB::query( DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = 94540', DB::prefix( 'actionscheduler_logs' ) ) );
+
+	$tables = [
+		Tasks::base_table_name(),
+		Task_Logs::base_table_name(),
+	];
+
+	foreach ( $tables as $table ) {
+		DB::query(
+			DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = %d', DB::prefix( $table ), 9567492 )
+		);
+	}
+}
+
+/**
  * Get the hook prefix.
  *
  * @return string
@@ -81,6 +102,8 @@ function tests_pigeon_common_bootstrap(): void {
 	// Bootstrap Pigeon.
 	$container->singleton( Provider::class );
 	$container->get( Provider::class )->register();
+
+	tests_pigeon_raise_auto_increment();
 
 	// Drop the tables after the tests are done.
 	tests_add_filter(
