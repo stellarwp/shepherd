@@ -15,12 +15,15 @@ use StellarWP\Pigeon\Tests\Traits\With_AS_Assertions;
 use StellarWP\Pigeon\Tests\Traits\With_Clock_Mock;
 use StellarWP\Pigeon\Tests\Traits\With_Uopz;
 use Exception;
+use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
+
 use function StellarWP\Pigeon\pigeon;
 
 class Regulator_Test extends WPTestCase {
 	use With_AS_Assertions;
 	use With_Uopz;
 	use With_Clock_Mock;
+	use SnapshotAssertions;
 
 	/**
 	 * @before
@@ -140,16 +143,26 @@ class Regulator_Test extends WPTestCase {
 
 		$this->assertSame( 0, did_action( $dummy_task->get_task_name() ) );
 
+		// 1st try
 		$this->assertTaskExecutesFailsAndReschedules( $last_scheduled_task_id );
+
+		// 2nd try
+		$this->assertTaskExecutesFails( $last_scheduled_task_id );
 
 		$logs = $this->get_logger()->retrieve_logs( $last_scheduled_task_id );
 
-		$this->assertCount( 6, $logs );
+		$this->assertCount( 5, $logs );
 		$this->assertSame( 'created', $logs[0]->get_type() );
 		$this->assertSame( 'started', $logs[1]->get_type() );
-		$this->assertSame( 'retrying', $logs[2]->get_type() );
-		$this->assertSame( 'started', $logs[3]->get_type() );
-		$this->assertSame( 'retrying', $logs[4]->get_type() );
-		$this->assertSame( 'failed', $logs[5]->get_type() );
+		$this->assertSame( 'rescheduled', $logs[2]->get_type() );
+		$this->assertSame( 'retrying', $logs[3]->get_type() );
+		$this->assertSame( 'failed', $logs[4]->get_type() );
+
+		$log_array = array_map(
+			fn( Log $log ) => $log->to_array(),
+			$logs
+		);
+
+		$this->assertMatchesJsonSnapshot( wp_json_encode( $log_array, JSON_SNAPSHOT_OPTIONS ) );
 	}
 }

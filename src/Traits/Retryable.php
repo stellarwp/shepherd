@@ -59,6 +59,6 @@ trait Retryable {
 	 * @return int The retry delay in seconds.
 	 */
 	public function get_retry_delay(): int {
-		return 0;
+		return 30;
 	}
 }

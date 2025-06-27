@@ -1,0 +1,62 @@
+[
+    {
+        "id": 7,
+        "task_id": 3,
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "info",
+        "type": "created",
+        "entry": "{\"message\":\"Task 3 created.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Retryable_Do_Action_Task\",\"args\":[],\"action_id\":3,\"current_try\":1}}"
+    },
+    {
+        "id": 8,
+        "task_id": 3,
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "info",
+        "type": "started",
+        "entry": "{\"message\":\"Task 3 starting.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Retryable_Do_Action_Task\",\"args\":[],\"action_id\":3,\"current_try\":1}}"
+    },
+    {
+        "id": 9,
+        "task_id": 3,
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "notice",
+        "type": "rescheduled",
+        "entry": "{\"message\":\"Task 3 rescheduled.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Retryable_Do_Action_Task\",\"args\":[],\"action_id\":4,\"current_try\":2,\"previous_action_id\":3}}"
+    },
+    {
+        "id": 10,
+        "task_id": 3,
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "info",
+        "type": "retrying",
+        "entry": "{\"message\":\"Task 3 retrying.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Retryable_Do_Action_Task\",\"args\":[],\"action_id\":4,\"current_try\":2}}"
+    },
+    {
+        "id": 11,
+        "task_id": 3,
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "error",
+        "type": "failed",
+        "entry": "{\"message\":\"Task 3 failed.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Retryable_Do_Action_Task\",\"args\":[],\"action_id\":4,\"current_try\":2,\"exception\":\"Mock Action failure\"}}"
+    }
+]

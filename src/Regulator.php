@@ -94,7 +94,7 @@ class Regulator extends Provider_Abstract {
 		add_action( 'action_scheduler_after_execute', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_execution_ignored', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_failed_execution', [ $this, 'untrack_action' ], 1, 0 );
-		add_action( 'action_scheduler_failed_execution', [ $this, 'handle_reschedule_of_failed_task' ], 0, 0 );
+		add_action( 'action_scheduler_after_process_queue', [ $this, 'handle_reschedule_of_failed_task' ], 1, 0 );
 	}
 
 	/**
@@ -202,16 +202,25 @@ class Regulator extends Provider_Abstract {
 
 			$this->scheduled_tasks[] = $task->save();
 
+			$log_data = [
+				'class'       => get_class( $task ),
+				'args'        => $task->get_args(),
+				'action_id'   => $action_id,
+				'current_try' => $task->get_current_try(),
+			];
+
 			if ( $previous_action_id ) {
 				$this->log_rescheduled(
 					$task->get_id(),
-					[
-						'action_id'          => $action_id,
-						'previous_action_id' => $previous_action_id,
-					]
+					array_merge(
+						$log_data,
+						[
+							'previous_action_id' => $previous_action_id,
+						]
+					)
 				);
 			} else {
-				$this->log_created( $task->get_id(), [ 'action_id' => $action_id ] );
+				$this->log_created( $task->get_id(), $log_data );
 			}
 
 			DB::commit();
