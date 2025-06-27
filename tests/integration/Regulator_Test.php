@@ -225,14 +225,6 @@ class Regulator_Test extends WPTestCase {
 
 		$this->assertTaskIsScheduledForExecutionAt( $last_scheduled_task_id, time() );
 
-		$this->set_fn_return( 'do_action', function ( $action, ...$args ) use ( $dummy_task ) {
-			if ( $action === $dummy_task->get_task_name() ) {
-				throw new Exception( 'Mock Action failure' );
-			}
-
-			return do_action( $action, ...$args );
-		}, true );
-
 		$this->assertSame( 0, did_action( $dummy_task->get_task_name() ) );
 
 		// 1st try

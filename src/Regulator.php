@@ -316,7 +316,7 @@ class Regulator extends Provider_Abstract {
 		];
 
 		try {
-			if ( $task->get_current_try() > 1 ) {
+			if ( $task->get_current_try() > 0 ) {
 				$this->log_retrying( $task->get_id(), $log_data );
 			} else {
 				$this->log_starting( $task->get_id(), $log_data );

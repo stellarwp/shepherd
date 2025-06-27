@@ -12,6 +12,7 @@ use tad\Codeception\SnapshotAssertions\Configuration;
 use ReflectionMethod;
 use Codeception\Snapshot;
 use StellarWP\Pigeon\Tests\Traits\With_Log_Snapshot;
+use tad\Codeception\SnapshotAssertions\AbstractSnapshot;
 
 class PigeonJsonSnapshot extends JsonSnapshot {
 
@@ -23,13 +24,13 @@ class PigeonJsonSnapshot extends JsonSnapshot {
             $traitMethods = static::getTraitMethods();
             $backtrace = array_values(array_filter(
                 debug_backtrace(
-                    DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT,
-                    6
-                ),
+					DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT,
+					6
+				),
                 static function (array $backtraceEntry) use ($traitMethods) {
                     return isset($backtraceEntry['class']) && !in_array(
                         $backtraceEntry['class'],
-                        [Snapshot::class, static::class, self::class, static::$traitClass],
+                        [Snapshot::class, static::class, self::class, AbstractSnapshot::class, static::$traitClass],
                         true
                     ) && !in_array($backtraceEntry['function'], $traitMethods, true);
                 }

@@ -1,0 +1,38 @@
+[
+    {
+        "id": {LOG_ID_1},
+        "task_id": {TASK_ID},
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "info",
+        "type": "created",
+        "entry": "{\"message\":\"Task {TASK_ID} created.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Internal_Counting_Task\",\"args\":[],\"action_id\":{ACTION_ID_1},\"current_try\":0}}"
+    },
+    {
+        "id": {LOG_ID_2},
+        "task_id": {TASK_ID},
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "info",
+        "type": "started",
+        "entry": "{\"message\":\"Task {TASK_ID} starting.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Internal_Counting_Task\",\"args\":[],\"action_id\":{ACTION_ID_1},\"current_try\":0}}"
+    },
+    {
+        "id": {LOG_ID_3},
+        "task_id": {TASK_ID},
+        "date": {
+            "date": "2025-06-13 17:25:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        },
+        "level": "info",
+        "type": "finished",
+        "entry": "{\"message\":\"Task {TASK_ID} finished.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Internal_Counting_Task\",\"args\":[],\"action_id\":{ACTION_ID_1},\"current_try\":0}}"
+    }
+]
