@@ -74,27 +74,11 @@ class Task_Test extends WPTestCase {
 				return 0;
 			}
 
-			public function is_retryable(): bool {
-				return false;
-			}
-
-			public function should_retry(): bool {
-				return false;
+			public function get_max_retries(): int {
+				return 0;
 			}
 
 			public function get_retry_delay(): int {
-				return 0;
-			}
-
-			public function is_debouncable(): bool {
-				return false;
-			}
-
-			public function get_debounce_delay(): int {
-				return 0;
-			}
-
-			public function get_debounce_delay_on_failure(): int {
 				return 0;
 			}
 
@@ -128,12 +112,8 @@ class Task_Test extends WPTestCase {
 		$task->get_args();
 		$task->get_group();
 		$task->get_priority();
-		$task->is_retryable();
-		$task->should_retry();
+		$task->get_max_retries();
 		$task->get_retry_delay();
-		$task->is_debouncable();
-		$task->get_debounce_delay();
-		$task->get_debounce_delay_on_failure();
 		$task->get_task_prefix();
 		$task->get_data();
 		$task->get_class_hash();

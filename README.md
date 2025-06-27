@@ -21,6 +21,5 @@ Pigeon does offer out of the box the following features that are not available w
 - A simple API for offloading already defined tasks. Such as sending emails or generating PDFs. You can see more in the [tasks documentation](./docs/tasks.md)!
 - A retry system for failed tasks.
 - A debounce system for tasks that are called multiple times in a short period of time.
-- Supporting tasks dependencies.
 - Being able to recognize tasks being rate limited.
 - The arguments being passed to the task's handler can be significantly larger than what Action Scheduler allows. Action scheduler uses the column the arguments are stored in the database as an index. Pigeon instead uses a hash of the arguments as an index, and stores the arguments in a long text column.

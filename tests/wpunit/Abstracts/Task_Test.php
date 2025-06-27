@@ -47,10 +47,7 @@ class Task_Test extends WPTestCase {
 		$this->assertSame( 2, $task->get_current_try() );
 		$this->assertSame( $task->get_task_prefix() . md5( wp_json_encode( [ get_class( $task ), 'test1', 3, 'test2' ] ) ), $task->get_args_hash() );
 
-		$this->assertFalse( $task->is_retryable() );
-		$this->assertFalse( $task->should_retry() );
-		$this->assertSame( 30, $task->get_retry_delay() );
-		$this->assertFalse( $task->is_debouncable() );
-		$this->assertSame( 0, $task->get_debounce_delay() );
+		$this->assertSame( 0, $task->get_max_retries() );
+		$this->assertSame( 60, $task->get_retry_delay() );
 	}
 }
