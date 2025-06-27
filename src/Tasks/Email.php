@@ -26,15 +26,6 @@ use InvalidArgumentException;
  */
 class Email extends Task_Abstract {
 	/**
-	 * The maximum number of retries.
-	 *
-	 * @since TBD
-	 *
-	 * @var int
-	 */
-	protected static int $max_retries = 5;
-
-	/**
 	 * The email task's constructor.
 	 *
 	 * @since TBD
@@ -104,5 +95,16 @@ class Email extends Task_Abstract {
 	 */
 	public function get_task_prefix(): string {
 		return 'pigeon_email_';
+	}
+
+	/**
+	 * Gets the maximum number of retries.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The maximum number of retries.
+	 */
+	public function get_max_retries(): int {
+		return 4;
 	}
 }

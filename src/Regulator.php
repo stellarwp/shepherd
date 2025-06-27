@@ -316,22 +316,19 @@ class Regulator extends Provider_Abstract {
 		];
 
 		try {
-			if ( $task->get_current_try() > 0 ) {
-				$this->log_retrying( $task->get_id(), $log_data );
-			} else {
-				$this->log_starting( $task->get_id(), $log_data );
+			try {
+				if ( $task->get_current_try() > 0 ) {
+					$this->log_retrying( $task->get_id(), $log_data );
+				} else {
+					$this->log_starting( $task->get_id(), $log_data );
+				}
+
+				$task->process();
+
+				$this->log_finished( $task->get_id(), $log_data );
+			} catch ( PigeonTaskException $e ) {
+				throw $e;
 			}
-
-			$task->process();
-
-			$this->log_finished( $task->get_id(), $log_data );
-		} catch ( PigeonTaskException $e ) {
-			if ( $this->should_retry( $task ) ) {
-				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
-			}
-
-			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
-			throw $e;
 		} catch ( Exception $e ) {
 			if ( $this->should_retry( $task ) ) {
 				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
