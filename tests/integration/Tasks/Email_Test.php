@@ -177,4 +177,78 @@ class Email_Test extends WPTestCase {
 
 		$this->assertMatchesLogSnapshot( $logs );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_schedule_same_task_twice(): void {
+		$spy = [];
+		$this->set_fn_return( 'wp_mail', function ( ...$args ) use ( &$spy ) {
+			$spy[] = $args;
+			return true;
+		}, true );
+
+		$pigeon = pigeon();
+		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+
+		$dummy_task = new Email( 'test@test.com', 'subject', 'body' );
+
+		$hook_name = 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled';
+
+		$this->assertSame( 0, did_action( $hook_name ) );
+		$pigeon->dispatch( $dummy_task );
+		$this->assertSame( 0, did_action( $hook_name ) );
+
+		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$this->assertIsInt( $last_scheduled_task_id );
+
+		$pigeon->dispatch( $dummy_task );
+		$this->assertSame( 1, did_action( $hook_name ) );
+		$this->assertEquals( $pigeon->get_last_scheduled_task_id(), $last_scheduled_task_id );
+
+		$pigeon->dispatch( new Email( 'test@test.com', 'subject', 'body' ) );
+		$this->assertSame( 2, did_action( $hook_name ) );
+		$this->assertEquals( $pigeon->get_last_scheduled_task_id(), $last_scheduled_task_id );
+
+		$this->assertTaskExecutesWithoutErrors( $last_scheduled_task_id );
+
+		$this->assertCount( 1, $spy );
+		$this->assertSame( [ 'test@test.com', 'subject', 'body', [], [] ], $spy[0] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_schedule_multiple_tasks_with_different_args(): void {
+		$spy = [];
+		$this->set_fn_return( 'wp_mail', function ( ...$args ) use ( &$spy ) {
+			$spy[] = $args;
+			return true;
+		}, true );
+
+		$pigeon = pigeon();
+		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+
+		$task1 = new Email( 'test1@test.com', 'subject1', 'body1' );
+		$pigeon->dispatch( $task1 );
+		$task1_id = $pigeon->get_last_scheduled_task_id();
+		$this->assertIsInt( $task1_id );
+
+		$task2 = new Email( 'test2@test.com', 'subject2', 'body2' );
+		$pigeon->dispatch( $task2 );
+		$task2_id = $pigeon->get_last_scheduled_task_id();
+		$this->assertIsInt( $task2_id );
+
+		$this->assertNotEquals( $task1_id, $task2_id );
+
+		$hook_name = 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled';
+		$this->assertSame( 0, did_action( $hook_name ) );
+
+		$this->assertTaskExecutesWithoutErrors( $task1_id );
+		$this->assertTaskExecutesWithoutErrors( $task2_id );
+
+		$this->assertCount( 2, $spy );
+		$this->assertSame( [ 'test1@test.com', 'subject1', 'body1', [], [] ], $spy[0] );
+		$this->assertSame( [ 'test2@test.com', 'subject2', 'body2', [], [] ], $spy[1] );
+	}
 }
