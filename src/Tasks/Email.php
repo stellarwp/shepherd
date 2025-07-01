@@ -63,7 +63,7 @@ class Email extends Task_Abstract {
 		 *
 		 * @since TBD
 		 *
-		 * @param Task $task The email task that was processed.
+		 * @param Email $task The email task that was processed.
 		 */
 		do_action( 'pigeon_' . Config::get_hook_prefix() . '_email_processed', $this );
 	}

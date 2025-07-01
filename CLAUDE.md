@@ -262,6 +262,19 @@ class My_Custom_Logger implements Logger {
 - Action Scheduler must be available (included as dependency)
 - All database operations use StellarWP's [DB](https://github.com/stellarwp/db) library
 
+## Contributing Guidelines
+
+**IMPORTANT**: Before making any commits or opening PRs, always check:
+
+- `.github/CONTRIBUTING.md` - Complete commit and PR guidelines
+- Pre-commit checklist:
+  - Run `composer test:analysis`
+  - Run `composer compatibility`
+  - Run `vendor/bin/phpcs`
+  - Run `slic run wpunit && slic run integration`
+  - Update documentation if needed
+  - Follow conventional commit format
+
 ## Documentation
 
 For more detailed information, refer to the documentation files:
@@ -270,3 +283,5 @@ For more detailed information, refer to the documentation files:
 - `docs/advanced-usage.md` - Advanced features like retries, debouncing, and logging
 - `docs/tasks.md` - Information about built-in tasks
 - `docs/tasks/email.md` - Detailed documentation for the Email task
+- `docs/api-reference.md` - Complete API documentation
+- `docs/configuration.md` - Configuration guide
