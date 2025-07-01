@@ -330,6 +330,16 @@ class Regulator extends Provider_Abstract {
 				throw $e;
 			}
 		} catch ( Exception $e ) {
+			/**
+			 * Fires when a task fails to be processed.
+			 *
+			 * @since TBD
+			 *
+			 * @param Task      $task The task that failed to be processed.
+			 * @param Exception $e    The exception that was thrown.
+			 */
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
+
 			if ( $this->should_retry( $task ) ) {
 				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
 			}
@@ -337,6 +347,16 @@ class Regulator extends Provider_Abstract {
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		} catch ( Throwable $e ) {
+			/**
+			 * Fires when a task fails to be processed.
+			 *
+			 * @since TBD
+			 *
+			 * @param Task      $task The task that failed to be processed.
+			 * @param Throwable $e    The exception that was thrown.
+			 */
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
+
 			if ( $this->should_retry( $task ) ) {
 				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
 			}

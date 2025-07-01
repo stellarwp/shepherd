@@ -11,6 +11,7 @@ declare( strict_types=1 );
 
 namespace StellarWP\Pigeon\Tasks;
 
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Abstracts\Task_Abstract;
 use StellarWP\Pigeon\Exceptions\PigeonTaskException;
 use InvalidArgumentException;
@@ -57,7 +58,14 @@ class Email extends Task_Abstract {
 			throw new PigeonTaskException( __( 'Failed to send email.', 'stellarwp-pigeon' ) );
 		}
 
-		do_action( 'pigeon_email_sent', $this->get_id() );
+		/**
+		 * Fires when the email task is processed.
+		 *
+		 * @since TBD
+		 *
+		 * @param Task $task The email task that was processed.
+		 */
+		do_action( 'pigeon_' . Config::get_hook_prefix() . '_email_processed', $this );
 	}
 
 	/**
