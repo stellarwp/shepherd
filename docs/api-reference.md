@@ -140,13 +140,70 @@ public function __construct(
 
 - **Task Prefix:** `pigeon_email_`
 - **Max Retries:** 4
-- **Retry Delay:** 30 seconds
+- **Retry Delay:** 30 seconds (exponential backoff)
 - **Group:** `pigeon_{prefix}_queue_default`
 - **Priority:** 10
 
 #### WordPress Hooks
 
 - `pigeon_{prefix}_email_processed` - Fired after a successful call to `wp_mail()`
+
+---
+
+### `HTTP_Request` Task
+
+Built-in task for making HTTP requests asynchronously.
+
+#### Constructor
+
+```php
+public function __construct(
+    string $url,
+    array $args = [],
+    string $method = 'GET'
+)
+```
+
+#### Configuration
+
+- **Task Prefix:** `pigeon_http_`
+- **Max Retries:** 10
+- **Retry Delay:** Exponential backoff
+- **Default Timeout:** 3 seconds
+- **Default Args:** Compression enabled, 5 redirects, reject unsafe URLs
+- **Group:** `pigeon_{prefix}_queue_default`
+- **Priority:** 10
+
+#### Supported Methods
+
+- `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`
+
+#### Additional Methods
+
+```php
+public function get_url(): string
+public function get_method(): string
+public function get_request_args(): array
+public function get_auth_headers(): array
+```
+
+#### Error Handling
+
+- **WP_Error responses**: Fail immediately without retry (throws `PigeonTaskFailWithoutRetryException`)
+- **4xx HTTP errors**: Fail immediately without retry (throws `PigeonTaskFailWithoutRetryException`) 
+- **5xx HTTP errors**: Retry with exponential backoff (throws `PigeonTaskException`)
+- **Other non-2xx**: Retry with exponential backoff (throws `PigeonTaskException`)
+
+#### WordPress Hooks
+
+- `pigeon_{prefix}_http_request_processed` - Fired after successful HTTP request
+- `pigeon_{prefix}_task_failed_without_retry` - Fired when task fails without retry (4xx errors, WP_Error)
+
+#### Special Features
+
+- **Authentication Headers**: Override `get_auth_headers()` to add auth without storing credentials in database
+- **Task ID Header**: Automatically adds `X-Pigeon-Task-ID` header with task ID
+- **Security Defaults**: URL validation, compression, and redirect limits enabled by default
 
 ---
 
@@ -270,6 +327,10 @@ throw new PigeonTaskException( 'Task processing failed' );
 
 Thrown and caught when attempting to schedule a duplicate task.
 
+### `PigeonTaskFailWithoutRetryException`
+
+Thrown when a task encounters an error that should not be retried (e.g., 4xx HTTP errors, WP_Error responses).
+
 ---
 
 ## Helper Functions
@@ -351,8 +412,14 @@ Table name: `pigeon_{prefix}_task_logs`
 - `pigeon_{prefix}_task_failed` - Fired when a task fails
   - Parameters: `$task`, `$exception`
 
+- `pigeon_{prefix}_task_failed_without_retry` - Fired when a task fails without retry
+  - Parameters: `$task`, `$exception` (PigeonTaskFailWithoutRetryException)
+
 - `pigeon_{prefix}_email_processed` - Fired after a successful call to `wp_mail()`
-  - Parameters: `$to`, `$subject`, `$body`, `$headers`, `$attachments`
+  - Parameters: `$task` (Email instance)
+
+- `pigeon_{prefix}_http_request_processed` - Fired after successful HTTP request
+  - Parameters: `$task` (HTTP_Request instance), `$response` (wp_remote_request response array)
 
 ### Filters
 

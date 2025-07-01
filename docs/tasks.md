@@ -30,6 +30,50 @@ $email = new Email(
 pigeon()->dispatch( $email );
 ```
 
+### [HTTP Request Task](./tasks/http-request.md)
+
+Makes HTTP requests asynchronously using WordPress's `wp_remote_request()` function.
+
+**Key Features:**
+
+- Support for all HTTP methods (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
+- Smart retry logic: 5xx errors retry (up to 10 attempts), 4xx errors fail immediately
+- Automatic security headers and authentication support
+- Built-in compression, redirect handling, and URL validation
+- WordPress action hooks for successful requests and failures
+- Task ID header automatically added to requests
+
+**Quick Example:**
+
+```php
+use StellarWP\Pigeon\Tasks\HTTP_Request;
+
+// Simple GET request (uses default 3s timeout)
+$request = new HTTP_Request( 'https://api.example.com/status' );
+pigeon()->dispatch( $request );
+
+// POST request with JSON data and custom timeout
+$webhook = new HTTP_Request(
+    'https://webhook.example.com/notify',
+    [
+        'headers' => ['Content-Type' => 'application/json'],
+        'body'    => wp_json_encode(['event' => 'user_registered']),
+        'timeout' => 60,
+    ],
+    'POST'
+);
+pigeon()->dispatch( $webhook );
+
+// Custom authentication (extend the class)
+class Authenticated_HTTP_Request extends HTTP_Request {
+    public function get_auth_headers(): array {
+        return [
+            'Authorization' => 'Bearer ' . get_option( 'api_token' ),
+        ];
+    }
+}
+```
+
 ## Creating Your Own Tasks
 
 To create custom tasks, extend the `Task_Abstract` class:
@@ -151,9 +195,9 @@ If you've created a useful task that could benefit others, consider contributing
 
 Planned tasks for future releases:
 
-- **HTTP Request Task**: Make HTTP requests with retry logic
 - **File Processing Task**: Process uploaded files asynchronously
 - **Database Cleanup Task**: Periodic database maintenance
 - **Cache Warming Task**: Pre-populate caches
+- **Bulk Operations Task**: Handle large data sets in chunks
 
 Have ideas for built-in tasks? [Open an issue](https://github.com/stellarwp/pigeon/issues) to discuss your suggestions.
