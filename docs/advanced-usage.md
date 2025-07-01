@@ -273,3 +273,71 @@ add_action( "pigeon_{$prefix}_http_request_processed", function( $task, $respons
     // Handle successful HTTP response
 }, 10, 2 );
 ```
+
+## Admin UI Configuration
+
+Pigeon includes an optional admin interface for monitoring and managing tasks. The admin UI is enabled by default but can be customized or disabled.
+
+### Enabling/Disabling Admin UI
+
+```php
+use StellarWP\Pigeon\Config;
+
+// Disable admin UI entirely
+Config::set_render_admin_ui( false );
+
+// Re-enable admin UI
+Config::set_render_admin_ui( true );
+```
+
+### Customizing Admin Page Access
+
+Control who can access the admin page by setting the required capability:
+
+```php
+// Default capability is 'manage_options'
+Config::set_admin_page_capability( 'manage_options' );
+
+// Allow editors to access the admin page
+Config::set_admin_page_capability( 'edit_posts' );
+
+// Restrict to administrators only
+Config::set_admin_page_capability( 'administrator' );
+```
+
+### Customizing Admin Page Titles
+
+You can customize the titles shown in the admin interface:
+
+```php
+use StellarWP\Pigeon\Config;
+
+// Custom page title (shown in browser tab and admin page list)
+Config::set_admin_page_title_callback( function() {
+    return __( 'My Task Manager', 'domain' );
+} );
+
+// Custom menu title (shown in WordPress admin sidebar under Tools)
+Config::set_admin_menu_title_callback( function() {
+    return __( 'Tasks', 'domain' );
+} );
+
+// Custom in-page title (shown as H1 on the admin page itself)
+Config::set_admin_page_in_page_title_callback( function() {
+    return __( 'Background Task Dashboard', 'domain' );
+} );
+```
+
+### Default Titles
+
+If you don't set custom callbacks, Pigeon uses these default patterns:
+
+- **Page Title**: `Pigeon ({hook_prefix})`
+- **Menu Title**: `Pigeon ({hook_prefix})`
+- **In-Page Title**: `Pigeon Task Manager (via {hook_prefix})`
+
+This allows multiple Pigeon instances (with different hook prefixes) to coexist in the same WordPress installation.
+
+### Admin UI Location
+
+The admin page is automatically added under **Tools** in the WordPress admin menu. The page renders a `<div id="pigeon-app"></div>` container that can be used to mount JavaScript-based interfaces.

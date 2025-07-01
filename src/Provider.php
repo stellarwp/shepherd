@@ -72,12 +72,12 @@ class Provider extends Provider_Abstract {
 		Schema_Config::set_db( DB::class );
 		$this->container->singleton( Logger::class, Config::get_logger() );
 		$this->container->singleton( Tables_Provider::class );
+		$this->container->singleton( Admin_Provider::class );
 		$this->container->singleton( Regulator::class );
 		$this->container->get( Tables_Provider::class )->register();
 		$this->container->get( Regulator::class )->register();
 
 		if ( is_admin() ) {
-			$this->container->singleton( Admin_Provider::class );
 			$this->container->get( Admin_Provider::class )->register();
 		}
 

@@ -23,16 +23,31 @@ use StellarWP\Pigeon\Config;
  */
 class Provider extends Provider_Abstract {
 	/**
+	 * Whether the provider has been registered.
+	 *
+	 * @since TBD
+	 *
+	 * @var bool
+	 */
+	private static bool $has_registered = false;
+
+	/**
 	 * Registers the admin functionality.
 	 *
 	 * @since TBD
 	 */
 	public function register(): void {
+		if ( self::is_registered() ) {
+			return;
+		}
+
 		if ( ! Config::get_render_admin_ui() ) {
 			return;
 		}
 
 		add_action( 'admin_menu', [ $this, 'register_admin_menu' ] );
+
+		self::$has_registered = true;
 	}
 
 	/**
@@ -64,5 +79,16 @@ class Provider extends Provider_Abstract {
 			<div id="pigeon-app"></div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Checks if Pigeon is registered.
+	 *
+	 * @since TBD
+	 *
+	 * @return bool
+	 */
+	public static function is_registered(): bool {
+		return self::$has_registered;
 	}
 }
