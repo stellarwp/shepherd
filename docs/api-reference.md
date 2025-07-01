@@ -409,6 +409,12 @@ Table name: `pigeon_{prefix}_task_logs`
 - `pigeon_{prefix}_task_already_scheduled` - Fired when a task already exists
   - Parameters: `$task`
 
+- `pigeon_{prefix}_task_processing` - Fired when a task starts being processed
+  - Parameters: `$task`, `$action_id` (int)
+
+- `pigeon_{prefix}_task_processed` - Fired when a task finishes processing successfully
+  - Parameters: `$task`, `$action_id` (int)
+
 - `pigeon_{prefix}_task_failed` - Fired when a task fails
   - Parameters: `$task`, `$exception`
 

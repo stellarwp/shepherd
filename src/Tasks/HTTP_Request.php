@@ -97,16 +97,22 @@ class HTTP_Request extends Task_Abstract {
 		$response = wp_remote_request( $url, $request_args );
 
 		// Check for WP_Error.
-		if ( ! is_array( $response ) || is_wp_error( $response ) ) {
+		if ( is_wp_error( $response ) ) {
 			throw new PigeonTaskFailWithoutRetryException(
 				sprintf(
 					/* translators: %1$s: HTTP method, %2$s: URL, %3$s: Error message */
 					__( 'HTTP %1$s request to %2$s failed with code: `%3$s` and message: `%4$s`', 'stellarwp-pigeon' ),
 					$method,
 					$url,
-					is_wp_error( $response ) ? $response->get_error_code() : __( 'unknown', 'stellarwp-pigeon' ),
-					is_wp_error( $response ) ? $response->get_error_message() : __( 'unknown', 'stellarwp-pigeon' )
+					$response->get_error_code(),
+					$response->get_error_message()
 				)
+			);
+		}
+
+		if ( ! is_array( $response ) ) {
+			throw new PigeonTaskFailWithoutRetryException(
+				__( 'HTTP request returned an invalid response.', 'stellarwp-pigeon' )
 			);
 		}
 
@@ -167,7 +173,7 @@ class HTTP_Request extends Task_Abstract {
 		}
 
 		// Validate URL.
-		$url = $this->get_url();
+		$url = $args[0];
 		if ( ! ( is_string( $url ) && filter_var( $url, FILTER_VALIDATE_URL ) ) ) {
 			throw new InvalidArgumentException( __( 'URL is not valid.', 'stellarwp-pigeon' ) );
 		}

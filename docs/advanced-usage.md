@@ -107,12 +107,14 @@ Pigeon includes comprehensive logging that tracks the complete lifecycle of each
 By default, logs are stored in Action Scheduler's `actionscheduler_logs` table using the `ActionScheduler_DB_Logger`. This reduces database overhead by reusing existing infrastructure. The following events are automatically logged:
 
 - `created`: Task scheduled
-- `started`: Task execution begins
-- `finished`: Task completed successfully
-- `failed`: Task failed (all retries exhausted)
+- `started`: Task execution begins (triggers `pigeon_{prefix}_task_processing` action)
+- `finished`: Task completed successfully (triggers `pigeon_{prefix}_task_processed` action)
+- `failed`: Task failed (all retries exhausted, triggers `pigeon_{prefix}_task_failed` action)
 - `rescheduled`: Task rescheduled
 - `retrying`: Retry attempt starting
 - `cancelled`: Task cancelled
+
+Note: Tasks that fail without retry (e.g., HTTP 4xx errors) trigger `pigeon_{prefix}_task_failed_without_retry` instead of being rescheduled.
 
 ### Retrieving Logs
 
@@ -241,13 +243,33 @@ Pigeon fires several WordPress actions during task lifecycle:
 ```php
 $prefix = Config::get_hook_prefix();
 
-// Task failed (fired by Regulator)
+// Task starts processing (fired by Regulator)
+add_action( "pigeon_{$prefix}_task_processing", function( $task, $action_id ) {
+    // Log, monitor, or prepare for task execution
+}, 10, 2 );
+
+// Task finished processing successfully (fired by Regulator)
+add_action( "pigeon_{$prefix}_task_processed", function( $task, $action_id ) {
+    // Cleanup, notify, or trigger dependent tasks
+}, 10, 2 );
+
+// Task failed with retries exhausted (fired by Regulator)
 add_action( "pigeon_{$prefix}_task_failed", function( $task, $exception ) {
-    // Handle task failure
+    // Handle permanent task failure
+}, 10, 2 );
+
+// Task failed without retry (fired by Regulator)
+add_action( "pigeon_{$prefix}_task_failed_without_retry", function( $task, $exception ) {
+    // Handle non-retryable failures (e.g., 4xx errors)
 }, 10, 2 );
 
 // Email sent (fired by Email task)
 add_action( "pigeon_{$prefix}_email_processed", function( $task ) {
-    // Do something else after the email is processed, like scheduling a dependent new task.
+    // Do something after the email is processed
 }, 10, 1 );
+
+// HTTP request completed (fired by HTTP_Request task)
+add_action( "pigeon_{$prefix}_http_request_processed", function( $task, $response ) {
+    // Handle successful HTTP response
+}, 10, 2 );
 ```
