@@ -13,6 +13,7 @@ use RuntimeException;
 use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Pigeon\Contracts\Logger;
 use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
+use Closure;
 
 /**
  * Pigeon Config
@@ -41,6 +42,15 @@ class Config {
 	protected static string $hook_prefix;
 
 	/**
+	 * The admin page capability.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	protected static string $admin_page_capability = 'manage_options';
+
+	/**
 	 * The logger.
 	 *
 	 * @since TBD
@@ -54,7 +64,7 @@ class Config {
 	 *
 	 * @since TBD
 	 *
-	 * @var int
+	 * @var Closure
 	 */
 	protected static int $max_table_name_length = 64;
 
@@ -73,6 +83,140 @@ class Config {
 		}
 
 		return self::$container;
+	}
+
+	/**
+	 * Gets the render admin UI flag.
+	 *
+	 * @since TBD
+	 *
+	 * @return bool
+	 */
+	public static function get_render_admin_ui(): bool {
+		return static::$render_admin_ui;
+	}
+
+	/**
+	 * Sets the render admin UI flag.
+	 *
+	 * @since TBD
+	 *
+	 * @param bool $render_admin_ui Whether to render the admin UI.
+	 */
+	public static function set_render_admin_ui( bool $render_admin_ui ): void {
+		static::$render_admin_ui = $render_admin_ui;
+	}
+
+	/**
+	 * Gets the admin page title.
+	 *
+	 * @since TBD
+	 *
+	 * @return string
+	 */
+	public static function get_admin_page_title(): string {
+		if ( is_callable( self::$get_admin_page_title_callback ) ) {
+			$result = call_user_func( self::$get_admin_page_title_callback );
+			if ( is_string( $result ) ) {
+				return $result;
+			}
+		}
+
+		/* translators: %s: The hook prefix for this instance */
+		return sprintf( __( 'Pigeon (%s)', 'stellarwp-pigeon' ), static::$hook_prefix );
+	}
+
+	/**
+	 * Sets the callback to get the admin page title.
+	 *
+	 * @since TBD
+	 *
+	 * @param ?Closure $callback The callback.
+	 */
+	public static function set_admin_page_title_callback( ?Closure $callback ): void {
+		self::$get_admin_page_title_callback = $callback;
+	}
+
+	/**
+	 * Gets the admin menu title.
+	 *
+	 * @since TBD
+	 *
+	 * @return string
+	 */
+	public static function get_admin_menu_title(): string {
+		if ( is_callable( self::$get_admin_menu_title_callback ) ) {
+			$result = call_user_func( self::$get_admin_menu_title_callback );
+			if ( is_string( $result ) ) {
+				return $result;
+			}
+		}
+
+		/* translators: %s: The hook prefix for this instance */
+		return sprintf( __( 'Pigeon (%s)', 'stellarwp-pigeon' ), static::$hook_prefix );
+	}
+
+	/**
+	 * Sets the callback to get the admin menu title.
+	 *
+	 * @since TBD
+	 *
+	 * @param ?Closure $callback The callback.
+	 */
+	public static function set_admin_menu_title_callback( ?Closure $callback ): void {
+		self::$get_admin_menu_title_callback = $callback;
+	}
+
+	/**
+	 * Gets the admin page in page title.
+	 *
+	 * @since TBD
+	 *
+	 * @return string
+	 */
+	public static function get_admin_page_in_page_title(): string {
+		if ( is_callable( self::$get_admin_page_in_page_title_callback ) ) {
+			$result = call_user_func( self::$get_admin_page_in_page_title_callback );
+			if ( is_string( $result ) ) {
+				return $result;
+			}
+		}
+
+		/* translators: %s: The hook prefix for this instance */
+		return sprintf( __( 'Pigeon Task Manager (via %s)', 'stellarwp-pigeon' ), static::$hook_prefix );
+	}
+
+	/**
+	 * Sets the callback to get the admin page in page title.
+	 *
+	 * @since TBD
+	 *
+	 * @param ?Closure $callback The callback.
+	 */
+	public static function set_admin_page_in_page_title_callback( ?Closure $callback ): void {
+		self::$get_admin_page_in_page_title_callback = $callback;
+	}
+
+	/**
+	 * Gets the admin page capability.
+	 *
+	 * @since TBD
+	 *
+	 * @return string
+	 */
+	public static function get_admin_page_capability(): string {
+		return self::$admin_page_capability;
+	}
+
+	/**
+	 * Sets the admin page capability.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $capability The capability.
+	 */
+	public static function set_admin_page_capability( string $capability ): void {
+		self::$admin_page_capability = $capability;
 	}
 
 	/**
