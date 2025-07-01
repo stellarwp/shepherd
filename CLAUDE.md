@@ -207,6 +207,7 @@ composer install --ignore-platform-req=ext-uopz
 - **Task base class**: `src/Abstracts/Task_Abstract.php`
 - **Database schemas**: `src/Tables/`
 - **Built-in tasks**: `src/Tasks/`
+- **Admin UI**: `src/Admin/Provider.php`
 - **Tests**: `tests/`
 - **Documentation**: `docs/`
 
