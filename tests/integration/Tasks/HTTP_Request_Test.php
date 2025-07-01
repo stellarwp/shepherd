@@ -280,6 +280,7 @@ class HTTP_Request_Test extends WPTestCase {
 		}, true );
 
 		$action_fired = false;
+		/** @var Task|null $action_task */
 		$action_task = null;
 		$action_response = null;
 
@@ -288,7 +289,7 @@ class HTTP_Request_Test extends WPTestCase {
 			$action_fired = true;
 			$action_task = $task;
 			$action_response = $resp;
-		} );
+		}, 10, 2 );
 
 		$pigeon = pigeon();
 
@@ -304,7 +305,7 @@ class HTTP_Request_Test extends WPTestCase {
 
 		$this->assertTrue( $action_fired );
 		$this->assertInstanceOf( HTTP_Request::class, $action_task );
-		$this->assertSame( $action_task, $task );
+		$this->assertSame( $action_task->get_id(), $task->get_id() );
 		$this->assertEquals( $response, $action_response );
 	}
 
