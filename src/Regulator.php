@@ -21,6 +21,7 @@ use Throwable;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Exceptions\PigeonTaskException;
 use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
+use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
 use StellarWP\Pigeon\Traits\Loggable;
 
 /**
@@ -325,6 +326,30 @@ class Regulator extends Provider_Abstract {
 			} catch ( PigeonTaskException $e ) {
 				throw $e;
 			}
+		} catch ( PigeonTaskFailWithoutRetryException $e ) {
+			/**
+			 * Fires when a task fails to be processed without retry.
+			 *
+			 * @since TBD
+			 *
+			 * @param Task                                $task The task that failed to be processed without retry.
+			 * @param PigeonTaskFailWithoutRetryException $e    The exception that was thrown.
+			 */
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
+
+			/**
+			 * Fires when a task fails to be processed without retry.
+			 *
+			 * @since TBD
+			 *
+			 * @param Task                                $task The task that failed to be processed without retry.
+			 * @param PigeonTaskFailWithoutRetryException $e    The exception that was thrown.
+			 */
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
+
+			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
+
+			throw $e;
 		} catch ( Exception $e ) {
 			/**
 			 * Fires when a task fails to be processed.
