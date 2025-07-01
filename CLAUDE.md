@@ -1,64 +1,272 @@
-# Pigeon Project Knowledge Base
+# StellarWP Pigeon - AI Assistant Context
 
-This document provides a comprehensive overview of the Pigeon project, its architecture, and its core concepts. It is intended to be used as a reference for developers and AI assistants working on the project.
+## Project Overview
 
-## 1. Project Overview
+Pigeon is a lightweight background processing library for WordPress built on top of Action Scheduler. It provides a clean, fluent API for defining and dispatching asynchronous tasks with built-in support for retries, debouncing, and logging.
 
-Pigeon is a lightweight and powerful background processing library for WordPress. It is built on top of the robust **Action Scheduler** library.
+## Key Features
 
-- **Purpose**: To provide a simple, fluent, and developer-friendly API for defining and dispatching asynchronous (background) tasks.
-- **Core Technologies**: PHP, WordPress, Action Scheduler.
-- **Key Features**: Fluent API, automatic retries, debouncing, detailed logging, and a set of pre-packaged, common-use tasks.
+- **Background Task Processing**: Offload time-consuming operations to background processes
+- **Automatic Retries**: Configurable retry mechanism with exponential backoff
+- **Task Debouncing**: Prevents tasks from running too frequently with customizable delays
+- **Unique Task Enforcement**: Prevents duplicate tasks from being scheduled
+- **Database Logging**: Comprehensive lifecycle tracking for all tasks
+- **Priority System**: Assign priorities (0-255) to control task execution order
+- **Group Management**: Organize tasks into logical groups
+- **Built-in Tasks**: Includes pre-packaged tasks like Email for common operations
 
-## 2. Core Concepts
+## Architecture
 
-### Tasks
+### Core Components
 
-The fundamental unit of work in Pigeon is a "Task".
+1. **Regulator** (`src/Regulator.php`): Central task management system
+2. **Provider** (`src/Provider.php`): Service provider for dependency injection
+3. **Task_Abstract** (`src/Abstracts/Task_Abstract.php`): Base class for all tasks
+4. **Database Tables**: Custom tables for task data and logging
 
-- **Implementation**: All tasks are PHP classes that **must** extend `StellarWP\Pigeon\Abstracts\Task_Abstract`.
-- **Arguments**: A task's arguments are passed to its constructor and **must** be forwarded to `parent::__construct(...)`. This allows Pigeon to store them.
-- **Execution Logic**: The main logic of a task is placed within the `process()` method.
-- **Failure Handling**: To signal a retryable failure, a task should override the `get_max_retries()` method to return the number of desired retries.
+### Database Schema
 
-### The Regulator
+- `stellarwp_pigeon_{prefix}_tasks`: Stores task data and retry information
+- `stellarwp_pigeon_{prefix}_task_logs`: Tracks task lifecycle events
 
-The `Regulator` is the central class in Pigeon. It acts as the main API for interacting with the library.
+### Task Lifecycle States
 
-- **Accessing**: It is accessed via the `StellarWP\Pigeon\pigeon()` helper function.
-- **Dispatching**: The primary method is `dispatch( Task $task, int $delay = 0 )`, which schedules a task for execution.
+- `created`: Task has been scheduled
+- `started`: Task execution has begun
+- `finished`: Task completed successfully
+- `failed`: Task execution failed
+- `rescheduled`: Task has been rescheduled
+- `retrying`: Task is being retried after failure
+- `cancelled`: Task has been cancelled
 
-### Logging
+## Installation & Setup
 
-Pigeon features a detailed logging system that records the entire lifecycle of a task to the database.
+### Installation
 
-- **Logger**: The default logger is `StellarWP\Pigeon\Loggers\DB_Logger`. Custom loggers can be created by implementing the `StellarWP\Pigeon\Contracts\Logger` interface.
-- **Log Events**: Key events logged include `created`, `started`, `finished`, `failed`, `rescheduled`, and `retrying`.
-- **Accessing Logs**: Logs for a task can be retrieved via `$logger->retrieve_logs( $task_id )`.
+```bash
+composer require stellarwp/pigeon
+```
 
-### Advanced Task Features
+### Registration
 
-- **Retries**: A task can be made retryable by overriding the `get_max_retries()` method to return the number of desired retries.
+Pigeon requires a DI container implementing `StellarWP\ContainerContract\ContainerInterface`. Register it on the `plugins_loaded` action at the LATEST:
 
-## 3. Testing Philosophy
+```php
+\StellarWP\Pigeon\Config::set_hook_prefix( 'my_app' ); // Needs to be set before the container is registered.
+$container = get_my_apps_container(); // Your container instance
+$container->singleton( \StellarWP\Pigeon\Provider::class );
+$container->get( \StellarWP\Pigeon\Provider::class )->register();
+```
 
-The project maintains a high standard of testing, primarily through integration tests.
+## Creating Tasks
 
-- **Framework**: Tests are built using `lucatume\WPBrowser\TestCase\WPTestCase`.
-- **Mocking and Spies**:
-    - WordPress functions (`wp_mail`, `do_action`, etc.) are mocked using the `With_Uopz` trait and its `set_fn_return()` method.
-    - A `$spy = []` array is used within the mock closure to capture call arguments for later assertion. This is the preferred way to verify interactions.
-- **Custom Test Traits**:
-    - `With_AS_Assertions`: Provides helpers like `assertTaskHasActionPending()` and `assertTaskExecutesWithoutErrors()` to interact with Action Scheduler.
-    - `With_Clock_Mock`: Used to freeze time (`freeze_time()`) for consistent testing of scheduled events.
-    - `With_Log_Snapshot`: Provides `assertMatchesLogSnapshot()` to easily create and verify the entire log output for a task.
+Tasks are recommended to extend `Task_Abstract`:
 
-## 4. Documentation Structure
+```php
+class My_Task extends Task_Abstract {
+    // Optional: Override constructor for type hinting
+    public function __construct( string $message, int $code = 200 ) {
+        parent::__construct( $message, $code ); // Should call parent constructor
+    }
 
-Project documentation is crucial and is maintained in Markdown files.
+    public function process(): void {
+        // Access arguments via $this->get_args()
+        $message = $this->get_args()[0];
+        $code = $this->get_args()[1];
 
-- **`README.md`**: The main entry point, providing a high-level overview and links to other docs.
-- **`docs/getting-started.md`**: Covers installation and basic usage.
-- **`docs/advanced-usage.md`**: Details advanced features like retries and debouncing.
-- **`docs/tasks.md`**: An index file for pre-packaged tasks.
-- **`docs/tasks/`**: A directory containing individual documentation for each pre-packaged task (e.g., `email.md`).
+        // Task logic here
+        if ( ! $result ) {
+            throw new PigeonTaskException( 'Task failed' );
+        }
+    }
+
+    public function get_task_prefix(): string {
+        return 'my_task_'; // Max 15 characters
+    }
+
+    // Optional: Configure retries
+    public function get_max_retries(): int {
+        return 2; // Will retry 2 times (3 total attempts)
+    }
+
+    // Optional: Configure retry delay
+    public function get_retry_delay(): int {
+        return 30; // 30 seconds between retries
+    }
+}
+```
+
+## Usage Examples
+
+```php
+// Dispatch a task immediately
+pigeon()->dispatch(new My_Task($arg1, $arg2));
+
+// Dispatch with delay (in seconds)
+pigeon()->dispatch(new My_Task($arg1, $arg2), 300); // 5 minutes
+
+// Retrieve task logs
+use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Pigeon\Provider;
+
+$logger = Provider::get_container()->get( Logger::class );
+$logs = $logger->retrieve_logs( $task_id );
+```
+
+## Built-in Tasks
+
+### Email Task
+
+Sends emails asynchronously with automatic retries (up to 5 attempts):
+
+```php
+use StellarWP\Pigeon\Tasks\Email;
+
+$email_task = new Email(
+    'recipient@example.com',
+    'Subject',
+    '<h1>HTML Body</h1>',
+    ['Content-Type: text/html; charset=UTF-8'],
+    ['/path/to/attachment.pdf']
+);
+
+pigeon()->dispatch($email_task);
+```
+
+## Development Commands
+
+### Testing
+
+```bash
+# You need to have slic installed and configured to use pigeon.
+
+# Then you can run each suite like:
+slic run wpunit
+slic run integration
+```
+
+### Code Quality
+
+```bash
+# Run static analysis
+composer test:analysis
+
+# Check PHP compatibility
+composer compatibility
+
+# Run coding standards check
+vendor/bin/phpcs
+```
+
+### Common Tasks
+
+```bash
+# Install dependencies, ignoring uopz extension which is met inside of the slic container.
+composer install --ignore-platform-req=ext-uopz
+
+```
+
+## Important Files and Locations
+
+- **Main entry point**: `pigeon.php`
+- **Core logic**: `src/Regulator.php`
+- **Task base class**: `src/Abstracts/Task_Abstract.php`
+- **Database schemas**: `src/Tables/`
+- **Built-in tasks**: `src/Tasks/`
+- **Tests**: `tests/`
+- **Documentation**: `docs/`
+
+## Testing Approach
+
+- Uses Codeception via [slic](https://github.com/stellarwp/slic) for testing
+- Test configuration in `codeception.dist.yml` and `codeception.slic.yml` with environmental variables defined in `.env.testing.slic`
+- Integration tests for full workflow testing
+- Snapshot testing for complex data structures
+
+## Coding Standards
+
+- Follows WordPress coding standards and more Specifically StellarWP's coding standards.
+- Uses PHPStan for static analysis (level defined in `phpstan.neon.dist`)
+- PHP 7.4+ compatibility required
+- PSR-4 autoloading under `StellarWP\Pigeon` namespace
+
+## Dependencies
+
+- **stellarwp/db**: Database abstraction layer
+- **stellarwp/schema**: Database schema management
+- **woocommerce/action-scheduler**: Task queue backend
+- **psr/log**: PSR-3 logger interface
+- **stellarwp/container-contract**: A DI container that implements [StellarWP's container contract](https://github.com/stellarwp/container-contract)
+
+## Common Development Patterns
+
+### Adding a New Task
+
+1. Create a new class extending `Task_Abstract` in `src/Tasks/`
+2. Implement required methods (`process()`, `get_task_prefix()`)
+3. Optionally override retry configuration methods
+4. If implemented withing Pigeon, add tests in `tests/unit/Tasks/`
+
+### Modifying Database Schema
+
+1. Update table's column definitions in `src/Tables/`
+2. Update the table's schema version.
+3. Update any affected repository classes.
+
+### Adding New Features
+
+1. Follow existing patterns in the codebase
+2. Add appropriate logging using the logger trait
+3. Include comprehensive tests
+4. Update documentation as needed
+
+## Troubleshooting
+
+### Common Issues
+
+1. **uopz extension missing**: Use `--ignore-platform-req=ext-uopz` with composer
+
+### Custom Logger Implementation
+
+You can implement a custom logger by implementing the `Logger` interface:
+
+```php
+use StellarWP\Pigeon\Contracts\Logger;
+
+class My_Custom_Logger implements Logger {
+    // Implement required methods
+}
+
+// Set before Provider::register()
+\StellarWP\Pigeon\Config::set_logger( new My_Custom_Logger() );
+```
+
+## Task Behavior Details
+
+### Unique Tasks
+
+- Tasks are unique based on class name and arguments
+- Dispatching a duplicate task will be ignored (no-op)
+
+### Retry Logic
+
+- Tasks fail when they throw an `Exception` in their `process()` method.
+- Retry count is the number of additional attempts (not total attempts)
+- Each retry can have a configurable delay
+- Failed tasks are logged
+
+## Additional Notes
+
+- This is a WordPress plugin/library, not a standalone application
+- Requires WordPress environment for full functionality
+- Action Scheduler must be available (included as dependency)
+- All database operations use StellarWP's [DB](https://github.com/stellarwp/db) library
+
+## Documentation
+
+For more detailed information, refer to the documentation files:
+
+- `docs/getting-started.md` - Installation and basic usage guide
+- `docs/advanced-usage.md` - Advanced features like retries, debouncing, and logging
+- `docs/tasks.md` - Information about built-in tasks
+- `docs/tasks/email.md` - Detailed documentation for the Email task
