@@ -102,6 +102,6 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 * @return int The retry delay in seconds.
 	 */
 	public function get_retry_delay(): int {
-		return 30 * ( 2 ** ( $this->get_current_try() - 1 ) );
+		return min( 6 * HOUR_IN_SECONDS, 30 * ( 2 ** ( $this->get_current_try() - 1 ) ) );
 	}
 }
