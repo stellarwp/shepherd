@@ -117,7 +117,7 @@ class Task_Logs extends Table {
 				'unsigned' => true,
 				'nullable' => false,
 			],
-			'action_id'          => [
+			'action_id'         => [
 				'type'     => self::COLUMN_TYPE_BIGINT,
 				'php_type' => self::PHP_TYPE_INT,
 				'length'   => 20,
