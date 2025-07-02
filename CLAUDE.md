@@ -195,9 +195,24 @@ vendor/bin/phpcs
 ### Common Tasks
 
 ```bash
-# Install dependencies, ignoring uopz extension which is met inside of the slic container.
+# Install PHP dependencies, ignoring uopz extension which is met inside of the slic container.
 composer install --ignore-platform-req=ext-uopz
 
+# Switch to the correct Node version (required before running npm commands)
+nvm use
+
+# Install JavaScript dependencies
+npm ci
+
+# Development build with hot reloading
+npm run dev
+
+# Production build
+npm run build
+
+# Linting
+npm run lint:js
+npm run lint:css
 ```
 
 ## Important Files and Locations

@@ -1,0 +1,24 @@
+{
+  "name": "stellarwp-pigeon",
+  "version": "1.0.0",
+  "description": "Background processing library for WordPress with React admin UI",
+  "private": true,
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.6.7"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start --mode=development --devtool=source-map",
+    "dev": "WP_DEVTOOL=eval-source-map wp-scripts start",
+    "lint:js": "wp-scripts lint-js app/",
+    "lint:css": "wp-scripts lint-style",
+    "format:js": "wp-scripts lint-js app/ --fix",
+    "format:css": "wp-scripts lint-style --fix",
+    "test": "wp-scripts test-unit-js",
+    "test:watch": "wp-scripts test-unit-js --watch"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^30.14.1"
+  }
+}
