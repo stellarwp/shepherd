@@ -7,7 +7,7 @@ namespace StellarWP\Pigeon;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use RuntimeException;
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
+use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
 
 class Config_Test extends WPTestCase {
 	/**
@@ -38,7 +38,7 @@ class Config_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_get_default_db_logger_if_none_is_set(): void {
-		$this->assertInstanceOf( DB_Logger::class, Config::get_logger() );
+		$this->assertInstanceOf( ActionScheduler_DB_Logger::class, Config::get_logger() );
 	}
 
 	/**

@@ -92,6 +92,15 @@ abstract class Table_Abstract extends Table {
 	public const COLUMN_TYPE_VARCHAR = 'varchar';
 
 	/**
+	 * The column type for a text.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const COLUMN_TYPE_TEXT = 'text';
+
+	/**
 	 * The column type for a longtext.
 	 *
 	 * @since TBD

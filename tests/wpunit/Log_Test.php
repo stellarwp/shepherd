@@ -8,7 +8,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use Psr\Log\LogLevel;
 use InvalidArgumentException;
 use StellarWP\Pigeon\Contracts\Log_Model;
-use StellarWP\Pigeon\Tables\Task_Logs;
+use StellarWP\Pigeon\Tables\AS_Logs;
 
 class Log_Test extends WPTestCase {
 	private function get_log_instance(): Log {
@@ -92,8 +92,6 @@ class Log_Test extends WPTestCase {
 	 */
 	public function it_should_get_table_interface(): void {
 		$log = $this->get_log_instance();
-		$container = tests_pigeon_get_container();
-		$container->singleton( Task_Logs::class, Task_Logs::class );
-		$this->assertInstanceOf( Task_Logs::class, $log->get_table_interface() );
+		$this->assertInstanceOf( AS_Logs::class, $log->get_table_interface() );
 	}
 }

@@ -42,7 +42,7 @@ class Regulator_Test extends WPTestCase {
 		$this->freeze_time( tests_pigeon_get_dt() );
 	}
 
-	private function get_logger(): DB_Logger {
+	private function get_logger(): Logger {
 		return Provider::get_container()->get( Logger::class );
 	}
 

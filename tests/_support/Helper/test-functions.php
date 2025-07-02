@@ -6,6 +6,7 @@ use StellarWP\Pigeon\Tables\Task_Logs;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Provider;
 use StellarWP\Pigeon\Config;
+use StellarWP\Schema\Register;
 
 /**
  * Drop the tables before and after the suite.
@@ -102,6 +103,9 @@ function tests_pigeon_common_bootstrap(): void {
 	// Bootstrap Pigeon.
 	$container->singleton( Provider::class );
 	$container->get( Provider::class )->register();
+
+	// For tests we forcefully register the task logs table for it to exist.
+	Register::table( Task_Logs::class );
 
 	tests_pigeon_raise_auto_increment();
 

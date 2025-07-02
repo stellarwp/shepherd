@@ -11,6 +11,20 @@ use StellarWP\Pigeon\Config;
 
 class DB_Logger_Test extends WPTestCase {
 	/**
+	 * @before
+	 */
+	public function set_db_logger_as_default(): void {
+		tests_pigeon_get_container()->singleton( Logger::class, DB_Logger::class );
+	}
+
+	/**
+	 * @after
+	 */
+	public function set_action_scheduler_db_logger_as_default(): void {
+		tests_pigeon_get_container()->singleton( Logger::class, ActionScheduler_DB_Logger::class );
+	}
+
+	/**
 	 * @test
 	 */
 	public function it_should_be_a_logger(): void {
@@ -26,9 +40,10 @@ class DB_Logger_Test extends WPTestCase {
 		$logger = new DB_Logger();
 		$task_id = 123;
 		$context = [
-			'task_id' => $task_id,
-			'type'    => 'created',
-			'test'    => 1,
+			'task_id'   => $task_id,
+			'action_id' => 456,
+			'type'      => 'created',
+			'test'      => 1,
 		];
 
 		$logger->info( 'Test log entry', $context );
@@ -40,6 +55,7 @@ class DB_Logger_Test extends WPTestCase {
 		$this->assertEquals( wp_json_encode( [ 'message' => 'Test log entry', 'context' => ['test' => 1 ] ] ), $logs[0]->get_entry() );
 		$this->assertEquals( 'info', $logs[0]->get_level() );
 		$this->assertEquals( 'created', $logs[0]->get_type() );
+		$this->assertEquals( 456, $logs[0]->get_action_id() );
 	}
 
 	/**

@@ -11,7 +11,7 @@ namespace StellarWP\Pigeon;
 
 use RuntimeException;
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
+use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
 
 /**
  * Pigeon Config
@@ -66,7 +66,7 @@ class Config {
 	 */
 	public static function get_logger(): Logger {
 		if ( ! static::$logger ) {
-			static::$logger = new DB_Logger();
+			static::$logger = new ActionScheduler_DB_Logger();
 		}
 
 		return static::$logger;

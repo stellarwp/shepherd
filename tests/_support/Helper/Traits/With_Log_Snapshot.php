@@ -18,7 +18,7 @@ trait With_Log_Snapshot {
 		$action_ids = array_values(
 			array_unique(
 				array_map(
-					fn( array $log ) => json_decode( $log['entry'], true )['context']['action_id'],
+					fn( array $log ) => $log['action_id'],
 					$log_array
 				)
 			)

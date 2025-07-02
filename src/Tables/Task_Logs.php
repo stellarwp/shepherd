@@ -35,6 +35,10 @@ class Task_Logs extends Table {
 			'columns' => 'task_id',
 		],
 		[
+			'name'    => 'action_id',
+			'columns' => 'action_id',
+		],
+		[
 			'name'    => 'type',
 			'columns' => 'type',
 		],
@@ -51,7 +55,7 @@ class Task_Logs extends Table {
 	 *
 	 * @var string
 	 */
-	const SCHEMA_VERSION = '0.0.1-dev';
+	const SCHEMA_VERSION = '0.0.2-dev';
 
 	/**
 	 * The base table name, without the table prefix.
@@ -113,6 +117,13 @@ class Task_Logs extends Table {
 				'unsigned' => true,
 				'nullable' => false,
 			],
+			'action_id'          => [
+				'type'     => self::COLUMN_TYPE_BIGINT,
+				'php_type' => self::PHP_TYPE_INT,
+				'length'   => 20,
+				'unsigned' => true,
+				'nullable' => false,
+			],
 			'date'              => [
 				'type'     => self::COLUMN_TYPE_TIMESTAMP,
 				'php_type' => self::PHP_TYPE_DATETIME,
@@ -151,14 +162,7 @@ class Task_Logs extends Table {
 		$results = [];
 
 		foreach ( self::fetch_all_where( DB::prepare( 'WHERE task_id = %d', $task_id ), 50, ARRAY_A, 'date ASC' ) as $log_array ) {
-			$log = new Log();
-			$log->set_id( $log_array['id'] );
-			$log->set_task_id( $log_array['task_id'] );
-			$log->set_date( DateTime::createFromFormat( 'Y-m-d H:i:s', $log_array['date'] ) );
-			$log->set_level( $log_array['level'] );
-			$log->set_type( $log_array['type'] );
-			$log->set_entry( $log_array['entry'] );
-			$results[] = $log;
+			$results[] = self::get_model_from_array( $log_array );
 		}
 
 		return $results;
@@ -177,6 +181,7 @@ class Task_Logs extends Table {
 		$log = new Log();
 		$log->set_id( $model_array['id'] );
 		$log->set_task_id( $model_array['task_id'] );
+		$log->set_action_id( $model_array['action_id'] );
 		$log->set_date( DateTime::createFromFormat( 'Y-m-d H:i:s', $model_array['date'] ) );
 		$log->set_level( $model_array['level'] );
 		$log->set_type( $model_array['type'] );

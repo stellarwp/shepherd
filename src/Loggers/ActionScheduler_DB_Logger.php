@@ -1,6 +1,6 @@
 <?php
 /**
- * Pigeon DB Logger
+ * Pigeon's Action Scheduler DB Logger
  *
  * @package StellarWP\Pigeon\Loggers
  */
@@ -13,7 +13,7 @@ use StellarWP\Pigeon\Contracts\Logger as LoggerContract;
 use Psr\Log\LoggerTrait;
 use Psr\Log\InvalidArgumentException;
 use StellarWP\Pigeon\Log;
-use StellarWP\Pigeon\Tables\Task_Logs;
+use StellarWP\Pigeon\Tables\AS_Logs;
 
 /**
  * Pigeon DB Logger
@@ -22,7 +22,7 @@ use StellarWP\Pigeon\Tables\Task_Logs;
  *
  * @package StellarWP\Pigeon\Loggers
  */
-class DB_Logger implements LoggerContract {
+class ActionScheduler_DB_Logger implements LoggerContract {
 	use LoggerTrait;
 
 	/**
@@ -35,7 +35,7 @@ class DB_Logger implements LoggerContract {
 	 * @return Log[] The logs for the task.
 	 */
 	public function retrieve_logs( int $task_id ): array {
-		return Task_Logs::get_by_task_id( $task_id );
+		return AS_Logs::get_by_task_id( $task_id );
 	}
 
 	/**
