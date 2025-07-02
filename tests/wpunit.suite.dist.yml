@@ -19,3 +19,4 @@ modules:
             domain: "%WP_DOMAIN%"
             title: stellarwp/pigeon tests
             configFile: tests/config.php
+            theme: kadence

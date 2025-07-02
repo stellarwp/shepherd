@@ -6,8 +6,8 @@ jobs:
     strategy:
       matrix:
         suite:
-          - acceptance
           - wpunit
+          - integration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository

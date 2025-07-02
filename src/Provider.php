@@ -11,10 +11,13 @@ declare( strict_types=1 );
 
 namespace StellarWP\Pigeon;
 
-use lucatume\DI52\ServiceProvider;
-use lucatume\DI52\Container;
+use StellarWP\Pigeon\Abstracts\Provider_Abstract;
+use StellarWP\ContainerContract\ContainerInterface as Container;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
 use RuntimeException;
+use StellarWP\Schema\Config as Schema_Config;
+use StellarWP\DB\DB;
+use StellarWP\Pigeon\Contracts\Logger;
 
 /**
  * Main Service Provider
@@ -23,7 +26,7 @@ use RuntimeException;
  *
  * @package StellarWP\Pigeon;
  */
-class Provider extends ServiceProvider {
+class Provider extends Provider_Abstract {
 	/**
 	 * The version of the plugin.
 	 *
@@ -68,15 +71,58 @@ class Provider extends ServiceProvider {
 	 * @return void The method does not return any value.
 	 */
 	public function register(): void {
-		if ( self::$has_registered ) {
+		if ( self::is_registered() ) {
 			return;
 		}
 
+		$this->require_action_scheduler();
+
 		self::$static_container = $this->container;
 
-		$this->container->register( Tables_Provider::class );
+		Schema_Config::set_container( $this->container );
+		Schema_Config::set_db( DB::class );
+		$this->container->singleton( Logger::class, Config::get_logger() );
+		$this->container->singleton( Tables_Provider::class );
+		$this->container->singleton( Regulator::class );
+		$this->container->get( Tables_Provider::class )->register();
+		$this->container->get( Regulator::class )->register();
 
 		self::$has_registered = true;
+	}
+
+	/**
+	 * Requires Action Scheduler.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	private function require_action_scheduler(): void {
+		require_once __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php';
+	}
+
+	/**
+	 * Sets the container.
+	 *
+	 * @since TBD
+	 *
+	 * @param ?Container $container The container.
+	 *
+	 * @return void
+	 */
+	public static function set_container( ?Container $container ): void {
+		self::$static_container = $container;
+	}
+
+	/**
+	 * Resets the registered state.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	public static function reset(): void {
+		self::$has_registered = false;
 	}
 
 	/**
@@ -85,47 +131,25 @@ class Provider extends ServiceProvider {
 	 * @since TBD
 	 *
 	 * @return Container
+	 *
+	 * @throws RuntimeException If the container has not been set.
 	 */
 	public static function get_container(): Container {
 		if ( ! self::$static_container ) {
-			self::$static_container = new Container();
+			throw new RuntimeException( 'The container has not been set.' );
 		}
 
 		return self::$static_container;
 	}
 
 	/**
-	 * Gets the hook prefix.
+	 * Checks if Pigeon is registered.
 	 *
 	 * @since TBD
 	 *
-	 * @throws RuntimeException If the hook prefix is not set.
-	 *
-	 * @return string
+	 * @return bool
 	 */
-	public static function get_hook_prefix(): string {
-		if ( ! static::$hook_prefix ) {
-			$class = __CLASS__;
-			throw new RuntimeException( "You must specify a hook prefix for your project with {$class}::set_hook_prefix()" );
-		}
-
-		return static::$hook_prefix;
-	}
-
-	/**
-	 * Sets the hook prefix.
-	 *
-	 * @param string $prefix The prefix to add to hooks.
-	 *
-	 * @throws RuntimeException If the hook prefix is empty.
-	 *
-	 * @return void
-	 */
-	public static function set_hook_prefix( string $prefix ): void {
-		if ( ! $prefix ) {
-			throw new RuntimeException( 'The hook prefix cannot be empty.' );
-		}
-
-		static::$hook_prefix = $prefix;
+	public static function is_registered(): bool {
+		return self::$has_registered;
 	}
 }

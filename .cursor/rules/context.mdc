@@ -1,0 +1,44 @@
+---
+description: General project principles and coding standards.
+globs:
+alwaysApply: false
+---
+- **WordPress Standards**: Always adhere to [WordPress coding standards](mdc:https:/developer.wordpress.org/coding-standards) for both PHP and JavaScript.
+- **Existing Patterns**: Follow the existing code structure, naming conventions, and architectural patterns found in the codebase. Consistency is key.
+- **Bail Early**: Use early returns in functions and methods to improve readability and reduce cognitive load.
+---
+description: Rules for implementing Pigeon tasks and features in PHP.
+globs:
+  - "src/**/*.php"
+---
+### Tasks
+- All tasks **must** extend `StellarWP\Pigeon\Abstracts\Task_Abstract`.
+- Task arguments must be passed to `parent::__construct()` to ensure they are correctly stored.
+- The core logic of a task resides in the `process()` method.
+- To trigger a retry, a task **must** overwrite the `get_max_retries` method.
+---
+description: Best practices and requirements for writing integration tests.
+globs:
+  - "tests/**/*.php"
+---
+### Test Structure
+- All integration tests **must** extend `lucatume\WPBrowser\TestCase\WPTestCase`.
+- Use the provided test traits (`With_AS_Assertions`, `With_Uopz`, `With_Clock_Mock`, `With_Log_Snapshot`) where appropriate.
+- Use `@before` and `@after` annotations for setting up test conditions (e.g., freezing time with `freeze_time()`) and cleaning up (e.g., `unset_uopz_returns()`).
+
+### Assertions & Mocks
+- **NEVER** interact with a real external service. Always mock external calls.
+- **WordPress Functions**: Use `set_fn_return` from the `With_Uopz` trait to mock WordPress functions like `wp_mail`.
+- **Spy Pattern**: To verify function calls, use the spy pattern. Define an empty `$spy = []` array and have your mock closure add the call arguments to it (`$spy[] = $args`). Then, assert against the contents of the `$spy` array.
+- **Task Lifecycle**: Every test for a task's execution **must** assert the full sequence of log entries (`created`, `started`, `retrying`, `finished`/`failed`). Use `assertMatchesLogSnapshot()` for this.
+- **Action Scheduler**: Use the helper methods from `With_AS_Assertions` (e.g., `assertTaskExecutesWithoutErrors`, `assertTaskExecutesFailsAndReschedules`) to test the interaction with Action Scheduler.
+---
+description: Guidelines for creating and updating project documentation.
+globs:
+  - "docs/**/*.md"
+  - "README.md"
+---
+- All new public-facing features, tasks, or methods **must** be documented.
+- If a new pre-packaged task is added, create a new Markdown file for it in the `docs/tasks/` directory.
+- Update the main `docs/tasks.md` file to link to the new task's documentation.
+- For new advanced features, update `docs/advanced-usage.md`.

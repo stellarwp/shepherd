@@ -1,0 +1,42 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+The docblocks of the php methods and function should follow the following format:
+
+/**
+ * Summary
+ *
+ * [OPTIONAL] Explanation or deeper description.
+ *
+ * @since TBD
+ *
+ * @param string $var1 Description of what $var1 is.
+ * @param int    $var2 Description of what $var2 is.
+ *
+ * @return string The result.
+ *
+ * @throws InvalidArgumentException If that or that happens.
+ * @throws RunTimeException         When that happens.
+ */
+
+For properties they should be like:
+
+/**
+ * Summary
+ *
+ * @since TBD
+ *
+ * @var string
+ */
+
+ For classes and files they should be like:
+
+ /**
+  * Summary of the file
+  *
+  * @since TBD
+  *
+  * @package StellarWP\Pigeon
+  */
