@@ -67,18 +67,18 @@ class AS_Logs extends Table {
 				'unsigned' => true,
 				'nullable' => false,
 			],
-			'message'              => [
+			'message'           => [
 				'type'     => self::COLUMN_TYPE_TEXT,
 				'php_type' => self::PHP_TYPE_STRING,
 				'nullable' => false,
 			],
-			'log_date_gmt'         => [
+			'log_date_gmt'      => [
 				'type'     => self::COLUMN_TYPE_TIMESTAMP,
 				'php_type' => self::PHP_TYPE_DATETIME,
 				'nullable' => true,
 				'default'  => '0000-00-00 00:00:00',
 			],
-			'log_date_local'       => [
+			'log_date_local'    => [
 				'type'     => self::COLUMN_TYPE_TIMESTAMP,
 				'php_type' => self::PHP_TYPE_DATETIME,
 				'nullable' => true,
