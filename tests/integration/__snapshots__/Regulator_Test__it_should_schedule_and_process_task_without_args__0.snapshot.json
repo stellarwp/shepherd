@@ -1,7 +1,8 @@
 [
     {
         "id": {LOG_ID_1},
-        "task_id": {LOG_ID_1},
+        "task_id": {TASK_ID},
+        "action_id": {ACTION_ID_1},
         "date": {
             "date": "2025-06-13 17:25:00.000000",
             "timezone_type": 3,
@@ -9,11 +10,12 @@
         },
         "level": "info",
         "type": "created",
-        "entry": "{\"message\":\"Task {LOG_ID_1} created.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Do_Action_Task\",\"args\":[],\"action_id\":{ACTION_ID_1},\"current_try\":0}}"
+        "entry": "{\"message\":\"Task {TASK_ID} created.\",\"context\":{\"current_try\":0}}"
     },
     {
         "id": {LOG_ID_2},
-        "task_id": {LOG_ID_1},
+        "task_id": {TASK_ID},
+        "action_id": {ACTION_ID_1},
         "date": {
             "date": "2025-06-13 17:25:00.000000",
             "timezone_type": 3,
@@ -21,11 +23,12 @@
         },
         "level": "info",
         "type": "started",
-        "entry": "{\"message\":\"Task {LOG_ID_1} starting.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Do_Action_Task\",\"args\":[],\"action_id\":{ACTION_ID_1},\"current_try\":0}}"
+        "entry": "{\"message\":\"Task {TASK_ID} starting.\",\"context\":{\"current_try\":0}}"
     },
     {
         "id": {LOG_ID_3},
-        "task_id": {LOG_ID_1},
+        "task_id": {TASK_ID},
+        "action_id": {ACTION_ID_1},
         "date": {
             "date": "2025-06-13 17:25:00.000000",
             "timezone_type": 3,
@@ -33,6 +36,6 @@
         },
         "level": "info",
         "type": "finished",
-        "entry": "{\"message\":\"Task {LOG_ID_1} finished.\",\"context\":{\"class\":\"StellarWP\\\\Pigeon\\\\Tests\\\\Tasks\\\\Do_Action_Task\",\"args\":[],\"action_id\":{ACTION_ID_1},\"current_try\":0}}"
+        "entry": "{\"message\":\"Task {TASK_ID} finished.\",\"context\":{\"current_try\":0}}"
     }
 ]

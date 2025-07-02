@@ -201,8 +201,6 @@ class Regulator extends Provider_Abstract {
 			$this->scheduled_tasks[] = $task->save();
 
 			$log_data = [
-				'class'       => get_class( $task ),
-				'args'        => $task->get_args(),
 				'action_id'   => $action_id,
 				'current_try' => $task->get_current_try(),
 			];
@@ -309,8 +307,6 @@ class Regulator extends Provider_Abstract {
 		}
 
 		$log_data = [
-			'class'       => get_class( $task ),
-			'args'        => $task->get_args(),
 			'action_id'   => $this->current_action_id,
 			'current_try' => $task->get_current_try(),
 		];
