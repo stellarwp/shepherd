@@ -104,7 +104,7 @@ Pigeon includes comprehensive logging that tracks the complete lifecycle of each
 
 ### Built-in Logging
 
-By default, logs are stored in the `stellarwp_pigeon_{prefix}_task_logs` database table. The following events are automatically logged:
+By default, logs are stored in Action Scheduler's `actionscheduler_logs` table using the `ActionScheduler_DB_Logger`. This reduces database overhead by reusing existing infrastructure. The following events are automatically logged:
 
 - `created`: Task scheduled
 - `started`: Task execution begins
@@ -146,7 +146,7 @@ use Psr\Log\AbstractLogger;
 class My_Custom_Logger extends AbstractLogger implements Logger {
     public function log( $level, $message, array $context = [] ): void {
         // Your custom logging logic
-        // $context must include 'task_id' and 'type'
+        // $context must include 'task_id', 'type', and 'action_id'
     }
 
     public function retrieve_logs( int $task_id ): array {
@@ -159,13 +159,23 @@ class My_Custom_Logger extends AbstractLogger implements Logger {
 Config::set_logger( new My_Custom_Logger() );
 ```
 
-### Null Logger
+### Switching Between Loggers
 
-To disable logging entirely, use the built-in `Null_Logger`:
+Pigeon provides multiple logger implementations:
 
 ```php
+use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Pigeon\Loggers\DB_Logger;
 use StellarWP\Pigeon\Loggers\Null_Logger;
 
+// Use Action Scheduler's logs table (default)
+Config::set_logger( new ActionScheduler_DB_Logger() );
+
+// Use Pigeon's dedicated logs table
+Config::set_logger( new DB_Logger() );
+
+// Disable logging entirely
 Config::set_logger( new Null_Logger() );
 ```
 

@@ -133,6 +133,40 @@ $email_task = new Email(
 pigeon()->dispatch($email_task);
 ```
 
+## Logging System
+
+### Default Logger Change (TBD)
+
+Pigeon now uses `ActionScheduler_DB_Logger` as the default logger instead of `DB_Logger`. This change:
+
+- **Reduces database overhead** by reusing Action Scheduler's existing `actionscheduler_logs` table
+- **Maintains compatibility** with the existing Logger interface
+- **Preserves all functionality** including log retrieval and lifecycle tracking
+
+### Logger Options
+
+```php
+use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Pigeon\Loggers\DB_Logger;
+
+// Default: Use Action Scheduler's logs table
+Config::set_logger( new ActionScheduler_DB_Logger() );
+
+// Alternative: Use Pigeon's dedicated logs table
+Config::set_logger( new DB_Logger() );
+```
+
+### Log Storage Format
+
+When using `ActionScheduler_DB_Logger`, logs are stored in a special format within the `message` column:
+
+```
+pigeon_{hook_prefix}||{task_id}||{type}||{level}||{json_entry}
+```
+
+This format allows Pigeon to store its metadata while maintaining compatibility with Action Scheduler's table structure.
+
 ## Development Commands
 
 ### Testing

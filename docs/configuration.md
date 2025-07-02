@@ -30,11 +30,25 @@ The hook prefix is used to:
 
 ### Custom Logger
 
-By default, Pigeon uses `DB_Logger` to store logs in the database. You can provide a custom logger:
+By default, Pigeon uses `ActionScheduler_DB_Logger` to store logs in Action Scheduler's existing logs table. This reduces database overhead by reusing Action Scheduler's infrastructure.
+
+Available loggers:
+
+- **`ActionScheduler_DB_Logger`** (default): Stores logs in Action Scheduler's `actionscheduler_logs` table
+- **`DB_Logger`**: Stores logs in Pigeon's dedicated `task_logs` table
+- **`Null_Logger`**: Disables logging entirely
 
 ```php
 use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Pigeon\Loggers\DB_Logger;
 use StellarWP\Pigeon\Loggers\Null_Logger;
+
+// Use Action Scheduler's logs table (default)
+Config::set_logger( new ActionScheduler_DB_Logger() );
+
+// Use Pigeon's dedicated logs table
+Config::set_logger( new DB_Logger() );
 
 // Disable logging
 Config::set_logger( new Null_Logger() );
@@ -69,10 +83,10 @@ $container->get( Provider::class )->register();
 
 ## Database Configuration
 
-Pigeon automatically creates two database tables during registration:
+Pigeon automatically creates database tables during registration:
 
 1. **Tasks Table**: `{prefix}_stellarwp_pigeon_{hook_prefix}_tasks`
-2. **Logs Table**: `{prefix}_stellarwp_pigeon_{hook_prefix}_task_logs`
+2. **Logs Table** (optional): `{prefix}_stellarwp_pigeon_{hook_prefix}_task_logs`
 
 Where:
 
@@ -81,7 +95,9 @@ Where:
 
 ### Table Creation
 
-Tables are created automatically when you call `Provider::register()`.
+The tasks table is created automatically when you call `Provider::register()`.
+
+The logs table is only created if you're using the `DB_Logger`. When using the default `ActionScheduler_DB_Logger`, logs are stored in Action Scheduler's existing `actionscheduler_logs` table.
 
 ## Action Scheduler Configuration
 
