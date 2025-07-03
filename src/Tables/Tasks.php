@@ -59,7 +59,7 @@ class Tasks extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $base_table_name = 'stellarwp_pigeon_%s_tasks';
+	protected static $base_table_name = 'pigeon_%s_tasks';
 
 	/**
 	 * The table group.
