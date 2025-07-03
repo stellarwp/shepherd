@@ -26,8 +26,8 @@ Pigeon is a lightweight background processing library for WordPress built on top
 
 ### Database Schema
 
-- `pigeon_{prefix}_tasks`: Stores task data and retry information
-- `pigeon_{prefix}_task_logs`: Tracks task lifecycle events
+- `pigeon_tasks_{prefix}`: Stores task data and retry information
+- `pigeon_task_logs_{prefix}`: Tracks task lifecycle events
 
 ### Task Lifecycle States
 

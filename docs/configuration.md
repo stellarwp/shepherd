@@ -85,8 +85,8 @@ $container->get( Provider::class )->register();
 
 Pigeon automatically creates database tables during registration:
 
-1. **Tasks Table**: `{prefix}_pigeon_{hook_prefix}_tasks`
-2. **Logs Table** (optional): `{prefix}_pigeon_{hook_prefix}_task_logs`
+1. **Tasks Table**: `{prefix}_pigeon_tasks_{hook_prefix}`
+2. **Logs Table** (optional): `{prefix}_pigeon_task_logs_{hook_prefix}`
 
 Where:
 

@@ -283,7 +283,7 @@ $task_id = pigeon()->get_last_scheduled_task_id();
 
 Default logger that stores logs in the database.
 
-- Table: `pigeon_{prefix}_task_logs`
+- Table: `pigeon_task_logs_{prefix}`
 - Implements PSR-3 log levels
 - Stores logs as JSON
 
@@ -301,7 +301,7 @@ Config::set_logger( new Null_Logger() );
 
 ### Tasks Table
 
-Table name: `pigeon_{prefix}_tasks`
+Table name: `pigeon_tasks_{prefix}`
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -314,7 +314,7 @@ Table name: `pigeon_{prefix}_tasks`
 
 ### Task Logs Table
 
-Table name: `pigeon_{prefix}_task_logs`
+Table name: `pigeon_task_logs_{prefix}`
 
 | Column | Type | Description |
 |--------|------|-------------|
