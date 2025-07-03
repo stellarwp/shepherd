@@ -74,7 +74,7 @@ jobs:
         run: ${SLIC_BIN} up chrome
       - name: Set up StellarWP Pigeon
         run: |
-          ${SLIC_BIN} use pigeon
+          ${SLIC_BIN} use shepherd
           ${SLIC_BIN} composer install
       - name: Init the WordPress container
         run: |
