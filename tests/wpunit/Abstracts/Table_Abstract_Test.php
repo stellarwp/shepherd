@@ -67,4 +67,38 @@ class Table_Abstract_Test extends WPTestCase {
 	public function it_should_return_empty_searchable_columns() {
 		$this->assertEquals( [], Dummy_Table::get_searchable_columns() );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_trim_long_hook_prefix_to_prevent_exceeding_mysql_table_name_limit() {
+		// Set a very long hook prefix that would exceed MySQL's 64-character limit
+		$long_prefix = 'this_is_a_very_long_hook_prefix_that_would_definitely_exceed_the_mysql_limit';
+		Config::set_hook_prefix( $long_prefix );
+
+		// Create a new instance to pick up the new prefix
+		new Dummy_Table();
+
+		// The table name should be trimmed to stay within the 64-character limit
+		$table_name = Dummy_Table::table_name();
+
+		// MySQL table name limit is 64 characters
+		$this->assertEquals( 64, strlen( $table_name ), 'Table name should not exceed MySQL\'s 64-character limit' );
+
+		$this->assertEquals( substr( DB::prefix( 'pigeon_dummy_table_' . $long_prefix ), 0, 64 ), $table_name );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_trim_short_hook_prefix() {
+		// Set a short hook prefix that won't exceed the limit
+		$short_prefix = 'short';
+		Config::set_hook_prefix( $short_prefix );
+
+		$table_name = Dummy_Table::table_name();
+
+		// The table name should contain the full hook prefix
+		$this->assertEquals( 'wp_pigeon_dummy_table_short', $table_name );
+	}
 }

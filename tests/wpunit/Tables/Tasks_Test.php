@@ -109,4 +109,26 @@ class Tasks_Test extends WPTestCase {
 		$this->assertCount( 2, $tasks );
 		$this->assertInstanceOf( Dummy_Task::class, $tasks[0] );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_handle_very_long_hook_prefix_without_exceeding_mysql_limit() {
+		$long_prefix = 'this_is_an_extremely_long_hook_prefix_that_would_normally_cause_mysql_errors';
+		Config::set_hook_prefix( $long_prefix );
+
+		// Get the table name - it should be trimmed to fit within MySQL's limit
+		$table_name = Tasks::table_name();
+
+		$this->assertEquals( 64, strlen( $table_name ), 'Tasks table name should not exceed MySQL\'s 64-character limit' );
+
+		$this->assertEquals( substr( DB::prefix( 'pigeon_tasks_' . $long_prefix ), 0, 64 ), $table_name );
+	}
+
+	/**
+	 * @after
+	 */
+	public function reset() {
+		Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
+	}
 }
