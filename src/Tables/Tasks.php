@@ -59,7 +59,7 @@ class Tasks extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $base_table_name = 'pigeon_%s_tasks';
+	protected static $base_table_name = 'pigeon_tasks_%s';
 
 	/**
 	 * The table group.
