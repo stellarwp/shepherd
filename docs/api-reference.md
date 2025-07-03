@@ -283,7 +283,7 @@ $task_id = pigeon()->get_last_scheduled_task_id();
 
 Default logger that stores logs in the database.
 
-- Table: `stellarwp_pigeon_{prefix}_task_logs`
+- Table: `pigeon_{prefix}_task_logs`
 - Implements PSR-3 log levels
 - Stores logs as JSON
 
@@ -301,7 +301,7 @@ Config::set_logger( new Null_Logger() );
 
 ### Tasks Table
 
-Table name: `stellarwp_pigeon_{prefix}_tasks`
+Table name: `pigeon_{prefix}_tasks`
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -314,7 +314,7 @@ Table name: `stellarwp_pigeon_{prefix}_tasks`
 
 ### Task Logs Table
 
-Table name: `stellarwp_pigeon_{prefix}_task_logs`
+Table name: `pigeon_{prefix}_task_logs`
 
 | Column | Type | Description |
 |--------|------|-------------|

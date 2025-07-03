@@ -85,13 +85,15 @@ $container->get( Provider::class )->register();
 
 Pigeon automatically creates database tables during registration:
 
-1. **Tasks Table**: `{prefix}_stellarwp_pigeon_{hook_prefix}_tasks`
-2. **Logs Table** (optional): `{prefix}_stellarwp_pigeon_{hook_prefix}_task_logs`
+1. **Tasks Table**: `{prefix}_pigeon_{hook_prefix}_tasks`
+2. **Logs Table** (optional): `{prefix}_pigeon_{hook_prefix}_task_logs`
 
 Where:
 
 - `{prefix}` is your WordPress table prefix (e.g., `wp_`)
 - `{hook_prefix}` is your configured hook prefix
+
+**Note:** Table names are automatically trimmed to ensure they don't exceed MySQL's 64-character limit.
 
 ### Table Creation
 
