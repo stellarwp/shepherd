@@ -117,12 +117,16 @@ class Tasks_Test extends WPTestCase {
 		$long_prefix = 'this_is_an_extremely_long_hook_prefix_that_would_normally_cause_mysql_errors';
 		Config::set_hook_prefix( $long_prefix );
 
-		// Get the table name - it should be trimmed to fit within MySQL's limit
+		// Get the table name - it should use the safe prefix
 		$table_name = Tasks::table_name();
 
-		$this->assertEquals( 64, strlen( $table_name ), 'Tasks table name should not exceed MySQL\'s 64-character limit' );
+		// Verify the table name doesn't exceed 64 characters
+		$this->assertLessThanOrEqual( 64, strlen( $table_name ), 'Tasks table name should not exceed MySQL\'s 64-character limit' );
 
-		$this->assertEquals( substr( DB::prefix( 'pigeon_tasks_' . $long_prefix ), 0, 64 ), $table_name );
+		// The table name should use the safe prefix
+		$safe_prefix = Config::get_safe_hook_prefix();
+		$expected = DB::prefix( 'pigeon_' . $safe_prefix . '_tasks' );
+		$this->assertEquals( $expected, $table_name );
 	}
 
 	/**

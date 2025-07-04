@@ -10,8 +10,8 @@ use StellarWP\Pigeon\Contracts\Model;
 use StellarWP\DB\DB;
 
 class Dummy_Table extends Table_Abstract {
-	protected static $base_table_name = 'pigeon_dummy_table_%s';
-	protected static $schema_slug = 'pigeon-dummy-table-%s';
+	protected static $base_table_name = 'pigeon_%s_dummy_table';
+	protected static $schema_slug = 'pigeon-%s-dummy-table';
 	protected static $uid_column = 'id';
 
 	public static function get_columns(): array {
@@ -44,8 +44,8 @@ class Table_Abstract_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_get_correct_table_name_and_slug() {
-		$this->assertEquals( 'wp_pigeon_dummy_table_test', Dummy_Table::table_name() );
-		$this->assertEquals( 'pigeon-dummy-table-test', Dummy_Table::get_schema_slug() );
+		$this->assertEquals( 'wp_pigeon_test_dummy_table', Dummy_Table::table_name() );
+		$this->assertEquals( 'pigeon-test-dummy-table', Dummy_Table::get_schema_slug() );
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Table_Abstract_Test extends WPTestCase {
 		$table = new Dummy_Table();
 		$definition = $table->get_definition();
 
-		$this->assertStringContainsString( 'CREATE TABLE `wp_pigeon_dummy_table_test`', $definition );
+		$this->assertStringContainsString( 'CREATE TABLE `wp_pigeon_test_dummy_table`', $definition );
 		$this->assertStringContainsString( '`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT', $definition );
 		$this->assertStringContainsString( '`name` varchar(255) NOT NULL', $definition );
 		$this->assertStringContainsString( 'PRIMARY KEY (`id`)', $definition );
@@ -79,13 +79,18 @@ class Table_Abstract_Test extends WPTestCase {
 		// Create a new instance to pick up the new prefix
 		new Dummy_Table();
 
-		// The table name should be trimmed to stay within the 64-character limit
+		// The table name should use the safe prefix
 		$table_name = Dummy_Table::table_name();
+		$safe_prefix = Config::get_safe_hook_prefix();
 
-		// MySQL table name limit is 64 characters
-		$this->assertEquals( 64, strlen( $table_name ), 'Table name should not exceed MySQL\'s 64-character limit' );
+		// The safe prefix should be trimmed
+		$this->assertLessThan( strlen( $long_prefix ), strlen( $safe_prefix ), 'Safe prefix should be shorter than original' );
 
-		$this->assertEquals( substr( DB::prefix( 'pigeon_dummy_table_' . $long_prefix ), 0, 64 ), $table_name );
+		// The table name should match expected format
+		$expected = DB::prefix( 'pigeon_' . $safe_prefix . '_dummy_table' );
+		$this->assertEquals( $expected, $table_name );
+
+		$this->assertEquals( 64, strlen( $table_name ) );
 	}
 
 	/**
@@ -99,6 +104,6 @@ class Table_Abstract_Test extends WPTestCase {
 		$table_name = Dummy_Table::table_name();
 
 		// The table name should contain the full hook prefix
-		$this->assertEquals( 'wp_pigeon_dummy_table_short', $table_name );
+		$this->assertEquals( 'wp_pigeon_short_dummy_table', $table_name );
 	}
 }
