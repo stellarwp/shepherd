@@ -7,6 +7,7 @@ use StellarWP\Pigeon\Abstracts\Task_Model_Abstract;
 use StellarWP\Pigeon\Action_Scheduler_Methods;
 use ActionScheduler_Action;
 use ActionScheduler_QueueRunner as Runner;
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Provider;
 use StellarWP\DB\DB;
 use function StellarWP\Pigeon\pigeon;
@@ -17,7 +18,7 @@ trait With_AS_Assertions {
 	 * @after
 	 */
 	protected function delete_actions_between_runs(): void {
-		Provider::get_container()->get( Task_Model_Abstract::TABLE_INTERFACE )->empty_table();
+		Config::get_container()->get( Task_Model_Abstract::TABLE_INTERFACE )->empty_table();
 		DB::query( DB::prepare( "DELETE FROM %i", DB::prefix( 'actionscheduler_actions' ) ) );
 	}
 

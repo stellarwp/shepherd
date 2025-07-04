@@ -5,8 +5,8 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon\Traits;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
 use Psr\Log\LogLevel;
 
 class Dummy_Loggable {
@@ -21,7 +21,7 @@ class Loggable_Test extends WPTestCase {
 	 */
 	public function set_up_mock_logger() {
 		$this->mock_logger = $this->createMock( Logger::class );
-		$container = Provider::get_container();
+		$container = Config::get_container();
 		$container->singleton( Logger::class, $this->mock_logger );
 	}
 

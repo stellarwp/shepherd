@@ -15,6 +15,7 @@ use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
 use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
 use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
 use DateTimeInterface;
 
@@ -140,11 +141,10 @@ abstract class Table_Abstract extends Table {
 	 */
 	public function __construct() {
 		$this->db        = DB::class;
-		$this->container = Pigeon_Main_Controller::get_container();
+		$this->container = Config::get_container();
 
 		// Modify table names to use the hook prefix.
-		self::$base_table_name = sprintf( self::$base_table_name, Config::get_safe_hook_prefix() );
-		self::$schema_slug     = sprintf( self::$schema_slug, Config::get_hook_prefix() );
+		self::$schema_slug = sprintf( self::$schema_slug, Config::get_hook_prefix() );
 	}
 
 	/**
@@ -157,7 +157,12 @@ abstract class Table_Abstract extends Table {
 	 * @return string The base table name.
 	 */
 	public static function base_table_name(): string {
-		return sprintf( static::$base_table_name, Config::get_safe_hook_prefix() );
+		$container = Config::get_container();
+
+		return sprintf(
+			static::$base_table_name,
+			$container->get( Safe_Dynamic_Prefix::class )->get()
+		);
 	}
 
 	/**
@@ -294,5 +299,16 @@ abstract class Table_Abstract extends Table {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Returns the base table name without the dynamic prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The base table name without the dynamic prefix.
+	 */
+	public static function raw_base_table_name(): string {
+		return static::$base_table_name;
 	}
 }
