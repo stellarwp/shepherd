@@ -26,6 +26,19 @@ The hook prefix is used to:
 - Avoid special characters (use only letters, numbers, underscores)
 - Keep it consistent across your application
 
+**Automatic Length Protection:**
+
+Pigeon automatically ensures table names don't exceed MySQL's 64-character limit. If your hook prefix is too long, it will be automatically trimmed to a safe length based on:
+
+- Your WordPress table prefix length
+- The longest Pigeon table name
+
+You can check the maximum safe length using:
+
+```php
+$max_length = Config::get_max_hook_prefix_length();
+```
+
 ## Optional Configuration
 
 ### Custom Logger
@@ -85,15 +98,15 @@ $container->get( Provider::class )->register();
 
 Pigeon automatically creates database tables during registration:
 
-1. **Tasks Table**: `{prefix}_pigeon_tasks_{hook_prefix}`
-2. **Logs Table** (optional): `{prefix}_pigeon_task_logs_{hook_prefix}`
+1. **Tasks Table**: `{prefix}_pigeon_{hook_prefix}_tasks`
+2. **Logs Table** (optional): `{prefix}_pigeon_{hook_prefix}_task_logs`
 
 Where:
 
 - `{prefix}` is your WordPress table prefix (e.g., `wp_`)
-- `{hook_prefix}` is your configured hook prefix
+- `{hook_prefix}` is your configured hook prefix (automatically trimmed if needed)
 
-**Note:** Table names are automatically trimmed to ensure they don't exceed MySQL's 64-character limit.
+**Note:** If your hook prefix is too long, Pigeon will automatically trim it to ensure table names don't exceed MySQL's 64-character limit. The trimming is calculated based on the longest table name.
 
 ### Table Creation
 

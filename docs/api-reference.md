@@ -62,6 +62,17 @@ Sets the hook prefix for your application (required).
 
 Returns the configured hook prefix.
 
+##### `get_safe_hook_prefix(): string`
+
+Returns the hook prefix trimmed to a safe length to ensure table names don't exceed MySQL's 64-character limit.
+
+##### `get_max_hook_prefix_length(): int`
+
+Returns the maximum safe length for a hook prefix based on:
+
+- WordPress table prefix length
+- The longest Pigeon table name
+
 ##### `set_logger( ?Logger $logger ): void`
 
 Sets a custom logger implementation.
@@ -283,7 +294,7 @@ $task_id = pigeon()->get_last_scheduled_task_id();
 
 Default logger that stores logs in the database.
 
-- Table: `pigeon_task_logs_{prefix}`
+- Table: `pigeon_{prefix}_task_logs`
 - Implements PSR-3 log levels
 - Stores logs as JSON
 
@@ -301,7 +312,7 @@ Config::set_logger( new Null_Logger() );
 
 ### Tasks Table
 
-Table name: `pigeon_tasks_{prefix}`
+Table name: `pigeon_{prefix}_tasks`
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -314,7 +325,7 @@ Table name: `pigeon_tasks_{prefix}`
 
 ### Task Logs Table
 
-Table name: `pigeon_task_logs_{prefix}`
+Table name: `pigeon_{prefix}_task_logs`
 
 | Column | Type | Description |
 |--------|------|-------------|
