@@ -13,7 +13,6 @@ namespace StellarWP\Pigeon\Abstracts;
 
 use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Provider as Pigeon_Main_Controller;
 use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
 use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
