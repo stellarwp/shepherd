@@ -27,7 +27,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Tables to register.
 	 *
-	 * @var array<string, class-string>
+	 * @var array<int, class-string>
 	 */
 	private array $tables = [
 		Tasks::class,

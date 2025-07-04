@@ -20,13 +20,6 @@ class Safe_Dynamic_Prefix {
 	private string $longest_table_name = '';
 
 	/**
-	 * The calculated safe max dynamic table prefix.
-	 *
-	 * @var string
-	 */
-	private string $safe_prefix = '';
-
-	/**
 	 * Calculates the longest table name.
 	 *
 	 * @since TBD

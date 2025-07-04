@@ -27,7 +27,7 @@ class Config {
 	 *
 	 * @var ContainerInterface
 	 */
-	private static ?ContainerInterface $container = null;
+	protected static ?ContainerInterface $container = null;
 
 	/**
 	 * The hook prefix.
