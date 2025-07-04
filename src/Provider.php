@@ -46,15 +46,6 @@ class Provider extends Provider_Abstract {
 	protected static string $hook_prefix;
 
 	/**
-	 * The container.
-	 *
-	 * @since TBD
-	 *
-	 * @var ?Container
-	 */
-	private static ?Container $static_container = null;
-
-	/**
 	 * Whether the provider has been registered.
 	 *
 	 * @since TBD
@@ -77,9 +68,7 @@ class Provider extends Provider_Abstract {
 
 		$this->require_action_scheduler();
 
-		self::$static_container = $this->container;
-
-		Schema_Config::set_container( $this->container );
+		Schema_Config::set_container( Config::get_container() );
 		Schema_Config::set_db( DB::class );
 		$this->container->singleton( Logger::class, Config::get_logger() );
 		$this->container->singleton( Tables_Provider::class );
@@ -99,19 +88,6 @@ class Provider extends Provider_Abstract {
 	 */
 	private function require_action_scheduler(): void {
 		require_once __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php';
-	}
-
-	/**
-	 * Sets the container.
-	 *
-	 * @since TBD
-	 *
-	 * @param ?Container $container The container.
-	 *
-	 * @return void
-	 */
-	public static function set_container( ?Container $container ): void {
-		self::$static_container = $container;
 	}
 
 	/**
@@ -135,11 +111,7 @@ class Provider extends Provider_Abstract {
 	 * @throws RuntimeException If the container has not been set.
 	 */
 	public static function get_container(): Container {
-		if ( ! self::$static_container ) {
-			throw new RuntimeException( 'The container has not been set.' );
-		}
-
-		return self::$static_container;
+		return Config::get_container();
 	}
 
 	/**

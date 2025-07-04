@@ -9,6 +9,7 @@ use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Abstracts\Task_Abstract;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
 use InvalidArgumentException;
 
 class Dummy_Task extends Task_Abstract implements Task {
@@ -56,8 +57,10 @@ class Tasks_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_be_using_the_prefix(): void {
+		$container = Config::get_container();
+		$safe_dynamic_prefix = $container->get( Safe_Dynamic_Prefix::class );
 		$name = Tasks::base_table_name();
-		$this->assertStringContainsString( Config::get_hook_prefix(), $name );
+		$this->assertStringContainsString( $safe_dynamic_prefix->get(), $name );
 
 		$query = DB::prepare( 'SHOW TABLES LIKE %s', DB::prefix( $name ) );
 		$tables = DB::get_results( $query );
@@ -124,8 +127,10 @@ class Tasks_Test extends WPTestCase {
 		$this->assertLessThanOrEqual( 64, strlen( $table_name ), 'Tasks table name should not exceed MySQL\'s 64-character limit' );
 
 		// The table name should use the safe prefix
-		$safe_prefix = Config::get_safe_hook_prefix();
-		$expected = DB::prefix( 'pigeon_' . $safe_prefix . '_tasks' );
+		$container           = Config::get_container();
+		$safe_dynamic_prefix = $container->get( Safe_Dynamic_Prefix::class );
+		$safe_prefix         = $safe_dynamic_prefix->get();
+		$expected            = DB::prefix( 'pigeon_' . $safe_prefix . '_tasks' );
 		$this->assertEquals( $expected, $table_name );
 	}
 

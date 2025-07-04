@@ -11,13 +11,13 @@ declare( strict_types=1 );
 
 namespace StellarWP\Pigeon;
 
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Contracts\Log_Model;
 use StellarWP\Pigeon\Tables\Task_Logs as Task_Logs_Table;
 use StellarWP\Pigeon\Tables\AS_Logs as AS_Logs_Table;
 use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
 use StellarWP\Pigeon\Loggers\DB_Logger;
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
 use StellarWP\Pigeon\Abstracts\Model_Abstract;
 use DateTimeInterface;
 use StellarWP\Pigeon\Abstracts\Table_Abstract;
@@ -287,7 +287,7 @@ class Log extends Model_Abstract implements Log_Model {
 	 * @throws RuntimeException If the log table interface is invalid.
 	 */
 	public function get_table_interface(): Table_Abstract {
-		$logger = Provider::get_container()->get( Logger::class );
+		$logger = Config::get_container()->get( Logger::class );
 
 		$table = null;
 
@@ -305,7 +305,7 @@ class Log extends Model_Abstract implements Log_Model {
 			throw new RuntimeException( 'Invalid log table interface.' );
 		}
 
-		return Provider::get_container()->get( $table );
+		return Config::get_container()->get( $table );
 	}
 
 	/**

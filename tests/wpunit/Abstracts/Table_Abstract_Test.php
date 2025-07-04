@@ -7,6 +7,7 @@ namespace StellarWP\Pigeon\Abstracts;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Contracts\Model;
+use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
 use StellarWP\DB\DB;
 
 class Dummy_Table extends Table_Abstract {
@@ -81,7 +82,7 @@ class Table_Abstract_Test extends WPTestCase {
 
 		// The table name should use the safe prefix
 		$table_name = Dummy_Table::table_name();
-		$safe_prefix = Config::get_safe_hook_prefix();
+		$safe_prefix = Config::get_container()->get( Safe_Dynamic_Prefix::class )->get();
 
 		// The safe prefix should be trimmed
 		$this->assertLessThan( strlen( $long_prefix ), strlen( $safe_prefix ), 'Safe prefix should be shorter than original' );
