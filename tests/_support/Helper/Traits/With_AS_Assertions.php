@@ -21,7 +21,7 @@ trait With_AS_Assertions {
 	protected function delete_actions_between_runs(): void {
 		Config::get_container()->get( Task_Model_Abstract::TABLE_INTERFACE )->empty_table();
 		DB::query( DB::prepare( "DELETE FROM %i", DB::prefix( 'actionscheduler_actions' ) ) );
-		remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_processing' );
+		remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started' );
 	}
 
 	protected function get_task_from_id( int $task_id ): Task {
@@ -120,11 +120,11 @@ trait With_AS_Assertions {
 	}
 
 	protected function add_listener( int $action_id, int $task_id ): void {
-		add_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_processing', function( Task $task, int $aid ) use ( $action_id, $task_id ) {
+		add_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started', function( Task $task, int $aid ) use ( $action_id, $task_id ) {
 			Assert::assertSame( $action_id, $aid );
 			Assert::assertSame( $action_id, $task->get_action_id() );
 			Assert::assertSame( $task_id, $task->get_id() );
-			remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_processing' );
+			remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started' );
 		}, 10, 2 );
 	}
 

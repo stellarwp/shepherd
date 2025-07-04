@@ -190,7 +190,7 @@ public function get_auth_headers(): array
 #### Error Handling
 
 - **WP_Error responses**: Fail immediately without retry (throws `PigeonTaskFailWithoutRetryException`)
-- **4xx HTTP errors**: Fail immediately without retry (throws `PigeonTaskFailWithoutRetryException`) 
+- **4xx HTTP errors**: Fail immediately without retry (throws `PigeonTaskFailWithoutRetryException`)
 - **5xx HTTP errors**: Retry with exponential backoff (throws `PigeonTaskException`)
 - **Other non-2xx**: Retry with exponential backoff (throws `PigeonTaskException`)
 
@@ -409,10 +409,10 @@ Table name: `pigeon_{prefix}_task_logs`
 - `pigeon_{prefix}_task_already_scheduled` - Fired when a task already exists
   - Parameters: `$task`
 
-- `pigeon_{prefix}_task_processing` - Fired when a task starts being processed
+- `pigeon_{prefix}_task_started` - Fired when a task starts being processed
   - Parameters: `$task`, `$action_id` (int)
 
-- `pigeon_{prefix}_task_processed` - Fired when a task finishes processing successfully
+- `pigeon_{prefix}_task_finished` - Fired when a task finishes processing successfully
   - Parameters: `$task`, `$action_id` (int)
 
 - `pigeon_{prefix}_task_failed` - Fired when a task fails

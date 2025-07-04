@@ -106,11 +106,11 @@ Pigeon includes comprehensive logging that tracks the complete lifecycle of each
 
 By default, logs are stored in Action Scheduler's `actionscheduler_logs` table using the `ActionScheduler_DB_Logger`. This reduces database overhead by reusing existing infrastructure. The following events are automatically logged:
 
-- `created`: Task scheduled
-- `started`: Task execution begins (triggers `pigeon_{prefix}_task_processing` action)
-- `finished`: Task completed successfully (triggers `pigeon_{prefix}_task_processed` action)
+- `created`: Task scheduled (triggers `pigeon_{prefix}_task_created` action)
+- `started`: Task execution begins (triggers `pigeon_{prefix}_task_started` action)
+- `finished`: Task completed successfully (triggers `pigeon_{prefix}_task_finished` action)
 - `failed`: Task failed (all retries exhausted, triggers `pigeon_{prefix}_task_failed` action)
-- `rescheduled`: Task rescheduled
+- `rescheduled`: Task rescheduled (triggers `pigeon_{prefix}_task_rescheduled` action)
 - `retrying`: Retry attempt starting
 - `cancelled`: Task cancelled
 
@@ -244,12 +244,12 @@ Pigeon fires several WordPress actions during task lifecycle:
 $prefix = Config::get_hook_prefix();
 
 // Task starts processing (fired by Regulator)
-add_action( "pigeon_{$prefix}_task_processing", function( $task, $action_id ) {
+add_action( "pigeon_{$prefix}_task_started", function( $task, $action_id ) {
     // Log, monitor, or prepare for task execution
 }, 10, 2 );
 
 // Task finished processing successfully (fired by Regulator)
-add_action( "pigeon_{$prefix}_task_processed", function( $task, $action_id ) {
+add_action( "pigeon_{$prefix}_task_finished", function( $task, $action_id ) {
     // Cleanup, notify, or trigger dependent tasks
 }, 10, 2 );
 

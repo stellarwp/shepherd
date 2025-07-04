@@ -207,6 +207,15 @@ class Regulator extends Provider_Abstract {
 			];
 
 			if ( $previous_action_id ) {
+				/**
+				 * Fires when a task should be retried.
+				 *
+				 * @since TBD
+				 *
+				 * @param Task $task The task that should be retried.
+				 */
+				do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_rescheduled', $task );
+
 				$this->log_rescheduled(
 					$task->get_id(),
 					array_merge(
@@ -217,6 +226,15 @@ class Regulator extends Provider_Abstract {
 					)
 				);
 			} else {
+				/**
+				 * Fires when a task should be retried.
+				 *
+				 * @since TBD
+				 *
+				 * @param Task $task The task that should be retried.
+				 */
+				do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_created', $task );
+
 				$this->log_created( $task->get_id(), $log_data );
 			}
 
@@ -321,7 +339,7 @@ class Regulator extends Provider_Abstract {
 		 * @param Task $task          The task that is being processed.
 		 * @param int  $action_id     The action ID that is being processed.
 		 */
-		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_processing', $task, $this->current_action_id );
+		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_started', $task, $this->current_action_id );
 
 		try {
 			try {
@@ -405,7 +423,7 @@ class Regulator extends Provider_Abstract {
 		 * @param Task $task          The task that is finished processing.
 		 * @param int  $action_id     The action ID that is finished processing.
 		 */
-		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_processed', $task, $this->current_action_id );
+		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_finished', $task, $this->current_action_id );
 	}
 
 	/**
