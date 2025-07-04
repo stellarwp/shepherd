@@ -29,7 +29,7 @@ class HTTP_Request_Test extends WPTestCase {
 		pigeon()->bust_runtime_cached_tasks();
 	}
 
-	private function get_logger(): DB_Logger {
+	private function get_logger(): Logger {
 		return Provider::get_container()->get( Logger::class );
 	}
 
