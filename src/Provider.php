@@ -12,9 +12,7 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon;
 
 use StellarWP\Pigeon\Abstracts\Provider_Abstract;
-use StellarWP\ContainerContract\ContainerInterface as Container;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
-use RuntimeException;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Contracts\Logger;
