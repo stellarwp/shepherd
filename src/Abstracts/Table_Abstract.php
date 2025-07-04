@@ -142,11 +142,9 @@ abstract class Table_Abstract extends Table {
 		$this->db        = DB::class;
 		$this->container = Pigeon_Main_Controller::get_container();
 
-		$hook_prefix = Config::get_hook_prefix();
-
 		// Modify table names to use the hook prefix.
-		self::$base_table_name = self::trim_table_name_to_safety( sprintf( self::$base_table_name, $hook_prefix ) );
-		self::$schema_slug     = sprintf( self::$schema_slug, $hook_prefix );
+		self::$base_table_name = sprintf( self::$base_table_name, Config::get_safe_hook_prefix() );
+		self::$schema_slug     = sprintf( self::$schema_slug, Config::get_hook_prefix() );
 	}
 
 	/**
@@ -159,7 +157,7 @@ abstract class Table_Abstract extends Table {
 	 * @return string The base table name.
 	 */
 	public static function base_table_name(): string {
-		return self::trim_table_name_to_safety( sprintf( static::$base_table_name, Config::get_hook_prefix() ) );
+		return sprintf( static::$base_table_name, Config::get_safe_hook_prefix() );
 	}
 
 	/**
@@ -173,23 +171,6 @@ abstract class Table_Abstract extends Table {
 	 */
 	public static function get_schema_slug(): string {
 		return sprintf( static::$schema_slug, Config::get_hook_prefix() );
-	}
-
-	/**
-	 * Trim the table name to safety.
-	 *
-	 * @since TBD
-	 *
-	 * @param string $base_table_name The base table name.
-	 *
-	 * @return string The trimmed table name.
-	 */
-	protected static function trim_table_name_to_safety( string $base_table_name ): string {
-		global $wpdb;
-
-		$prefix_length = strlen( $wpdb->prefix );
-
-		return substr( $base_table_name, 0, 64 - $prefix_length );
 	}
 
 	/**

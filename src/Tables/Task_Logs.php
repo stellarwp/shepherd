@@ -64,7 +64,7 @@ class Task_Logs extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $base_table_name = 'pigeon_task_logs_%s';
+	protected static $base_table_name = 'pigeon_%s_task_logs';
 
 	/**
 	 * The table group.

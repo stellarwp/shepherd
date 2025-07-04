@@ -40,6 +40,59 @@ class Config {
 	protected static ?Logger $logger = null;
 
 	/**
+	 * The maximum safe hook prefix length.
+	 *
+	 * @since TBD
+	 *
+	 * @var ?int
+	 */
+	protected static ?int $max_hook_prefix_length = null;
+
+	/**
+	 * The maximum table name length.
+	 *
+	 * @since TBD
+	 *
+	 * @var int
+	 */
+	protected const MAX_TABLE_NAME_LENGTH = 64;
+
+	/**
+	 * The longest table name.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	protected const LONGEST_TABLE_NAME = 'pigeon_%s_task_logs';
+
+	/**
+	 * Gets the maximum safe hook prefix length.
+	 *
+	 * Calculates the maximum length a hook prefix can be while ensuring
+	 * table names don't exceed MySQL's 64-character limit.
+	 *
+	 * @since TBD
+	 *
+	 * @return int The maximum safe hook prefix length.
+	 */
+	public static function get_max_hook_prefix_length(): int {
+		if ( null !== static::$max_hook_prefix_length ) {
+			return static::$max_hook_prefix_length;
+		}
+
+		global $wpdb;
+
+		$wp_prefix_length = strlen( $wpdb->prefix );
+
+		$hook_prefix = static::get_hook_prefix();
+
+		$base_name_length = strlen( sprintf( self::LONGEST_TABLE_NAME, $hook_prefix ) );
+
+		return strlen( $hook_prefix ) + ( self::MAX_TABLE_NAME_LENGTH - $base_name_length - $wp_prefix_length );
+	}
+
+	/**
 	 * Gets the hook prefix.
 	 *
 	 * @since TBD
@@ -55,6 +108,33 @@ class Config {
 		}
 
 		return static::$hook_prefix;
+	}
+
+	/**
+	 * Gets the safe hook prefix.
+	 *
+	 * Returns the hook prefix trimmed to the maximum safe length
+	 * to ensure table names don't exceed MySQL's limit.
+	 *
+	 * @since TBD
+	 *
+	 * @throws RuntimeException If the hook prefix is not set or the max hook prefix length could not be determined.
+	 *
+	 * @return string The safe hook prefix.
+	 */
+	public static function get_safe_hook_prefix(): string {
+		$prefix     = static::get_hook_prefix();
+		$max_length = static::get_max_hook_prefix_length();
+
+		if ( ! $max_length ) {
+			throw new RuntimeException( 'The max hook prefix could not be determined.' );
+		}
+
+		if ( strlen( $prefix ) > $max_length ) {
+			return substr( $prefix, 0, $max_length );
+		}
+
+		return $prefix;
 	}
 
 	/**
@@ -108,7 +188,8 @@ class Config {
 	 * @return void
 	 */
 	public static function reset(): void {
-		static::$hook_prefix = '';
-		static::$logger      = null;
+		static::$hook_prefix            = '';
+		static::$logger                 = null;
+		static::$max_hook_prefix_length = null;
 	}
 }
