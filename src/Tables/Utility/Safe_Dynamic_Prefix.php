@@ -78,7 +78,7 @@ class Safe_Dynamic_Prefix {
 		global $wpdb;
 
 		$wp_prefix_length             = strlen( $wpdb->prefix );
-		$longest_table_name           = $longest_table_name ?? $this->longest_table_name;
+		$longest_table_name         ??= $this->longest_table_name;
 		$unprefixed_table_name_length = strlen( sprintf( $longest_table_name, '' ) );
 
 		return Config::get_max_table_name_length() - $unprefixed_table_name_length - $wp_prefix_length;

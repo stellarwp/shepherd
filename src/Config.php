@@ -61,7 +61,7 @@ class Config {
 	 *
 	 * @return ContainerInterface
 	 */
-	public static function get_container() : ContainerInterface {
+	public static function get_container(): ContainerInterface {
 		if ( self::$container === null ) {
 			throw new \RuntimeException( 'You must provide a container via StellarWP\Pigeon\Config::set_container() before attempting to fetch it.' );
 		}
@@ -116,7 +116,7 @@ class Config {
 	 *
 	 * @return bool
 	 */
-	public static function has_container() : bool {
+	public static function has_container(): bool {
 		return self::$container !== null;
 	}
 
