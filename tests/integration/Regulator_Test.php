@@ -43,7 +43,7 @@ class Regulator_Test extends WPTestCase {
 	}
 
 	private function get_logger(): Logger {
-		return Provider::get_container()->get( Logger::class );
+		return Config::get_container()->get( Logger::class );
 	}
 
 	/**

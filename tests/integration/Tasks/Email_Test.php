@@ -5,8 +5,7 @@ namespace StellarWP\Pigeon\Tasks;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Tests\Traits\With_AS_Assertions;
 use StellarWP\Pigeon\Tests\Traits\With_Clock_Mock;
 use StellarWP\Pigeon\Tests\Traits\With_Log_Snapshot;
@@ -29,7 +28,7 @@ class Email_Test extends WPTestCase {
 	}
 
 	private function get_logger(): Logger {
-		return Provider::get_container()->get( Logger::class );
+		return Config::get_container()->get( Logger::class );
 	}
 
 	/**
