@@ -4,8 +4,9 @@ use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Pigeon\Tables\Tasks;
 use StellarWP\Pigeon\Tables\Task_Logs;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Provider;
 use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Tables;
 use StellarWP\Schema\Register;
 
 /**
@@ -14,10 +15,20 @@ use StellarWP\Schema\Register;
  * @return void
  */
 function tests_pigeon_drop_tables() {
-	$tables = [
-		Tasks::base_table_name(),
-		Task_Logs::base_table_name(),
+	$container           = tests_pigeon_get_container();
+	$safe_dynamic_prefix = $container->get( Tables\Utility\Safe_Dynamic_Prefix::class );
+
+	$tables        = [];
+	$table_classes = [
+		Tasks::class,
+		Task_Logs::class,
 	];
+
+	$longest_table_name = $safe_dynamic_prefix->get_longest_table_name( $table_classes );
+
+	foreach ( $table_classes as $table_class ) {
+		$tables[] = sprintf( $table_class::raw_base_table_name(), $safe_dynamic_prefix->get( $longest_table_name ) );
+	}
 
 	foreach ( $tables as $table ) {
 		DB::query(
@@ -52,6 +63,18 @@ function tests_pigeon_raise_auto_increment(): void {
 			DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = %d', DB::prefix( $table ), 9567492 )
 		);
 	}
+}
+
+/**
+ * Resets the config.
+ *
+ * @return void
+ */
+function tests_pigeon_reset_config(): void {
+	Config::reset();
+	Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
+	Config::set_container( tests_pigeon_get_container() );
+	Config::set_max_table_name_length( 25 );
 }
 
 /**
@@ -94,11 +117,10 @@ function tests_pigeon_get_dt(): DateTimeInterface {
  * @return void
  */
 function tests_pigeon_common_bootstrap(): void {
-	Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
-
-	$container = tests_pigeon_get_container();
-
+	tests_pigeon_reset_config();
 	tests_pigeon_drop_tables();
+
+	$container = Config::get_container();
 
 	// Bootstrap Pigeon.
 	$container->singleton( Provider::class );

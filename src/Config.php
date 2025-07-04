@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon;
 
 use RuntimeException;
+use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Pigeon\Contracts\Logger;
 use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
 
@@ -21,6 +22,15 @@ use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
  * @package StellarWP\Pigeon\Config
  */
 class Config {
+	/**
+	 * Container object.
+	 *
+	 * @since TBD
+	 *
+	 * @var ?ContainerInterface
+	 */
+	protected static ?ContainerInterface $container = null;
+
 	/**
 	 * The hook prefix.
 	 *
@@ -40,56 +50,29 @@ class Config {
 	protected static ?Logger $logger = null;
 
 	/**
-	 * The maximum safe hook prefix length.
-	 *
-	 * @since TBD
-	 *
-	 * @var ?int
-	 */
-	protected static ?int $max_hook_prefix_length = null;
-
-	/**
 	 * The maximum table name length.
 	 *
 	 * @since TBD
 	 *
 	 * @var int
 	 */
-	protected const MAX_TABLE_NAME_LENGTH = 64;
+	protected static int $max_table_name_length = 64;
 
 	/**
-	 * The longest table name.
+	 * Get the container.
 	 *
 	 * @since TBD
 	 *
-	 * @var string
+	 * @throws RuntimeException If the container is not set.
+	 *
+	 * @return ContainerInterface
 	 */
-	protected const LONGEST_TABLE_NAME = 'pigeon_%s_task_logs';
-
-	/**
-	 * Gets the maximum safe hook prefix length.
-	 *
-	 * Calculates the maximum length a hook prefix can be while ensuring
-	 * table names don't exceed MySQL's 64-character limit.
-	 *
-	 * @since TBD
-	 *
-	 * @return int The maximum safe hook prefix length.
-	 */
-	public static function get_max_hook_prefix_length(): int {
-		if ( null !== static::$max_hook_prefix_length ) {
-			return static::$max_hook_prefix_length;
+	public static function get_container(): ContainerInterface {
+		if ( self::$container === null ) {
+			throw new RuntimeException( 'You must provide a container via StellarWP\Pigeon\Config::set_container() before attempting to fetch it.' );
 		}
 
-		global $wpdb;
-
-		$wp_prefix_length = strlen( $wpdb->prefix );
-
-		$hook_prefix = static::get_hook_prefix();
-
-		$base_name_length = strlen( sprintf( self::LONGEST_TABLE_NAME, $hook_prefix ) );
-
-		return strlen( $hook_prefix ) + ( self::MAX_TABLE_NAME_LENGTH - $base_name_length - $wp_prefix_length );
+		return self::$container;
 	}
 
 	/**
@@ -111,33 +94,6 @@ class Config {
 	}
 
 	/**
-	 * Gets the safe hook prefix.
-	 *
-	 * Returns the hook prefix trimmed to the maximum safe length
-	 * to ensure table names don't exceed MySQL's limit.
-	 *
-	 * @since TBD
-	 *
-	 * @throws RuntimeException If the hook prefix is not set or the max hook prefix length could not be determined.
-	 *
-	 * @return string The safe hook prefix.
-	 */
-	public static function get_safe_hook_prefix(): string {
-		$prefix     = static::get_hook_prefix();
-		$max_length = static::get_max_hook_prefix_length();
-
-		if ( ! $max_length ) {
-			throw new RuntimeException( 'The max hook prefix could not be determined.' );
-		}
-
-		if ( strlen( $prefix ) > $max_length ) {
-			return substr( $prefix, 0, $max_length );
-		}
-
-		return $prefix;
-	}
-
-	/**
 	 * Gets the logger.
 	 *
 	 * @since TBD
@@ -150,6 +106,33 @@ class Config {
 		}
 
 		return static::$logger;
+	}
+
+	/**
+	 * Gets the maximum table name length.
+	 *
+	 * @return int
+	 */
+	public static function get_max_table_name_length(): int {
+		return static::$max_table_name_length;
+	}
+
+	/**
+	 * Returns whether the container has been set.
+	 *
+	 * @return bool
+	 */
+	public static function has_container(): bool {
+		return self::$container !== null;
+	}
+
+	/**
+	 * Set the container object.
+	 *
+	 * @param ContainerInterface $container Container object.
+	 */
+	public static function set_container( ContainerInterface $container ) {
+		self::$container = $container;
 	}
 
 	/**
@@ -183,13 +166,27 @@ class Config {
 	}
 
 	/**
+	 * Sets the maximum table name length.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $length The maximum table name length.
+	 *
+	 * @return void
+	 */
+	public static function set_max_table_name_length( int $length ): void {
+		static::$max_table_name_length = $length;
+	}
+
+	/**
 	 * Resets the config.
 	 *
 	 * @return void
 	 */
 	public static function reset(): void {
-		static::$hook_prefix            = '';
-		static::$logger                 = null;
-		static::$max_hook_prefix_length = null;
+		static::$container             = null;
+		static::$hook_prefix           = '';
+		static::$logger                = null;
+		static::$max_table_name_length = 64;
 	}
 }

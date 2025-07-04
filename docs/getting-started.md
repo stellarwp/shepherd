@@ -43,6 +43,9 @@ add_action( 'plugins_loaded', function() {
     // Register Pigeon as a singleton
     $container->singleton( Provider::class );
 
+    // Set the container for Pigeon.
+    Config::set_container( $container );
+
     // Initialize Pigeon
     $container->get( Provider::class )->register();
 } );

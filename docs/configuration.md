@@ -88,6 +88,7 @@ $container = get_my_container();
 // Register Pigeon as a singleton
 $container->singleton( Provider::class );
 
+Config::set_container( $container );
 Config::set_hook_prefix( 'my_app' ); // Needs to be set before the provider is initialized.
 
 // Initialize Pigeon

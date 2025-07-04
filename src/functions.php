@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace StellarWP\Pigeon;
 
 use RuntimeException;
+use StellarWP\Pigeon\Config;
 
 /**
  * Get the Pigeon's Regulator instance.
@@ -31,7 +32,7 @@ function pigeon(): Regulator {
 		return $pigeon;
 	}
 
-	$pigeon = Provider::get_container()->get( Regulator::class );
+	$pigeon = Config::get_container()->get( Regulator::class );
 
 	return $pigeon;
 }

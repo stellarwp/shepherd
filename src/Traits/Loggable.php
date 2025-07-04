@@ -11,8 +11,8 @@ declare( strict_types=1 );
 
 namespace StellarWP\Pigeon\Traits;
 
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
 use Psr\Log\LogLevel;
 
 /**
@@ -41,7 +41,7 @@ trait Loggable {
 	 */
 	private function get_logger(): Logger {
 		if ( ! $this->logger ) {
-			$this->logger = Provider::get_container()->get( Logger::class );
+			$this->logger = Config::get_container()->get( Logger::class );
 		}
 
 		return $this->logger;
