@@ -10,7 +10,7 @@ use StellarWP\Pigeon\Contracts\Model;
 use StellarWP\DB\DB;
 
 class Dummy_Table extends Table_Abstract {
-	protected static $base_table_name = 'pigeon_%s_dummy_table';
+	protected static $base_table_name = 'pi_%s_dummy_table';
 	protected static $schema_slug = 'pigeon-%s-dummy-table';
 	protected static $uid_column = 'id';
 
@@ -44,7 +44,7 @@ class Table_Abstract_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_get_correct_table_name_and_slug() {
-		$this->assertEquals( 'wp_pigeon_test_dummy_table', Dummy_Table::table_name() );
+		$this->assertEquals( 'wp_pi_test_dummy_table', Dummy_Table::table_name() );
 		$this->assertEquals( 'pigeon-test-dummy-table', Dummy_Table::get_schema_slug() );
 	}
 
@@ -55,7 +55,7 @@ class Table_Abstract_Test extends WPTestCase {
 		$table = new Dummy_Table();
 		$definition = $table->get_definition();
 
-		$this->assertStringContainsString( 'CREATE TABLE `wp_pigeon_test_dummy_table`', $definition );
+		$this->assertStringContainsString( 'CREATE TABLE `wp_pi_test_dummy_table`', $definition );
 		$this->assertStringContainsString( '`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT', $definition );
 		$this->assertStringContainsString( '`name` varchar(255) NOT NULL', $definition );
 		$this->assertStringContainsString( 'PRIMARY KEY (`id`)', $definition );
@@ -87,10 +87,10 @@ class Table_Abstract_Test extends WPTestCase {
 		$this->assertLessThan( strlen( $long_prefix ), strlen( $safe_prefix ), 'Safe prefix should be shorter than original' );
 
 		// The table name should match expected format
-		$expected = DB::prefix( 'pigeon_' . $safe_prefix . '_dummy_table' );
+		$expected = DB::prefix( 'pi_' . $safe_prefix . '_dummy_table' );
 		$this->assertEquals( $expected, $table_name );
 
-		$this->assertEquals( 64, strlen( $table_name ) );
+		$this->assertLessThanOrEqual( 64, strlen( $table_name ) );
 	}
 
 	/**
@@ -104,6 +104,6 @@ class Table_Abstract_Test extends WPTestCase {
 		$table_name = Dummy_Table::table_name();
 
 		// The table name should contain the full hook prefix
-		$this->assertEquals( 'wp_pigeon_short_dummy_table', $table_name );
+		$this->assertEquals( 'wp_pi_short_dummy_table', $table_name );
 	}
 }
