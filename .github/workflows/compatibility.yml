@@ -33,6 +33,7 @@ jobs:
 
       - uses: ramsey/composer-install@v3
         with:
+          composer-options: "--ignore-platform-reqs"
           dependency-versions: highest
 
       - name: Run PHP Compatibility

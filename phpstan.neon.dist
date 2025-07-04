@@ -16,6 +16,8 @@ parameters:
 	inferPrivatePropertyTypeFromConstructor: true
 	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
+	scanDirectories:
+		- vendor/woocommerce/action-scheduler/
 
 	# Paths to be analyzed.
 	paths:

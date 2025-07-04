@@ -6,8 +6,8 @@ jobs:
     strategy:
       matrix:
         suite:
-          - acceptance
           - wpunit
+          - integration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -74,7 +74,7 @@ jobs:
         run: ${SLIC_BIN} up chrome
       - name: Set up StellarWP Pigeon
         run: |
-          ${SLIC_BIN} use pigeon
+          ${SLIC_BIN} use shepherd
           ${SLIC_BIN} composer install
       - name: Init the WordPress container
         run: |

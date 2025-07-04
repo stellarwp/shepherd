@@ -11,8 +11,10 @@ declare(strict_types=1);
 
 namespace StellarWP\Pigeon\Tables;
 
-use lucatume\DI52\ServiceProvider;
+use StellarWP\Pigeon\Abstracts\Provider_Abstract;
 use StellarWP\Schema\Register;
+use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Pigeon\Loggers\DB_Logger;
 
 /**
  * Pigeon Tables Service Provider
@@ -21,7 +23,7 @@ use StellarWP\Schema\Register;
  *
  * @package StellarWP\Pigeon\Tables;
  */
-class Provider extends ServiceProvider {
+class Provider extends Provider_Abstract {
 	/**
 	 * Registers the service provider bindings.
 	 *
@@ -31,5 +33,9 @@ class Provider extends ServiceProvider {
 	 */
 	public function register(): void {
 		Register::table( Tasks::class );
+
+		if ( $this->container->get( Logger::class ) instanceof DB_Logger ) {
+			Register::table( Task_Logs::class );
+		}
 	}
 }

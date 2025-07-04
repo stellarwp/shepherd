@@ -66,6 +66,7 @@ jobs:
           ${SLIC_BIN} wp core version
           ${SLIC_BIN} wp core update --force --version=6.7
           ${SLIC_BIN} wp core version
+          ${SLIC_BIN} use shepherd
 
       - name: Install WooCommerce
         run: ${SLIC_BIN} site-cli plugin install woocommerce

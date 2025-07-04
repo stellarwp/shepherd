@@ -1,24 +1,28 @@
-# Pigeon Message Delivery
+# Pigeon
 
-[![CI](https://github.com/stellarwp/pigeon/workflows/CI/badge.svg)](https://github.com/stellarwp/pigeon/actions?query=branch%3Amain) [![Static Analysis](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/stellarwp/pigeon/actions/workflows/static-analysis.yml)
+Pigeon is a lightweight and powerful background processing library for WordPress, built on top of Action Scheduler. It provides a simple, fluent API for defining and dispatching asynchronous tasks, with built-in support for retries, debouncing, and logging.
 
-A library for offloading tasks to be handled asynchronously in WordPress.
+## Features
 
-## What is Pigeon?
+- **Simple, Fluent API**: A straightforward way to define and dispatch background tasks.
+- **Action Scheduler Integration**: Leverages the reliability of Action Scheduler for task processing.
+- **Automatic Retries**: Configurable automatic retries for failed tasks.
+- **Debouncing**: Prevent tasks from running too frequently.
+- **Logging**: Built-in database logging for task lifecycle events.
+- **Included Tasks**: Comes with a ready-to-use `Email` task.
 
-Pigeon is a library for offloading tasks to be handled asynchronously in WordPress. It's designed to be a lightweight and flexible solution for handling tasks that need to be processed in the background, such as sending emails, processing payments, or updating data in the database.
+## Getting Started
 
-Pigeon is built on top of the [Action Scheduler](https://actionscheduler.org/) library, which provides a robust and flexible way to manage background tasks.
+For a guide on how to install Pigeon and get started with creating and dispatching your first task, please see our [Getting Started guide](./docs/getting-started.md).
 
-## Why prefer Pigeon over Action Scheduler?
+## Advanced Usage
 
-Pigeon is a wrapper of Action Scheduler. Whatever you can do with Action Scheduler, you can do with Pigeon.
+For more detailed information on advanced features like task retries, debouncing, unique tasks, and logging, please refer to our [Advanced Usage guide](./docs/advanced-usage.md).
 
-Pigeon does offer out of the box the following features that are not available with Action Scheduler:
+## Built-in Tasks
 
-- A simple API for offloading already defined tasks. Such as sending emails or generating PDFs. You can see more in the [tasks documentation](./docs/tasks.md)!
-- A retry system for failed tasks.
-- A debounce system for tasks that are called multiple times in a short period of time.
-- Supporting tasks dependencies.
-- Being able to recognize tasks being rate limited.
-- The arguments being passed to the task's handler can be significantly larger than what Action Scheduler allows. Action scheduler uses the column the arguments are stored in the database as an index. Pigeon instead uses a hash of the arguments as an index, and stores the arguments in a long text column.
+Pigeon comes with a set of pre-packaged tasks to handle common background operations. For more information, please see our [Tasks guide](./docs/tasks.md).
+
+## Contributing
+
+We welcome contributions! Please see our contributing guidelines for more information. (TODO: Add a CONTRIBUTING.md file)
