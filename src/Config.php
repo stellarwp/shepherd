@@ -25,7 +25,9 @@ class Config {
 	/**
 	 * Container object.
 	 *
-	 * @var ContainerInterface
+	 * @since TBD
+	 *
+	 * @var ?ContainerInterface
 	 */
 	protected static ?ContainerInterface $container = null;
 
@@ -67,7 +69,7 @@ class Config {
 	 */
 	public static function get_container(): ContainerInterface {
 		if ( self::$container === null ) {
-			throw new \RuntimeException( 'You must provide a container via StellarWP\Pigeon\Config::set_container() before attempting to fetch it.' );
+			throw new RuntimeException( 'You must provide a container via StellarWP\Pigeon\Config::set_container() before attempting to fetch it.' );
 		}
 
 		return self::$container;

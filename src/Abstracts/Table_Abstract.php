@@ -141,9 +141,6 @@ abstract class Table_Abstract extends Table {
 	public function __construct() {
 		$this->db        = DB::class;
 		$this->container = Config::get_container();
-
-		// Modify table names to use the hook prefix.
-		self::$schema_slug = sprintf( self::$schema_slug, Config::get_hook_prefix() );
 	}
 
 	/**

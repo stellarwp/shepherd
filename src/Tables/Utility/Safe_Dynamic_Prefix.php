@@ -9,6 +9,7 @@
 
 namespace StellarWP\Pigeon\Tables\Utility;
 
+use RuntimeException;
 use StellarWP\Pigeon\Config;
 
 /**
@@ -94,7 +95,7 @@ class Safe_Dynamic_Prefix {
 	 *
 	 * @param string|null $longest_table_name The longest table name to calculate the maximum length for.
 	 *
-	 * @throws \RuntimeException If the dynamic table prefix is not set or the max dynamic table prefix length could not be determined.
+	 * @throws RuntimeException If the dynamic table prefix is not set or the max dynamic table prefix length could not be determined.
 	 *
 	 * @return string The safe hook prefix.
 	 */
@@ -103,7 +104,7 @@ class Safe_Dynamic_Prefix {
 		$max_length = $this->get_max_length( $longest_table_name );
 
 		if ( ! $max_length ) {
-			throw new \RuntimeException( 'The max dynamic table prefix could not be determined.' );
+			throw new RuntimeException( 'The max dynamic table prefix could not be determined.' );
 		}
 
 		if ( strlen( $prefix ) > $max_length ) {

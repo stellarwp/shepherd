@@ -102,19 +102,6 @@ class Provider extends Provider_Abstract {
 	}
 
 	/**
-	 * Gets the container.
-	 *
-	 * @since TBD
-	 *
-	 * @return Container
-	 *
-	 * @throws RuntimeException If the container has not been set.
-	 */
-	public static function get_container(): Container {
-		return Config::get_container();
-	}
-
-	/**
 	 * Checks if Pigeon is registered.
 	 *
 	 * @since TBD
