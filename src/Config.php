@@ -59,6 +59,10 @@ class Config {
 	/**
 	 * Get the container.
 	 *
+	 * @since TBD
+	 *
+	 * @throws RuntimeException If the container is not set.
+	 *
 	 * @return ContainerInterface
 	 */
 	public static function get_container(): ContainerInterface {

@@ -11,6 +11,13 @@ namespace StellarWP\Pigeon\Tables\Utility;
 
 use StellarWP\Pigeon\Config;
 
+/**
+ * Safe dynamic table prefix utility class.
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Pigeon\Tables\Utility;
+ */
 class Safe_Dynamic_Prefix {
 	/**
 	 * Longest table name.
