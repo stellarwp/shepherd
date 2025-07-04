@@ -297,6 +297,32 @@ class Config {
 	}
 
 	/**
+	 * Gets the package URL.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $path The path to the package.
+	 *
+	 * @return string
+	 */
+	public static function get_package_url( string $path = '' ): string {
+		return plugin_dir_url( __DIR__ ) . ltrim( wp_normalize_path( $path ), '/' );
+	}
+
+	/**
+	 * Gets the package path.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $path The path to the package.
+	 *
+	 * @return string
+	 */
+	public static function get_package_path( string $path = '' ): string {
+		return __DIR__ . '/../' . ltrim( wp_normalize_path( $path ), '/' );
+	}
+
+	/**
 	 * Sets the logger.
 	 *
 	 * @since TBD

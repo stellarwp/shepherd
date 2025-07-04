@@ -70,7 +70,7 @@ class Provider_Test extends WPTestCase {
 		// Check the output.
 		$this->assertStringContainsString( '<div class="wrap">', $output );
 		$this->assertStringContainsString( 'Pigeon Task Manager (via foobar)', $output );
-		$this->assertStringContainsString( '<div id="pigeon-app"></div>', $output );
+		$this->assertStringContainsString( '<div id="shepherd-app"></div>', $output );
 	}
 
 	/**

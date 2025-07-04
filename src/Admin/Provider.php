@@ -56,13 +56,15 @@ class Provider extends Provider_Abstract {
 	 * @since TBD
 	 */
 	public function register_admin_menu(): void {
-		add_management_page(
+		$page_hook = add_management_page(
 			Config::get_admin_page_title(),
 			Config::get_admin_menu_title(),
 			Config::get_admin_page_capability(),
 			'pigeon-' . Config::get_hook_prefix(),
 			[ $this, 'render_admin_page' ]
 		);
+
+		add_action( "admin_print_styles-{$page_hook}", [ $this, 'enqueue_admin_page_assets' ] );
 	}
 
 	/**
@@ -76,7 +78,7 @@ class Provider extends Provider_Abstract {
 			<h1>
 				<?php echo esc_html( Config::get_admin_page_in_page_title() ); ?>
 			</h1>
-			<div id="pigeon-app"></div>
+			<div id="shepherd-app"></div>
 		</div>
 		<?php
 	}
@@ -90,5 +92,17 @@ class Provider extends Provider_Abstract {
 	 */
 	public static function is_registered(): bool {
 		return self::$has_registered;
+	}
+
+	/**
+	 * Enqueues the admin page assets.
+	 *
+	 * @since TBD
+	 */
+	public function enqueue_admin_page_assets(): void {
+		$asset_data = require Config::get_package_path( 'build/main.asset.php' );
+		wp_enqueue_script( 'shepherd-admin-script', Config::get_package_url( 'build/main.js' ), $asset_data['dependencies'], $asset_data['version'], true );
+
+		wp_enqueue_style( 'shepherd-admin-style', Config::get_package_url( 'build/style-main.css' ), [], $asset_data['version'] );
 	}
 }
