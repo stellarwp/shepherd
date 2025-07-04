@@ -14,7 +14,7 @@ namespace StellarWP\Pigeon\Abstracts;
 use StellarWP\Pigeon\Contracts\Task_Model;
 use RuntimeException;
 use StellarWP\Pigeon\Tables\Tasks as Tasks_Table;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Contracts\Task;
 use StellarWP\Pigeon\Action_Scheduler_Methods;
 use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
@@ -240,7 +240,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	 * @return Table_Abstract The table interface.
 	 */
 	public function get_table_interface(): Table_Abstract {
-		return Provider::get_container()->get( static::TABLE_INTERFACE );
+		return Config::get_container()->get( static::TABLE_INTERFACE );
 	}
 
 	/**
