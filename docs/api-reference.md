@@ -140,7 +140,7 @@ public function __construct(
 
 - **Task Prefix:** `pigeon_email_`
 - **Max Retries:** 4
-- **Retry Delay:** 30 seconds (exponential backoff)
+- **Retry Delay:** 30 seconds (exponential backoff: 30s then 60s then 120s then 240s and so on)
 - **Group:** `pigeon_{prefix}_queue_default`
 - **Priority:** 10
 
