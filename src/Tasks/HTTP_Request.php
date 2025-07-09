@@ -16,6 +16,7 @@ use StellarWP\Pigeon\Abstracts\Task_Abstract;
 use StellarWP\Pigeon\Exceptions\PigeonTaskException;
 use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
 use InvalidArgumentException;
+use WP_Error;
 
 // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 
@@ -68,6 +69,8 @@ class HTTP_Request extends Task_Abstract {
 	public function __construct( string $url, array $args = [], string $method = 'GET' ) {
 		parent::__construct( $url, $args, strtoupper( $method ) );
 	}
+
+	// phpcs:disable Squiz.Commenting.FunctionCommentThrowTag.Missing
 
 	/**
 	 * Processes the HTTP request task.
@@ -209,6 +212,8 @@ class HTTP_Request extends Task_Abstract {
 		 */
 		do_action( 'pigeon_' . Config::get_hook_prefix() . '_http_request_processed', $this, $response );
 	}
+
+	// phpcs:enable Squiz.Commenting.FunctionCommentThrowTag.Missing
 
 	/**
 	 * Validates the HTTP request task's arguments.
