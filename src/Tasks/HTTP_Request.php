@@ -98,7 +98,20 @@ class HTTP_Request extends Task_Abstract {
 
 		// Check for WP_Error.
 		if ( is_wp_error( $response ) ) {
-			throw new PigeonTaskFailWithoutRetryException(
+			/**
+			 * Filters whether to retry the HTTP request on WP_Error.
+			 *
+			 * @since TBD
+			 *
+			 * @param bool         $should_retry Whether to retry the HTTP request on WP_Error.
+			 * @param WP_Error     $response     The WP_Error object.
+			 * @param HTTP_Request $task         The HTTP request task.
+			 */
+			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_wp_error', false, $response, $this );
+
+			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+
+			throw new $expection_class(
 				sprintf(
 					/* translators: %1$s: HTTP method, %2$s: URL, %3$s: Error message */
 					__( 'HTTP %1$s request to %2$s failed with code: `%3$s` and message: `%4$s`', 'stellarwp-pigeon' ),
@@ -111,7 +124,20 @@ class HTTP_Request extends Task_Abstract {
 		}
 
 		if ( ! is_array( $response ) ) {
-			throw new PigeonTaskFailWithoutRetryException(
+			/**
+			 * Filters whether to retry the HTTP request on invalid response.
+			 *
+			 * @since TBD
+			 *
+			 * @param bool         $should_retry Whether to retry the HTTP request on invalid response.
+			 * @param mixed        $response     The response.
+			 * @param HTTP_Request $task         The HTTP request task.
+			 */
+			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_invalid_response', false, $response, $this );
+
+			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+
+			throw new $expection_class(
 				__( 'HTTP request returned an invalid response.', 'stellarwp-pigeon' )
 			);
 		}
@@ -122,7 +148,20 @@ class HTTP_Request extends Task_Abstract {
 
 		// Check for HTTP error status codes (4xx, 5xx).
 		if ( $response_code >= 400 && $response_code < 500 ) {
-			throw new PigeonTaskFailWithoutRetryException(
+			/**
+			 * Filters whether to retry the HTTP request on HTTP error status codes (4xx, 5xx).
+			 *
+			 * @since TBD
+			 *
+			 * @param bool         $should_retry Whether to retry the HTTP request on HTTP error status codes (4xx, 5xx).
+			 * @param array        $response     The response.
+			 * @param HTTP_Request $task         The HTTP request task.
+			 */
+			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_http_error_status_codes', false, $response, $this );
+
+			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+
+			throw new $expection_class(
 				sprintf(
 					/* translators: %1$s: HTTP method, %2$s: URL, %3$d: Response code, %4$s: Response message */
 					__( 'HTTP %1$s request to %2$s returned error %3$d: `%4$s`', 'stellarwp-pigeon' ),
@@ -135,7 +174,20 @@ class HTTP_Request extends Task_Abstract {
 		}
 
 		if ( $response_code < 200 || $response_code >= 300 ) {
-			throw new PigeonTaskException(
+			/**
+			 * Filters whether to retry the HTTP request on non-2xx response codes.
+			 *
+			 * @since TBD
+			 *
+			 * @param bool         $should_retry Whether to retry the HTTP request on non-2xx response codes.
+			 * @param array        $response     The response.
+			 * @param HTTP_Request $task         The HTTP request task.
+			 */
+			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_non_2xx_response_codes', true, $response, $this );
+
+			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+
+			throw new $expection_class(
 				sprintf(
 					/* translators: %1$s: HTTP method, %2$s: URL, %3$d: Response code, %4$s: Response message */
 					__( 'HTTP %1$s request to %2$s returned error %3$d: `%4$s`', 'stellarwp-pigeon' ),
@@ -167,16 +219,6 @@ class HTTP_Request extends Task_Abstract {
 	 */
 	protected function validate_args(): void {
 		$args = $this->get_args();
-
-		if ( count( $args ) < 1 ) {
-			throw new InvalidArgumentException( __( 'HTTP request task requires at least a URL.', 'stellarwp-pigeon' ) );
-		}
-
-		// Validate URL.
-		$url = $args[0];
-		if ( ! ( is_string( $url ) && filter_var( $url, FILTER_VALIDATE_URL ) ) ) {
-			throw new InvalidArgumentException( __( 'URL is not valid.', 'stellarwp-pigeon' ) );
-		}
 
 		// Validate request arguments.
 		if ( isset( $args[1] ) && ! is_array( $args[1] ) ) {
