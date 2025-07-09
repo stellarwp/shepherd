@@ -225,6 +225,10 @@ class HTTP_Request extends Task_Abstract {
 	protected function validate_args(): void {
 		$args = $this->get_args();
 
+		if ( empty( $args[0] ) ) {
+			throw new InvalidArgumentException( __( 'URL is required.', 'stellarwp-pigeon' ) );
+		}
+
 		// Validate request arguments.
 		if ( isset( $args[1] ) && ! is_array( $args[1] ) ) {
 			throw new InvalidArgumentException( __( 'Request arguments must be an array.', 'stellarwp-pigeon' ) );

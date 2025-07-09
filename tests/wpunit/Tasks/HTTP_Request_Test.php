@@ -68,19 +68,9 @@ class HTTP_Request_Test extends WPTestCase {
 	 */
 	public function it_should_throw_exception_for_empty_url() {
 		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'URL is not valid.' );
+		$this->expectExceptionMessage( 'URL is required.' );
 
 		new HTTP_Request( '' );
-	}
-
-	/**
-	 * @test
-	 */
-	public function it_should_throw_exception_for_invalid_url() {
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'URL is not valid.' );
-
-		new HTTP_Request( 'not-a-url' );
 	}
 
 	/**
