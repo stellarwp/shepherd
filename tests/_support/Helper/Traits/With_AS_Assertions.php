@@ -10,6 +10,7 @@ use ActionScheduler_QueueRunner as Runner;
 use StellarWP\Pigeon\Config;
 use StellarWP\Pigeon\Provider;
 use StellarWP\DB\DB;
+use PHPUnit\Framework\Assert;
 use function StellarWP\Pigeon\pigeon;
 
 trait With_AS_Assertions {
@@ -20,6 +21,7 @@ trait With_AS_Assertions {
 	protected function delete_actions_between_runs(): void {
 		Config::get_container()->get( Task_Model_Abstract::TABLE_INTERFACE )->empty_table();
 		DB::query( DB::prepare( "DELETE FROM %i", DB::prefix( 'actionscheduler_actions' ) ) );
+		remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started' );
 	}
 
 	protected function get_task_from_id( int $task_id ): Task {
@@ -65,7 +67,8 @@ trait With_AS_Assertions {
 
 	protected function assertTaskExecutesWithoutErrors( int $task_id ): void {
 		$action_id = $this->get_task_from_id( $task_id )->get_action_id();
-		Runner::instance()->run();
+		$this->add_listener( $action_id, $task_id );
+		$this->execute_as_runner();
 
 		$status = DB::get_var(
 			DB::prepare(
@@ -82,7 +85,8 @@ trait With_AS_Assertions {
 
 	protected function assertTaskExecutesFailsAndReschedules( int $task_id ): void {
 		$action_id = $this->get_task_from_id( $task_id )->get_action_id();
-		Runner::instance()->run();
+		$this->add_listener( $action_id, $task_id );
+		$this->execute_as_runner();
 
 		$status = DB::get_var(
 			DB::prepare(
@@ -99,7 +103,8 @@ trait With_AS_Assertions {
 
 	protected function assertTaskExecutesFails( int $task_id ): void {
 		$action_id = $this->get_task_from_id( $task_id )->get_action_id();
-		Runner::instance()->run();
+		$this->add_listener( $action_id, $task_id );
+		$this->execute_as_runner();
 
 		$status = DB::get_var(
 			DB::prepare(
@@ -112,5 +117,19 @@ trait With_AS_Assertions {
 		$this->assertSame( 'failed', $status );
 
 		$this->assertTaskHasActionFinished( $task_id );
+	}
+
+	protected function add_listener( int $action_id, int $task_id ): void {
+		add_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started', function( Task $task, int $aid ) use ( $action_id, $task_id ) {
+			Assert::assertSame( $action_id, $aid );
+			Assert::assertSame( $action_id, $task->get_action_id() );
+			Assert::assertSame( $task_id, $task->get_id() );
+			remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started' );
+		}, 10, 2 );
+	}
+
+	protected function execute_as_runner(): void {
+		// Fresh instance to avoid re-running the same action multiple times in the context of the same request.
+		( new Runner() )->run();
 	}
 }

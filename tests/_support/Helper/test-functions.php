@@ -58,9 +58,9 @@ function tests_pigeon_raise_auto_increment(): void {
 		Task_Logs::base_table_name(),
 	];
 
-	foreach ( $tables as $table ) {
+	foreach ( $tables as $offset => $table ) {
 		DB::query(
-			DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = %d', DB::prefix( $table ), 9567492 )
+			DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = %d', DB::prefix( $table ), 728365 + ( 1 + (int) $offset * 3 ) )
 		);
 	}
 }

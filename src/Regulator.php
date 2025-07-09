@@ -21,6 +21,7 @@ use Throwable;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Exceptions\PigeonTaskException;
 use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
+use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
 use StellarWP\Pigeon\Traits\Loggable;
 
 /**
@@ -206,6 +207,15 @@ class Regulator extends Provider_Abstract {
 			];
 
 			if ( $previous_action_id ) {
+				/**
+				 * Fires when a task should be retried.
+				 *
+				 * @since TBD
+				 *
+				 * @param Task $task The task that should be retried.
+				 */
+				do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_rescheduled', $task );
+
 				$this->log_rescheduled(
 					$task->get_id(),
 					array_merge(
@@ -216,6 +226,15 @@ class Regulator extends Provider_Abstract {
 					)
 				);
 			} else {
+				/**
+				 * Fires when a task should be retried.
+				 *
+				 * @since TBD
+				 *
+				 * @param Task $task The task that should be retried.
+				 */
+				do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_created', $task );
+
 				$this->log_created( $task->get_id(), $log_data );
 			}
 
@@ -282,10 +301,11 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @param string $args_hash The arguments hash.
 	 *
-	 * @throws RuntimeException    If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
-	 * @throws PigeonTaskException If the task fails to be processed.
-	 * @throws Exception           If the task fails to be processed.
-	 * @throws Throwable           If the task fails to be processed.
+	 * @throws RuntimeException                    If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
+	 * @throws PigeonTaskException                 If the task fails to be processed.
+	 * @throws PigeonTaskFailWithoutRetryException If the task fails to be processed without retry.
+	 * @throws Exception                           If the task fails to be processed.
+	 * @throws Throwable                           If the task fails to be processed.
 	 */
 	public function process_task( string $args_hash ): void {
 		$task = null;
@@ -311,6 +331,16 @@ class Regulator extends Provider_Abstract {
 			'current_try' => $task->get_current_try(),
 		];
 
+		/**
+		 * Fires when a task is being processed.
+		 *
+		 * @since TBD
+		 *
+		 * @param Task $task          The task that is being processed.
+		 * @param int  $action_id     The action ID that is being processed.
+		 */
+		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_started', $task, $this->current_action_id );
+
 		try {
 			try {
 				if ( $task->get_current_try() > 0 ) {
@@ -325,6 +355,30 @@ class Regulator extends Provider_Abstract {
 			} catch ( PigeonTaskException $e ) {
 				throw $e;
 			}
+		} catch ( PigeonTaskFailWithoutRetryException $e ) {
+			/**
+			 * Fires when a task fails to be processed without retry.
+			 *
+			 * @since TBD
+			 *
+			 * @param Task                                $task The task that failed to be processed without retry.
+			 * @param PigeonTaskFailWithoutRetryException $e    The exception that was thrown.
+			 */
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
+
+			/**
+			 * Fires when a task fails to be processed without retry.
+			 *
+			 * @since TBD
+			 *
+			 * @param Task                                $task The task that failed to be processed without retry.
+			 * @param PigeonTaskFailWithoutRetryException $e    The exception that was thrown.
+			 */
+			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
+
+			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
+
+			throw $e;
 		} catch ( Exception $e ) {
 			/**
 			 * Fires when a task fails to be processed.
@@ -360,6 +414,16 @@ class Regulator extends Provider_Abstract {
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		}
+
+		/**
+		 * Fires when a task is finished processing.
+		 *
+		 * @since TBD
+		 *
+		 * @param Task $task          The task that is finished processing.
+		 * @param int  $action_id     The action ID that is finished processing.
+		 */
+		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_finished', $task, $this->current_action_id );
 	}
 
 	/**

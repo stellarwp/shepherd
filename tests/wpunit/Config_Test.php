@@ -7,8 +7,8 @@ namespace StellarWP\Pigeon;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use RuntimeException;
 use StellarWP\ContainerContract\ContainerInterface;
-use StellarWP\Pigeon\Contracts\Logger;
 use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Pigeon\Loggers\Null_Logger;
 
 class Config_Test extends WPTestCase {
 	/**
@@ -57,10 +57,9 @@ class Config_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_set_and_get_logger(): void {
-		/** @var Logger $mock_logger */
-		$mock_logger = $this->createMock( Logger::class );
-		Config::set_logger( $mock_logger );
-		$this->assertSame( $mock_logger, Config::get_logger() );
+		$null_logger = new Null_Logger();
+		Config::set_logger( $null_logger );
+		$this->assertSame( $null_logger, Config::get_logger() );
 	}
 
 	/**
