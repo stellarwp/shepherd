@@ -224,6 +224,9 @@ npm run lint:css
 - **Built-in tasks**: `src/Tasks/`
 - **Admin UI PHP**: `src/Admin/Provider.php`
 - **Admin UI React**: `app/`
+- **Exception classes**: `src/Exceptions/`
+- **Logger implementations**: `src/Loggers/`
+- **Utility traits**: `src/Traits/`
 - **Tests**: `tests/` (PHP) and `tests/js/` (JavaScript)
 - **Documentation**: `docs/`
 
@@ -352,7 +355,10 @@ Pigeon includes a React-based admin interface for managing background tasks. The
 3. **Internationalization**: All strings use WordPress i18n functions
 4. **Status Mapping**: Intelligent status detection based on Action Scheduler state
 5. **Human-Readable Dates**: Recent dates show relative time, older dates show absolute
-6. **Bulk Actions**: Support for bulk edit and delete operations
+6. **Advanced Filtering**: Filter by task type, status, and current try count
+7. **Bulk Actions**: Support for bulk edit and delete operations
+8. **Unique Value Caching**: Optimized filtering with `getUniqueValuesOfData()` function
+9. **Responsive Design**: Adapts to different screen sizes with WordPress admin styling
 
 ### Development Workflow
 
@@ -396,6 +402,95 @@ The admin UI can be extended by:
 3. Adding custom actions to the DataViews table
 4. Implementing custom REST API endpoints
 
+## Advanced Features
+
+### Exception System
+
+Pigeon includes specialized exception classes for different failure scenarios:
+
+- **`PigeonTaskException`**: Base exception for general task failures
+- **`PigeonTaskAlreadyExistsException`**: Thrown when attempting to schedule duplicate tasks
+- **`PigeonTaskFailWithoutRetryException`**: For tasks that should fail immediately without retry
+
+### Database Utilities
+
+#### Safe Dynamic Prefix
+
+The `Safe_Dynamic_Prefix` utility automatically manages table name length limits:
+
+```php
+use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
+
+// Automatically calculates safe prefix based on longest table name
+$safe_prefix = Safe_Dynamic_Prefix::get( 'very_long_application_prefix' );
+```
+
+#### Advanced Query Methods
+
+The `Custom_Table_Query_Methods` trait provides powerful database operations:
+
+- Batch processing with generators for memory efficiency
+- Complex pagination with JOIN support
+- Advanced WHERE clause building
+- Bulk operations: `insert_many()`, `update_many()`, `delete_many()`
+- Upsert operations for conflict resolution
+- Search across multiple columns
+
+### Logger Implementations
+
+Pigeon supports multiple logging strategies:
+
+1. **`ActionScheduler_DB_Logger`** (default): Uses Action Scheduler's log table
+2. **`DB_Logger`**: Uses dedicated Pigeon log tables
+3. **`Null_Logger`**: Disables logging entirely for testing
+
+### Action Scheduler Integration
+
+The `Action_Scheduler_Methods` class provides enhanced Action Scheduler functionality:
+
+- Bulk action operations
+- Enhanced action retrieval with filtering
+- Pending action management
+- Wrapper methods for common operations
+
+## Testing Framework
+
+### Test Structure
+
+Pigeon uses a comprehensive testing approach:
+
+- **46 PHP test files** covering all components
+- **Jest-based JavaScript tests** for React components
+- **Snapshot testing** for regression prevention
+- **Mock task classes** for testing scenarios
+
+### Test Utilities
+
+Key testing features include:
+
+- **Custom snapshot assertions** for log verification
+- **Clock mocking** for time-sensitive tests
+- **WordPress integration** via Codeception
+- **Container management** for dependency injection testing
+- **Test helper functions** for common operations
+
+### Running Tests
+
+```bash
+# PHP Tests with slic
+slic run wpunit         # Unit tests
+slic run integration    # Integration tests
+
+# JavaScript Tests
+npm test               # Run all JS tests
+npm run test:watch     # Watch mode
+
+# Code Quality
+composer test:analysis  # PHPStan analysis
+composer compatibility  # PHP version compatibility
+vendor/bin/phpcs       # Coding standards
+```
+
 ## Contributing Guidelines
 
 **IMPORTANT**: Before making any commits or opening PRs, always check:
@@ -415,8 +510,11 @@ The admin UI can be extended by:
 For more detailed information, refer to the documentation files:
 
 - `docs/getting-started.md` - Installation and basic usage guide
-- `docs/advanced-usage.md` - Advanced features like retries, debouncing, and logging
+- `docs/advanced-usage.md` - Advanced features like retries, debouncing, logging, and database utilities
+- `docs/admin-ui.md` - Complete admin interface guide
+- `docs/testing.md` - Comprehensive testing documentation
 - `docs/tasks.md` - Information about built-in tasks
 - `docs/tasks/email.md` - Detailed documentation for the Email task
+- `docs/tasks/http-request.md` - HTTP Request task documentation
 - `docs/api-reference.md` - Complete API documentation
 - `docs/configuration.md` - Configuration guide

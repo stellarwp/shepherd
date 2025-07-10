@@ -402,3 +402,251 @@ To modify the admin UI:
 5. Build for production: `npm run build`
 
 The built files are output to the `build/` directory and automatically enqueued by the PHP admin provider.
+
+## Exception Handling
+
+### Specialized Exceptions
+
+Pigeon provides specific exception types for different failure scenarios:
+
+```php
+use StellarWP\Pigeon\Exceptions\PigeonTaskException;
+use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
+use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
+
+class My_Task extends Task_Abstract {
+    public function process(): void {
+        // General task failure (will retry based on configuration)
+        if ( $some_condition ) {
+            throw new PigeonTaskException( 'Task failed due to temporary issue' );
+        }
+        
+        // Task should fail immediately without retry (e.g., invalid data)
+        if ( $invalid_data ) {
+            throw new PigeonTaskFailWithoutRetryException( 'Invalid task arguments' );
+        }
+        
+        // Note: PigeonTaskAlreadyExistsException is thrown automatically
+        // when attempting to schedule duplicate tasks
+    }
+}
+```
+
+### Exception Handling Strategies
+
+- **PigeonTaskException**: Use for temporary failures that might succeed on retry
+- **PigeonTaskFailWithoutRetryException**: Use for permanent failures (bad data, 4xx HTTP errors)
+- **Standard Exceptions**: Any other exception will be treated as a temporary failure
+
+## Database Utilities
+
+### Safe Table Naming
+
+The `Safe_Dynamic_Prefix` utility prevents MySQL table name length violations:
+
+```php
+use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
+
+// Automatically trims long prefixes to fit MySQL's 64-character limit
+$safe_prefix = Safe_Dynamic_Prefix::get( 'very_long_application_prefix_name' );
+
+// The utility considers the longest table name in Pigeon when calculating safe length
+echo $safe_prefix; // Will be trimmed to ensure table names don't exceed 64 chars
+```
+
+### Advanced Query Operations
+
+Use the `Custom_Table_Query_Methods` trait for complex database operations:
+
+```php
+use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
+
+class My_Custom_Table extends Table_Abstract {
+    use Custom_Table_Query_Methods;
+    
+    public function get_high_priority_tasks() {
+        // Complex query with joins and filtering
+        return $this->query()
+            ->select( [ 'tasks.*', 'logs.latest_entry' ] )
+            ->join( 'task_logs as logs', 'tasks.id', 'logs.task_id' )
+            ->where( 'priority', '>', 5 )
+            ->order_by( 'created_at', 'DESC' )
+            ->limit( 50 )
+            ->get_results();
+    }
+    
+    public function bulk_update_status( array $task_ids, string $status ) {
+        // Efficient bulk operations
+        return $this->update_many(
+            [ 'status' => $status, 'updated_at' => time() ],
+            [ 'id' => $task_ids ]
+        );
+    }
+    
+    public function search_tasks( string $search_term ) {
+        // Search across multiple columns
+        return $this->search( 
+            $search_term, 
+            [ 'task_class', 'data', 'status' ] 
+        );
+    }
+}
+```
+
+### Batch Processing
+
+Process large datasets efficiently with generators:
+
+```php
+// Process tasks in batches to avoid memory issues
+foreach ( $table->get_in_batches( 100 ) as $batch ) {
+    foreach ( $batch as $task ) {
+        // Process each task
+        process_task( $task );
+    }
+    
+    // Memory is released after each batch
+}
+```
+
+## Logger Configuration
+
+### Available Logger Types
+
+Pigeon supports three logger implementations:
+
+```php
+use StellarWP\Pigeon\Config;
+use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Pigeon\Loggers\DB_Logger;
+use StellarWP\Pigeon\Loggers\Null_Logger;
+
+// Default: Use Action Scheduler's existing log table
+Config::set_logger( new ActionScheduler_DB_Logger() );
+
+// Alternative: Use dedicated Pigeon log tables
+Config::set_logger( new DB_Logger() );
+
+// For testing: Disable logging entirely
+Config::set_logger( new Null_Logger() );
+```
+
+### ActionScheduler_DB_Logger Format
+
+When using `ActionScheduler_DB_Logger`, logs are stored with a special format in the Action Scheduler logs table:
+
+```
+pigeon_{hook_prefix}||{task_id}||{type}||{level}||{json_entry}
+```
+
+This allows Pigeon to store its metadata while maintaining compatibility with Action Scheduler's existing structure.
+
+### Custom Logger Implementation
+
+Create custom loggers by implementing the `Logger` interface:
+
+```php
+use StellarWP\Pigeon\Contracts\Logger;
+
+class Custom_Logger implements Logger {
+    public function log( int $task_id, int $action_id, string $type, string $level, string $entry ): bool {
+        // Custom logging logic (e.g., external service, file system)
+        return $this->send_to_external_service( $task_id, $type, $level, $entry );
+    }
+    
+    public function retrieve_logs( int $task_id ): array {
+        // Return array of Log objects
+        return $this->get_logs_from_external_service( $task_id );
+    }
+}
+
+// Set custom logger before registration
+Config::set_logger( new Custom_Logger() );
+```
+
+## Action Scheduler Integration
+
+### Enhanced Action Scheduler Methods
+
+The `Action_Scheduler_Methods` class provides additional functionality:
+
+```php
+use StellarWP\Pigeon\Action_Scheduler_Methods;
+
+// Get action with enhanced error handling
+$action = Action_Scheduler_Methods::get_action_by_id( $action_id );
+
+// Bulk operations
+$action_ids = Action_Scheduler_Methods::get_pending_actions_by_hook( 'my_hook' );
+Action_Scheduler_Methods::cancel_actions_by_ids( $action_ids );
+
+// Enhanced querying
+$actions = Action_Scheduler_Methods::get_actions_by_status( 'failed', 50 );
+```
+
+### Custom Action Scheduler Hooks
+
+Monitor Action Scheduler events related to Pigeon tasks:
+
+```php
+// Hook into Action Scheduler events
+add_action( 'action_scheduler_stored_action', function( $action_id ) {
+    // Action was stored in queue
+    error_log( "Action {$action_id} was queued" );
+} );
+
+add_action( 'action_scheduler_canceled_action', function( $action_id ) {
+    // Action was cancelled
+    $task = get_task_by_action_id( $action_id );
+    if ( $task ) {
+        error_log( "Pigeon task {$task->id} was cancelled" );
+    }
+} );
+```
+
+## Performance Optimization
+
+### Database Indexing
+
+Pigeon tables include optimized indexes:
+
+```sql
+-- Tasks table indexes
+INDEX `action_id` (action_id)
+INDEX `args_hash` (args_hash)  -- For duplicate detection
+INDEX `class_hash` (class_hash) -- For task type queries
+
+-- Logs table indexes  
+INDEX `task_id` (task_id)       -- For log retrieval
+INDEX `action_id` (action_id)   -- For Action Scheduler integration
+```
+
+### Memory Management
+
+For high-volume task processing:
+
+```php
+// Use generators for large result sets
+foreach ( Tasks::get_in_batches( 500 ) as $batch ) {
+    process_batch( $batch );
+    
+    // Clear object caches periodically
+    wp_cache_flush();
+}
+
+// Disable logging in high-volume scenarios
+Config::set_logger( new Null_Logger() );
+```
+
+### Task Deduplication
+
+Pigeon automatically prevents duplicate tasks:
+
+```php
+// These will only create one task
+pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) );
+pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) ); // Ignored
+
+// To force duplicates, vary the arguments
+pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body', [], [], time() ) );
+```
