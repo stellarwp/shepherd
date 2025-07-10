@@ -1,8 +1,9 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import type { Field } from '@wordpress/dataviews';
+import type { Field, Option } from '@wordpress/dataviews';
 import { getSettings, humanTimeDiff, dateI18n, getDate } from '@wordpress/date';
-import type { Task, PaginationInfo } from './types';
+import type { Task, PaginationInfo, TaskArgs, AjaxTasksResponse } from './types';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Returns the fields for the Shepherd table.
@@ -11,7 +12,7 @@ import type { Task, PaginationInfo } from './types';
  *
  * @return Field< any >[] The fields.
  */
-export const getFields = (): Field< any >[] => {
+export const getFields = ( data: Task[] ): Field< any >[] => {
 	return [
 		{
 			id: 'id',
@@ -30,6 +31,11 @@ export const getFields = (): Field< any >[] => {
 			label: __( 'Task Type', 'stellarwp-pigeon' ),
 			enableHiding: true,
 			enableSorting: true,
+			filterBy: {
+				operators: [ 'is' ],
+				isPrimary: true,
+			},
+			elements: getUniqueValuesOfData( 'task_class', data ),
 			getValue: ( { item } ) => {
 				return item.data.task_class;
 			},
@@ -69,8 +75,12 @@ export const getFields = (): Field< any >[] => {
 			label: __( 'Status', 'stellarwp-pigeon' ),
 			enableHiding: false,
 			enableSorting: true,
+			filterBy: {
+				operators: [ 'is', 'isNot' ],
+				isPrimary: true,
+			},
 			getValue: ( { item } ) => {
-				return item.status.slug;
+				return item.status;
 			},
 			elements: [
 				{
@@ -78,12 +88,12 @@ export const getFields = (): Field< any >[] => {
 					label: __( 'Pending', 'stellarwp-pigeon' ),
 				},
 				{
-					value: 'running',
-					label: __( 'Running', 'stellarwp-pigeon' ),
+					value: 'in-progress',
+					label: __( 'In Progress', 'stellarwp-pigeon' ),
 				},
 				{
-					value: 'success',
-					label: __( 'Success', 'stellarwp-pigeon' ),
+					value: 'complete',
+					label: __( 'Complete', 'stellarwp-pigeon' ),
 				},
 				{
 					value: 'failed',
@@ -136,26 +146,115 @@ export const getFields = (): Field< any >[] => {
 	];
 };
 
-export const getTasks = ( $page: number, $per_page: number ): Task[] => {
-	const tasks = window?.shepherdData?.tasks;
+/**
+ * The default arguments for the tasks query.
+ *
+ * @since TBD
+ *
+ * @var TaskArgs
+ */
+const defaultArgs = window?.shepherdData?.defaultArgs ?? {};
 
-	if ( ! tasks ) {
-		return [];
+const defaultArgsHash = ( JSON.stringify( defaultArgs ) );
+
+export const getTasks = async ( args: TaskArgs ): Promise< { data: Task[]; paginationInfo: PaginationInfo } > => {
+	const argsHash = ( JSON.stringify( args ) );
+
+	if ( argsHash === defaultArgsHash ) {
+		const tasks = window?.shepherdData?.tasks;
+
+		if ( ! tasks ) {
+			return {
+				data: [],
+				paginationInfo: {
+					totalItems: 0,
+					totalPages: 0,
+				},
+			};
+		}
+
+		return {
+			data: tasks.map( ( task ) => {
+				return {
+					id: task.id,
+					action_id: task.action_id,
+					data: task.data,
+					current_try: task.current_try,
+					status: task.status,
+					scheduled_at: task.scheduled_at?.date
+						? getDate( task.scheduled_at.date )
+						: null,
+					logs: task.logs,
+				};
+			} ),
+			paginationInfo: getPaginationInfo(),
+		};
 	}
 
-	return tasks.map( ( task ) => {
+	const url = new URLSearchParams();
+	url.append( 'action', 'shepherd_get_tasks' );
+	url.append( 'nonce', window?.shepherdData?.nonce ?? '' );
+	for ( const [ key, value ] of Object.entries( args ) ) {
+		if ( Array.isArray( value ) ) {
+			for ( const item of value ) {
+				url.append( key, JSON.stringify( item ) );
+			}
+		} else {
+			url.append( key, value.toString() );
+		}
+	}
+
+	try {
+		const response = await apiFetch< AjaxTasksResponse >(
+			{
+				url: window.ajaxurl,
+				body: url,
+				method: 'POST',
+			}
+		);
+
+		if ( ! response.success ) {
+			console.error( response );
+
+			return {
+				data: [],
+				paginationInfo: {
+					totalItems: 0,
+					totalPages: 0,
+				},
+			};
+		}
+
 		return {
-			id: task.id,
-			action_id: task.action_id,
-			data: task.data,
-			current_try: task.current_try,
-			status: task.status,
-			scheduled_at: task.scheduled_at?.date
-				? getDate( task.scheduled_at.date )
-				: null,
-			logs: task.logs,
+			data: response.data.tasks.map( ( task ) => {
+				return {
+					id: task.id,
+					action_id: task.action_id,
+					data: task.data,
+					current_try: task.current_try,
+					status: task.status,
+					scheduled_at: task.scheduled_at?.date
+						? getDate( task.scheduled_at.date )
+						: null,
+					logs: task.logs,
+				};
+			} ),
+			paginationInfo: {
+				totalItems: response.data.totalItems,
+				totalPages: response.data.totalPages,
+			},
 		};
-	} );
+	} catch ( error ) {
+		console.error( error );
+
+		return {
+			data: [],
+			paginationInfo: {
+				totalItems: 0,
+				totalPages: 0,
+			},
+		};
+	}
 };
 
 export const getPaginationInfo = (): PaginationInfo => {
@@ -166,4 +265,23 @@ export const getPaginationInfo = (): PaginationInfo => {
 		totalItems,
 		totalPages,
 	};
+};
+
+const uniqueValues = {};
+
+export const getUniqueValuesOfData = ( field: string, data: Task[] ): Option[] => {
+	const values = data.map( ( item ) => item[ field ] ?? item.data[ field ] );
+
+	if ( ! uniqueValues[ field ] ) {
+		uniqueValues[ field ] = [];
+	}
+
+	uniqueValues[ field ] = [ ...new Set( [ ...uniqueValues[ field ], ...values ] ) ];
+
+	return uniqueValues[ field ].map( ( value ) => {
+		return {
+			label: value,
+			value,
+		};
+	} );
 };
