@@ -21,10 +21,10 @@ module.exports = {
 						{
 							isTSX: true,
 							allExtensions: true,
-						},
+				},
 					],
 				],
-			},
+		},
 		],
 		'^.+\\.(js|jsx)$': '@wordpress/scripts/config/babel-transform',
 	},
