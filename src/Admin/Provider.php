@@ -163,13 +163,14 @@ class Provider extends Provider_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @return array
+	 * @return void
 	 */
 	public function ajax_get_tasks(): void {
 		check_ajax_referer( 'shepherd_get_tasks', 'nonce' );
 
 		if ( ! current_user_can( Config::get_admin_page_capability() ) ) {
 			wp_send_json_error( __( 'You are not authorized to access this page.', 'stellarwp-pigeon' ) );
+			/** @phpstan-ignore deadCode.unreachable */
 			return;
 		}
 
@@ -210,7 +211,7 @@ class Provider extends Provider_Abstract {
 	 * @param int   $per_page The number of items per page.
 	 * @param int   $page The page number.
 	 *
-	 * @return array<string => Task[], string => int, string => int>
+	 * @return array{'tasks': array, 'totalItems': int, 'totalPages': int}
 	 */
 	protected function get_tasks( array $args, int $per_page = 10, int $page = 1 ): array {
 		$task_array = Tasks::paginate( $args, $per_page, $page, AS_Actions::class, 'action_id=action_id', [ 'status' ] );
@@ -250,7 +251,7 @@ class Provider extends Provider_Abstract {
 		return [
 			'tasks'      => $tasks,
 			'totalItems' => $total_items,
-			'totalPages' => ceil( $total_items / $per_page ),
+			'totalPages' => (int) ceil( $total_items / $per_page ),
 		];
 	}
 }
