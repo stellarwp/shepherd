@@ -51,12 +51,14 @@ Tasks display one of five statuses:
 
 ### Filtering and Search
 
-The interface supports advanced filtering:
+The interface supports advanced filtering with real-time AJAX updates:
 
-- **Task Type Filter**: Filter by specific task classes
-- **Status Filter**: Show only tasks with specific statuses
+- **Task Type Filter**: Filter by specific task classes (mapped to class_hash for efficiency)
+- **Status Filter**: Show only tasks with specific statuses using multiple operators
 - **Current Try Filter**: Filter by retry attempt number
 - **Search**: Full-text search across task data
+- **Dynamic Loading**: Filters trigger AJAX requests for real-time data updates
+- **Multiple Operators**: Support for 'is' and 'isNot' filter operations
 
 ### Bulk Actions
 
@@ -281,17 +283,27 @@ npm run lint:css
 
 ### Data Flow
 
-1. **PHP Backend** (`src/Admin/Provider.php`):
-   - Fetches tasks from database
-   - Retrieves Action Scheduler data
-   - Maps task statuses
-   - Localizes data to JavaScript
+1. **Initial Page Load** (`src/Admin/Provider.php`):
+   - Fetches default tasks from database (first 10 items)
+   - Performs JOIN queries with Action Scheduler actions table
+   - Maps task statuses based on Action Scheduler state
+   - Localizes initial data and configuration to JavaScript
+   - Includes security nonce for AJAX requests
 
-2. **JavaScript Frontend** (`app/`):
-   - Receives data via `window.shepherdData`
+2. **AJAX API** (`wp_ajax_shepherd_get_tasks`):
+   - Handles dynamic filtering, sorting, and searching
+   - Processes filter parameters (task_type → class_hash mapping)
+   - Supports multiple filter operators (is, isNot)
+   - Returns paginated results with metadata
+   - Maintains security with nonce verification
+
+3. **JavaScript Frontend** (`app/`):
+   - Receives initial data via `window.shepherdData`
+   - Detects when new parameters differ from defaults
+   - Makes AJAX requests for dynamic data updates
    - Transforms data for DataViews component
    - Renders interactive table interface
-   - Handles user interactions
+   - Handles user interactions and state management
 
 ### WordPress Integration
 
@@ -305,8 +317,10 @@ The admin UI integrates with WordPress through:
 ### Performance Considerations
 
 - **Pagination**: Tasks are paginated server-side (default: 10 per page)
-- **Lazy Loading**: Only visible data is loaded initially
-- **Filtering**: Server-side filtering for large datasets
+- **Hybrid Loading**: Initial page load with data, subsequent requests via AJAX
+- **Server-side Filtering**: All filtering and searching performed on the server
+- **Database Optimization**: JOIN queries with Action Scheduler for enriched data
+- **Efficient Queries**: Task type filters use hashed class names for faster lookups
 - **Caching**: Unique values are cached for filter dropdowns
 
 ## Troubleshooting
@@ -328,8 +342,18 @@ The admin UI integrates with WordPress through:
 
 1. **Check PHP errors**: Review WordPress debug log
 2. **Check localized data**: View page source for `window.shepherdData`
-3. **Check database**: Verify tasks exist in Pigeon tables
-4. **Check Action Scheduler**: Ensure Action Scheduler is active
+3. **Check AJAX endpoint**: Test AJAX requests in browser network tab
+4. **Check nonce validity**: Ensure nonce is being passed correctly
+5. **Check database**: Verify tasks exist in Pigeon tables
+6. **Check Action Scheduler**: Ensure Action Scheduler is active
+7. **Check JOIN queries**: Verify Action Scheduler tables exist
+
+### AJAX Issues
+
+1. **403 Errors**: Check user permissions and nonce validity
+2. **500 Errors**: Review PHP error logs for database or code issues
+3. **Slow responses**: Check database performance and query optimization
+4. **Filter not working**: Verify filter format matches expected JSON structure
 
 ## Extending with Custom Interfaces
 
@@ -359,6 +383,75 @@ function render_custom_task_interface() {
 }
 ```
 
+## AJAX API Reference
+
+### Endpoint: `wp_ajax_shepherd_get_tasks`
+
+The AJAX API provides real-time data fetching with advanced filtering capabilities.
+
+#### Request Parameters
+
+- **action**: `shepherd_get_tasks` (required)
+- **nonce**: Security nonce from `shepherdData.nonce` (required)
+- **perPage**: Number of items per page (default: 10)
+- **page**: Page number (default: 1)
+- **orderby**: Sort column (default: 'id')
+- **order**: Sort direction - 'asc' or 'desc' (default: 'desc')
+- **search**: Search term for full-text search
+- **filters**: JSON array of filter objects
+
+#### Filter Format
+
+Filters are passed as a JSON array of objects:
+
+```json
+[
+  {
+    "field": "status",
+    "operator": "is",
+    "value": "pending"
+  },
+  {
+    "field": "task_type",
+    "operator": "isNot",
+    "value": "EmailTask"
+  }
+]
+```
+
+#### Response Format
+
+```json
+{
+  "success": true,
+  "data": {
+    "tasks": [
+      {
+        "id": 123,
+        "action_id": 456,
+        "data": {
+          "task_class": "MyTask",
+          "args": ["arg1", "arg2"]
+        },
+        "current_try": 1,
+        "status": "pending",
+        "scheduled_at": "2024-01-01T12:00:00+00:00",
+        "logs": []
+      }
+    ],
+    "totalItems": 150,
+    "totalPages": 15
+  }
+}
+```
+
+#### Security
+
+- Requires valid WordPress nonce
+- Respects admin page capability settings
+- Input sanitization and validation
+- SQL injection protection via prepared statements
+
 ## Future Enhancements
 
 The admin UI is designed to be extensible. Planned enhancements include:
@@ -370,5 +463,7 @@ The admin UI is designed to be extensible. Planned enhancements include:
 - **Bulk operations**: Cancel running tasks, bulk reschedule
 - **Export functionality**: CSV/JSON export of task data
 - **Dashboard widgets**: Summary statistics for WordPress dashboard
+- **Advanced search**: Field-specific search operators
+- **Task dependencies**: Visual dependency graphs
 
 For the latest development status and to contribute ideas, see the project's GitHub repository.

@@ -234,6 +234,84 @@ The task tables include indexes on:
 - `class_hash`: For task type queries
 - `task_id`: For log retrieval
 
+### JOIN Queries with Action Scheduler
+
+Pigeon supports efficient JOIN queries with Action Scheduler tables:
+
+```php
+use StellarWP\Pigeon\Tables\Tasks;
+use StellarWP\Pigeon\Tables\AS_Actions;
+
+// Join with Action Scheduler actions table for enriched data
+$tasks = Tasks::paginate(
+    $args,               // Query arguments
+    10,                  // Per page
+    1,                   // Page number
+    AS_Actions::class,   // Join table class
+    'action_id=action_id', // JOIN condition
+    ['status']           // Additional columns to select
+);
+
+// This enables filtering by Action Scheduler status without data duplication
+$filtered_tasks = Tasks::paginate(
+    [
+        'orderby' => 'status',
+        'order' => 'asc',
+        [
+            'column' => 'status',
+            'value' => 'pending',
+            'operator' => '='
+        ]
+    ],
+    10,
+    1,
+    AS_Actions::class,
+    'action_id=action_id',
+    ['status']
+);
+```
+
+### Advanced Filtering System
+
+Pigeon provides powerful filtering capabilities:
+
+```php
+// Task type filtering (mapped to class_hash for efficiency)
+$args = [
+    [
+        'column' => 'class_hash',
+        'value' => md5('My_Task_Class'),
+        'operator' => '='
+    ]
+];
+
+// Multiple filters with different operators
+$args = [
+    [
+        'column' => 'status', 
+        'value' => 'pending',
+        'operator' => '='
+    ],
+    [
+        'column' => 'current_try',
+        'value' => 3,
+        'operator' => '<'
+    ],
+    [
+        'column' => 'class_hash',
+        'value' => md5('Failed_Task'),
+        'operator' => '!='
+    ]
+];
+
+// Search across multiple columns
+$args = [
+    'term' => 'email notification', // Searches task data
+    'orderby' => 'id',
+    'order' => 'desc'
+];
+```
+
 ## Advanced Integration
 
 ### WordPress Hooks
@@ -276,7 +354,7 @@ add_action( "pigeon_{$prefix}_http_request_processed", function( $task, $respons
 
 ## Admin UI Configuration
 
-Pigeon includes an optional admin interface for monitoring and managing tasks. The admin UI is enabled by default but can be customized or disabled.
+Pigeon includes a React-based admin interface for monitoring and managing tasks with real-time AJAX updates. The admin UI is disabled by default and must be explicitly enabled.
 
 ### Enabling/Disabling Admin UI
 
@@ -638,7 +716,7 @@ foreach ( Tasks::get_in_batches( 500 ) as $batch ) {
 Config::set_logger( new Null_Logger() );
 ```
 
-### Task Deduplication
+#### Task Deduplication
 
 Pigeon automatically prevents duplicate tasks:
 
@@ -650,3 +728,97 @@ pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) ); /
 // To force duplicates, vary the arguments
 pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body', [], [], time() ) );
 ```
+
+## Admin UI AJAX Integration
+
+The admin UI provides real-time data updates through AJAX:
+
+### AJAX Endpoint Configuration
+
+```php
+// The admin provider registers the AJAX endpoint
+add_action( 'wp_ajax_shepherd_get_tasks', [ $provider, 'ajax_get_tasks' ] );
+
+// Endpoint handles:
+// - Security with nonce verification
+// - Permission checks
+// - Dynamic filtering and sorting
+// - Pagination
+// - Search functionality
+```
+
+### Filter Processing
+
+The AJAX endpoint processes filter parameters:
+
+```php
+// task_type filters are mapped to class_hash for efficiency
+if ( $filter['field'] === 'task_type' ) {
+    $args[] = [
+        'column' => 'class_hash',
+        'value' => md5( $filter['value'] ),
+        'operator' => $filter['operator'] === 'isNot' ? '!=' : '='
+    ];
+}
+
+// Other filters are applied directly
+$args[] = [
+    'column' => $filter['field'],
+    'value' => $filter['value'],
+    'operator' => $filter['operator'] === 'isNot' ? '!=' : '='
+];
+```
+
+### Performance Optimization
+
+- **Hybrid Loading**: Initial page load includes default data, subsequent requests use AJAX
+- **Server-side Processing**: All filtering, sorting, and searching on the server
+- **Efficient Queries**: JOIN operations with Action Scheduler for status information
+- **Minimal Data Transfer**: Only necessary columns selected
+
+## AS_Actions Table Interface
+
+The `AS_Actions` class provides a read-only interface to Action Scheduler's actions table:
+
+```php
+use StellarWP\Pigeon\Tables\AS_Actions;
+
+// Get table name
+$table_name = AS_Actions::table_name(); // wp_actionscheduler_actions
+
+// Available columns for JOIN operations
+$columns = AS_Actions::get_columns();
+// Returns: action_id (BIGINT), status (VARCHAR)
+
+// Searchable columns
+$searchable = AS_Actions::get_searchable_columns(); 
+// Returns: ['status']
+```
+
+### Usage in JOIN Queries
+
+```php
+// Enable status filtering without data duplication
+$tasks_with_status = Tasks::paginate(
+    [
+        'orderby' => 'status',
+        [
+            'column' => 'status',
+            'value' => 'complete',
+            'operator' => '='
+        ]
+    ],
+    20,
+    1,
+    AS_Actions::class,     // Join table
+    'action_id=action_id', // JOIN condition
+    ['status']             // Additional columns
+);
+```
+
+### Benefits
+
+- **No Data Duplication**: Status stored only in Action Scheduler
+- **Real-time Accuracy**: Always current status information
+- **Performance**: Optimized JOIN queries
+- **Consistency**: Single source of truth for action status

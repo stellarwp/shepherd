@@ -236,6 +236,10 @@ npm run lint:css
 - Test configuration in `codeception.dist.yml` and `codeception.slic.yml` with environmental variables defined in `.env.testing.slic`
 - Integration tests for full workflow testing
 - Snapshot testing for complex data structures
+- JavaScript tests using Jest and React Testing Library
+  - Component tests in `tests/js/app/components/*.spec.tsx`
+  - Data layer tests in `tests/js/app/data.spec.tsx`
+  - Mock WordPress dependencies for isolated testing
 
 ## Coding Standards
 
@@ -259,7 +263,15 @@ npm run lint:css
 1. Create a new class extending `Task_Abstract` in `src/Tasks/`
 2. Implement required methods (`process()`, `get_task_prefix()`)
 3. Optionally override retry configuration methods
-4. If implemented withing Pigeon, add tests in `tests/unit/Tasks/`
+4. If implemented within Pigeon, add tests in `tests/unit/Tasks/`
+
+### Working with the Admin UI
+
+1. **Adding new columns**: Update `getFields()` in `app/data.tsx`
+2. **Custom filters**: Add filter definitions with operators in field configuration
+3. **Custom actions**: Define actions in `ShepherdTable` component
+4. **API modifications**: Update `ajax_get_tasks()` in `src/Admin/Provider.php`
+5. **Testing**: Add tests for both React components and PHP endpoints
 
 ### Modifying Database Schema
 
@@ -315,6 +327,8 @@ class My_Custom_Logger implements Logger {
 - Requires WordPress environment for full functionality
 - Action Scheduler must be available (included as dependency)
 - All database operations use StellarWP's [DB](https://github.com/stellarwp/db) library
+- Admin UI requires WordPress 6.1+ for DataViews component
+- React components use WordPress's @wordpress/dataviews package
 
 ## React Admin UI Architecture
 
@@ -347,6 +361,12 @@ Pigeon includes a React-based admin interface for managing background tasks. The
   - Retrieves Action Scheduler action details
   - Maps task status based on action state and logs
   - Includes all task logs for each task
+- **AJAX API endpoint** (`wp_ajax_shepherd_get_tasks`):
+  - Handles dynamic filtering, sorting, and searching
+  - Supports complex queries with joins to Action Scheduler tables
+  - Returns paginated results with real-time data
+  - Maps task_type filters to class_hash for efficient queries
+  - Supports multiple filter operators (is, isNot)
 
 #### Key Features
 
@@ -359,6 +379,8 @@ Pigeon includes a React-based admin interface for managing background tasks. The
 7. **Bulk Actions**: Support for bulk edit and delete operations
 8. **Unique Value Caching**: Optimized filtering with `getUniqueValuesOfData()` function
 9. **Responsive Design**: Adapts to different screen sizes with WordPress admin styling
+10. **AJAX-Powered**: Real-time data fetching without page reloads
+11. **Optimized Performance**: Initial data loaded with page, subsequent requests via AJAX
 
 ### Development Workflow
 
