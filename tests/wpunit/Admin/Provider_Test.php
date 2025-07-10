@@ -13,7 +13,6 @@ namespace StellarWP\Pigeon\Admin;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Provider as Main_Provider;
 use StellarWP\Pigeon\Tests\Traits\With_Uopz;
 
 class Provider_Test extends WPTestCase {
@@ -30,7 +29,7 @@ class Provider_Test extends WPTestCase {
 	}
 
 	protected function get_admin_provider(): Provider {
-		return Main_Provider::get_container()->get( Provider::class );
+		return Config::get_container()->get( Provider::class );
 	}
 
 	/**
@@ -115,5 +114,99 @@ class Provider_Test extends WPTestCase {
 
 		// Reset to default.
 		Config::set_admin_page_capability( 'manage_options' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_enqueue_admin_page_assets(): void {
+		global $wp_scripts, $wp_styles;
+
+		// Mock the asset data.
+		$asset_data = [
+			'dependencies' => [ 'wp-components', 'wp-data' ],
+			'version'      => '1.0.0',
+		];
+
+		$this->set_fn_return( 'require', fn() => $asset_data, true );
+
+		$provider = $this->get_admin_provider();
+		$provider->enqueue_admin_page_assets();
+
+		// Check script is enqueued.
+		$this->assertArrayHasKey( 'shepherd-admin-script', $wp_scripts->registered );
+		$this->assertContains( 'wp-components', $wp_scripts->registered['shepherd-admin-script']->deps );
+		$this->assertContains( 'wp-data', $wp_scripts->registered['shepherd-admin-script']->deps );
+
+		// Check style is enqueued.
+		$this->assertArrayHasKey( 'shepherd-admin-style', $wp_styles->registered );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_localize_script_data(): void {
+		global $wp_scripts;
+
+		// Mock the asset data.
+		$asset_data = [
+			'dependencies' => [],
+			'version'      => '1.0.0',
+		];
+
+		$this->set_fn_return( 'require', fn() => $asset_data, true );
+
+		$provider = $this->get_admin_provider();
+		$provider->enqueue_admin_page_assets();
+
+		// Check localized data exists.
+		$localized = $wp_scripts->get_data( 'shepherd-admin-script', 'data' );
+		$this->assertStringContainsString( 'shepherdData', $localized );
+		$this->assertStringContainsString( 'tasks', $localized );
+		$this->assertStringContainsString( 'totalItems', $localized );
+		$this->assertStringContainsString( 'totalPages', $localized );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_get_task_status_correctly(): void {
+		$provider = $this->get_admin_provider();
+
+		// Use reflection to access protected method.
+		$method = new \ReflectionMethod( $provider, 'get_task_status' );
+		$method->setAccessible( true );
+
+		// Test cancelled status.
+		$cancelled_action = $this->createMock( \ActionScheduler_CanceledAction::class );
+		$status = $method->invoke( $provider, $cancelled_action, null );
+		$this->assertEquals( 'cancelled', $status['slug'] );
+		$this->assertEquals( __( 'Cancelled', 'stellarwp-pigeon' ), $status['label'] );
+
+		// Test finished/success status.
+		$finished_action = $this->createMock( \ActionScheduler_FinishedAction::class );
+		$status = $method->invoke( $provider, $finished_action, null );
+		$this->assertEquals( 'success', $status['slug'] );
+		$this->assertEquals( __( 'Success', 'stellarwp-pigeon' ), $status['label'] );
+
+		// Test pending status (no log).
+		$regular_action = $this->createMock( \ActionScheduler_Action::class );
+		$status = $method->invoke( $provider, $regular_action, null );
+		$this->assertEquals( 'pending', $status['slug'] );
+		$this->assertEquals( __( 'Pending', 'stellarwp-pigeon' ), $status['label'] );
+
+		// Test running status with started log.
+		$started_log = $this->createMock( \StellarWP\Pigeon\Log::class );
+		$started_log->method( 'get_type' )->willReturn( \StellarWP\Pigeon\Log::TYPE_STARTED );
+		$status = $method->invoke( $provider, $regular_action, $started_log );
+		$this->assertEquals( 'running', $status['slug'] );
+		$this->assertEquals( __( 'Running', 'stellarwp-pigeon' ), $status['label'] );
+
+		// Test failed status.
+		$failed_log = $this->createMock( \StellarWP\Pigeon\Log::class );
+		$failed_log->method( 'get_type' )->willReturn( \StellarWP\Pigeon\Log::TYPE_FAILED );
+		$status = $method->invoke( $provider, $regular_action, $failed_log );
+		$this->assertEquals( 'failed', $status['slug'] );
+		$this->assertEquals( __( 'Failed', 'stellarwp-pigeon' ), $status['label'] );
 	}
 }
