@@ -107,9 +107,9 @@ pigeon()->dispatch(new My_Task($arg1, $arg2), 300); // 5 minutes
 
 // Retrieve task logs
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 
-$logger = Provider::get_container()->get( Logger::class );
+$logger = Config::get_container()->get( Logger::class );
 $logs = $logger->retrieve_logs( $task_id );
 ```
 

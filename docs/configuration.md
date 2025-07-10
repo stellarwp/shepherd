@@ -33,12 +33,6 @@ Pigeon automatically ensures table names don't exceed MySQL's 64-character limit
 - Your WordPress table prefix length
 - The longest Pigeon table name
 
-You can check the maximum safe length using:
-
-```php
-$max_length = Config::get_max_hook_prefix_length();
-```
-
 ## Optional Configuration
 
 ### Custom Logger

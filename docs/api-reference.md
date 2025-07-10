@@ -62,17 +62,6 @@ Sets the hook prefix for your application (required).
 
 Returns the configured hook prefix.
 
-##### `get_safe_hook_prefix(): string`
-
-Returns the hook prefix trimmed to a safe length to ensure table names don't exceed MySQL's 64-character limit.
-
-##### `get_max_hook_prefix_length(): int`
-
-Returns the maximum safe length for a hook prefix based on:
-
-- WordPress table prefix length
-- The longest Pigeon table name
-
 ##### `set_logger( ?Logger $logger ): void`
 
 Sets a custom logger implementation.
@@ -89,6 +78,14 @@ Returns the configured logger (defaults to DB_Logger).
 Resets all configuration to defaults.
 
 - **Warning:** This should only be used in testing scenarios, not in production code.
+
+##### `set_container( ContainerInterface $container ): void`
+
+Sets the dependency injection container.
+
+##### `get_container(): ContainerInterface`
+
+Returns the container instance.
 
 ##### `set_render_admin_ui( bool $render_admin_ui ): void`
 
@@ -160,14 +157,6 @@ Service provider for dependency injection and initialization.
 ##### `register(): void`
 
 Initializes Pigeon and registers all components.
-
-##### `set_container( ContainerInterface $container ): void`
-
-Sets the dependency injection container.
-
-##### `get_container(): ContainerInterface`
-
-Returns the container instance.
 
 ##### `is_registered(): bool`
 

@@ -120,10 +120,10 @@ Note: Tasks that fail without retry (e.g., HTTP 4xx errors) trigger `pigeon_{pre
 
 ```php
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 
 // Get the logger instance
-$logger = Provider::get_container()->get( Logger::class );
+$logger = Config::get_container()->get( Logger::class );
 
 // Retrieve logs for a specific task
 $logs = $logger->retrieve_logs( $task_id );
