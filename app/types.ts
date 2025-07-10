@@ -1,3 +1,5 @@
+import type { Operator, SortDirection } from '@wordpress/dataviews';
+
 export type TaskData = {
 	args: any[];
 	task_class: string;
@@ -52,4 +54,31 @@ export type Task = {
 export type PaginationInfo = {
 	totalItems: number;
 	totalPages: number;
+};
+
+export type FieldValue = {
+	label: string | number;
+	value: string | number | boolean;
+};
+
+export type TaskArgs = {
+	perPage?: number;
+	page?: number;
+	order?: SortDirection;
+	orderby?: string;
+	search?: string;
+	filters?: {
+		field: string;
+		operator: Operator;
+		value: any;
+	}[];
+};
+
+export type AjaxTasksResponse = {
+	success: boolean;
+	data: {
+		tasks: Task[];
+		totalItems: number;
+		totalPages: number;
+	};
 };
