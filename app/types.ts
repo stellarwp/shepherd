@@ -3,11 +3,28 @@ export type TaskData = {
 	task_class: string;
 };
 
-export type ValidStatusSlug = 'pending' | 'running' | 'success' | 'failed' | 'cancelled';
+export type ValidStatusSlug =
+	| 'pending'
+	| 'running'
+	| 'success'
+	| 'failed'
+	| 'cancelled';
 
-export type ValidLogType = 'created' | 'started' | 'rescheduled' | 'retrying' | 'failed';
+export type ValidLogType =
+	| 'created'
+	| 'started'
+	| 'rescheduled'
+	| 'retrying'
+	| 'failed';
 
-export type ValidLogLevel = 'info' | 'notice' | 'warning' | 'error' | 'critical' | 'alert' | 'emergency';
+export type ValidLogLevel =
+	| 'info'
+	| 'notice'
+	| 'warning'
+	| 'error'
+	| 'critical'
+	| 'alert'
+	| 'emergency';
 
 export type Log = {
 	id: number;

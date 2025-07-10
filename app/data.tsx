@@ -43,7 +43,19 @@ export const getFields = (): Field< any >[] => {
 				return JSON.stringify( item.data.args, null, 4 );
 			},
 			render: ( { item } ) => {
-				return <code style={ { whiteSpace: 'pre-wrap', wordWrap: 'break-word', maxWidth: '400px', maxHeight: '200px', overflow: 'scroll' } }>{ item.data.args }</code>;
+				return (
+					<code
+						style={ {
+							whiteSpace: 'pre-wrap',
+							wordWrap: 'break-word',
+							maxWidth: '400px',
+							maxHeight: '200px',
+							overflow: 'scroll',
+						} }
+					>
+						{ item.data.args }
+					</code>
+				);
 			},
 		},
 		{
@@ -99,13 +111,24 @@ export const getFields = (): Field< any >[] => {
 				return (
 					<time
 						dateTime={ item.scheduled_at.toISOString() }
-						title={ dateI18n( getSettings().formats.datetime, item.scheduled_at ) }
+						title={ dateI18n(
+							getSettings().formats.datetime,
+							item.scheduled_at
+						) }
 					>
-						{
-							Math.abs( item.scheduled_at.getTime() - getDate( null ).getTime() ) < 1000 * 60 * 60 * 24
-								? humanTimeDiff( item.scheduled_at, getDate( null ) )
-								: dateI18n( getSettings().formats.date, item.scheduled_at )
-						}
+						{ Math.abs(
+							item.scheduled_at.getTime() -
+								getDate( null ).getTime()
+						) <
+						1000 * 60 * 60 * 24
+							? humanTimeDiff(
+									item.scheduled_at,
+									getDate( null )
+							  )
+							: dateI18n(
+									getSettings().formats.date,
+									item.scheduled_at
+							  ) }
 					</time>
 				);
 			},
@@ -127,7 +150,9 @@ export const getTasks = ( $page: number, $per_page: number ): Task[] => {
 			data: task.data,
 			current_try: task.current_try,
 			status: task.status,
-			scheduled_at: task.scheduled_at?.date ? getDate( task.scheduled_at.date ) : null,
+			scheduled_at: task.scheduled_at?.date
+				? getDate( task.scheduled_at.date )
+				: null,
 			logs: task.logs,
 		};
 	} );
@@ -141,4 +166,4 @@ export const getPaginationInfo = (): PaginationInfo => {
 		totalItems,
 		totalPages,
 	};
-}
+};

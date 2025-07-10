@@ -1,14 +1,13 @@
 import React from 'react';
-import { DataViews } from '@wordpress/dataviews/wp' ;
+import { DataViews } from '@wordpress/dataviews/wp';
 import { Icon, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { details, edit } from '@wordpress/icons';
 
 import { getFields, getTasks, getPaginationInfo } from '../data';
 
-
-export const ShepherdTable = (arg1, arg2): React.ReactNode => {
-	const onChangeView = (...args): void => {
+export const ShepherdTable = (): React.ReactNode => {
+	const onChangeView = ( ...args ): void => {
 		console.log( 'View changed', args );
 	};
 
@@ -72,7 +71,13 @@ export const ShepherdTable = (arg1, arg2): React.ReactNode => {
 			direction: 'desc',
 		},
 		titleField: 'id',
-		fields: [ 'action_id', 'task_type', 'current_try', 'status', 'scheduled_at' ],
+		fields: [
+			'action_id',
+			'task_type',
+			'current_try',
+			'status',
+			'scheduled_at',
+		],
 		layout: {},
 	};
 
@@ -109,7 +114,10 @@ export const ShepherdTable = (arg1, arg2): React.ReactNode => {
 			supportsBulk: true,
 			RenderModal: ( { items, closeModal, onActionPerformed } ) => (
 				<div>
-					<p>Are you sure you want to delete { items.length } item(s)?</p>
+					<p>
+						Are you sure you want to delete { items.length }{ ' ' }
+						item(s)?
+					</p>
 					<Button
 						variant="primary"
 						onClick={ () => {
