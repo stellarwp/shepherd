@@ -340,4 +340,65 @@ This allows multiple Pigeon instances (with different hook prefixes) to coexist 
 
 ### Admin UI Location
 
-The admin page is automatically added under **Tools** in the WordPress admin menu. The page renders a `<div id="pigeon-app"></div>` container that can be used to mount JavaScript-based interfaces.
+The admin page can be added under **Tools** in the WordPress admin menu, by setting the `render_admin_ui` config to `true`. The page includes a fully-featured React-based task management interface.
+
+### Admin UI Features
+
+Pigeon includes a built-in React-powered admin interface that provides:
+
+1. **Task List View**: A comprehensive table showing all background tasks with:
+   - Task ID and Action ID
+   - Task type (class name)
+   - Arguments passed to the task
+   - Current retry attempt number
+   - Task status (Pending, Running, Success, Failed, Cancelled)
+   - Scheduled execution time
+   - Sortable columns and pagination
+
+2. **Task Actions**: Interactive controls for managing tasks:
+   - **View**: See detailed task logs (available for tasks with log entries)
+   - **Reschedule**: Reschedule a task to a new date and time
+   - **Edit**: Modify task properties (bulk action supported)
+   - **Delete**: Remove tasks with confirmation dialog (bulk action supported)
+
+3. **Real-time Status Display**:
+   - Tasks show their current status with appropriate labels
+   - Scheduled times are displayed in human-readable format (e.g., "2 hours ago")
+   - Recent tasks show relative time, older tasks show absolute dates
+
+4. **Responsive Design**: The interface uses WordPress DataViews component for consistent admin experience
+
+### Technical Implementation
+
+The admin UI is built with:
+
+- **React**: For component architecture
+- **WordPress DataViews**: For the table interface
+- **WordPress i18n**: For internationalization support
+- **TypeScript**: For type safety
+
+The data is provided server-side through PHP and includes:
+
+- Task information from the Pigeon tasks table
+- Action details from Action Scheduler
+- Comprehensive log entries for each task
+- Pagination metadata
+
+### Admin UI Development
+
+The admin UI source code is located in the `app/` directory:
+
+- `app/index.tsx` - Main entry point
+- `app/components/ShepherdTable.tsx` - Task table component
+- `app/data.tsx` - Data processing and field definitions
+- `app/types.ts` - TypeScript type definitions
+
+To modify the admin UI:
+
+1. Install the appropriate Node.js version: `nvm use`
+2. Install Node.js dependencies: `npm ci`
+3. Run development build: `npm run dev`
+4. Make your changes to the React components
+5. Build for production: `npm run build`
+
+The built files are output to the `build/` directory and automatically enqueued by the PHP admin provider.

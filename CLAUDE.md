@@ -222,8 +222,9 @@ npm run lint:css
 - **Task base class**: `src/Abstracts/Task_Abstract.php`
 - **Database schemas**: `src/Tables/`
 - **Built-in tasks**: `src/Tasks/`
-- **Admin UI**: `src/Admin/Provider.php`
-- **Tests**: `tests/`
+- **Admin UI PHP**: `src/Admin/Provider.php`
+- **Admin UI React**: `app/`
+- **Tests**: `tests/` (PHP) and `tests/js/` (JavaScript)
 - **Documentation**: `docs/`
 
 ## Testing Approach
@@ -312,6 +313,89 @@ class My_Custom_Logger implements Logger {
 - Action Scheduler must be available (included as dependency)
 - All database operations use StellarWP's [DB](https://github.com/stellarwp/db) library
 
+## React Admin UI Architecture
+
+### Overview
+
+Pigeon includes a React-based admin interface for managing background tasks. The UI is built with TypeScript and modern WordPress development practices.
+
+### Architecture Components
+
+#### Frontend Structure (`app/`)
+
+- **`index.tsx`**: Entry point that renders the ShepherdTable component
+- **`components/ShepherdTable.tsx`**: Main table component using WordPress DataViews
+- **`data.tsx`**: Data processing functions and field definitions
+  - `getFields()`: Returns table column definitions with custom rendering
+  - `getTasks()`: Transforms server data into Task objects
+  - `getPaginationInfo()`: Extracts pagination metadata
+- **`types.ts`**: TypeScript type definitions for:
+  - `Task`: Main task object with status, logs, and metadata
+  - `Log`: Task log entries with level and type
+  - `TaskData`: Serialized task class and arguments
+  - Various status and type enums
+
+#### Backend Integration (`src/Admin/Provider.php`)
+
+- Registers admin menu under Tools
+- Enqueues React build assets
+- Provides localized data via `get_localized_data()`:
+  - Fetches tasks from database with pagination
+  - Retrieves Action Scheduler action details
+  - Maps task status based on action state and logs
+  - Includes all task logs for each task
+
+#### Key Features
+
+1. **WordPress DataViews Integration**: Uses official WordPress components for consistency
+2. **Type Safety**: Full TypeScript support with strict typing
+3. **Internationalization**: All strings use WordPress i18n functions
+4. **Status Mapping**: Intelligent status detection based on Action Scheduler state
+5. **Human-Readable Dates**: Recent dates show relative time, older dates show absolute
+6. **Bulk Actions**: Support for bulk edit and delete operations
+
+### Development Workflow
+
+```bash
+# Install dependencies
+npm ci
+
+# Development with hot reload
+npm run dev
+
+# Production build
+npm run build
+
+# Run tests
+npm test
+
+# Lint JavaScript/TypeScript
+npm run lint:js
+```
+
+### Testing
+
+JavaScript tests are located in `tests/js/` and use:
+
+- Jest as the test runner
+- React Testing Library for component tests
+- WordPress Scripts test configuration
+- Mock implementations for WordPress dependencies
+
+Test files:
+
+- `tests/js/app/components/ShepherdTable.spec.tsx`: Table component tests
+- `tests/js/app/data.spec.tsx`: Data processing function tests
+
+### Extending the UI
+
+The admin UI can be extended by:
+
+1. Filtering the PHP data before localization
+2. Modifying React components directly
+3. Adding custom actions to the DataViews table
+4. Implementing custom REST API endpoints
+
 ## Contributing Guidelines
 
 **IMPORTANT**: Before making any commits or opening PRs, always check:
@@ -322,6 +406,7 @@ class My_Custom_Logger implements Logger {
   - Run `composer compatibility`
   - Run `vendor/bin/phpcs`
   - Run `slic run wpunit && slic run integration`
+  - Run `npm test` for JavaScript tests
   - Update documentation if needed
   - Follow conventional commit format
 

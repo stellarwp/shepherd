@@ -166,7 +166,7 @@ class Tasks extends Table {
 	 * @return Task[] The tasks, or an empty array if no tasks are found.
 	 */
 	public static function get_by_args_hash( string $args_hash ): array {
-		/** @var Task[]|null */
+		/** @var Task[] */
 		return self::get_all_by( 'args_hash', $args_hash );
 	}
 
