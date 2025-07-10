@@ -21,6 +21,7 @@ use ActionScheduler_Action;
 use ActionScheduler_CanceledAction;
 use ActionScheduler_FinishedAction;
 use ActionScheduler_NullAction;
+use ActionScheduler_SimpleSchedule;
 
 /**
  * Admin provider.
@@ -140,6 +141,7 @@ class Provider extends Provider_Abstract {
 
 			$action = Action_Scheduler_Methods::get_action_by_id( (int) $action_id );
 
+			/** @var ActionScheduler_SimpleSchedule $schedule */
 			$schedule = $action->get_schedule();
 
 			$logs = Config::get_container()->get( Logger::class )->retrieve_logs( (int) $task->id );
