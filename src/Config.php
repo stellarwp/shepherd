@@ -64,9 +64,45 @@ class Config {
 	 *
 	 * @since TBD
 	 *
-	 * @var Closure
+	 * @var int
 	 */
 	protected static int $max_table_name_length = 64;
+
+	/**
+	 * The render admin UI flag.
+	 *
+	 * @since TBD
+	 *
+	 * @var bool
+	 */
+	protected static bool $render_admin_ui = false;
+
+	/**
+	 * The callback to get the admin page title.
+	 *
+	 * @since TBD
+	 *
+	 * @var ?Closure
+	 */
+	protected static ?Closure $get_admin_page_title_callback = null;
+
+	/**
+	 * The callback to get the admin menu title.
+	 *
+	 * @since TBD
+	 *
+	 * @var ?Closure
+	 */
+	protected static ?Closure $get_admin_menu_title_callback = null;
+
+	/**
+	 * The callback to get the admin page in page title.
+	 *
+	 * @since TBD
+	 *
+	 * @var ?Closure
+	 */
+	protected static ?Closure $get_admin_page_in_page_title_callback = null;
 
 	/**
 	 * Get the container.
@@ -79,7 +115,7 @@ class Config {
 	 */
 	public static function get_container(): ContainerInterface {
 		if ( self::$container === null ) {
-			throw new RuntimeException( 'You must provide a container via StellarWP\Pigeon\Config::set_container() before attempting to fetch it.' );
+			throw new RuntimeException( __( 'You must provide a container via StellarWP\Pigeon\Config::set_container() before attempting to fetch it.', 'stellarwp-pigeon' ) );
 		}
 
 		return self::$container;
@@ -354,9 +390,14 @@ class Config {
 	 * @return void
 	 */
 	public static function reset(): void {
-		static::$container             = null;
-		static::$hook_prefix           = '';
-		static::$logger                = null;
-		static::$max_table_name_length = 64;
+		static::$container                             = null;
+		static::$hook_prefix                           = '';
+		static::$logger                                = null;
+		static::$max_table_name_length                 = 64;
+		static::$render_admin_ui                       = false;
+		static::$get_admin_page_title_callback         = null;
+		static::$get_admin_menu_title_callback         = null;
+		static::$get_admin_page_in_page_title_callback = null;
+		static::$admin_page_capability                 = 'manage_options';
 	}
 }

@@ -4,94 +4,81 @@ import { Icon, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { details, edit } from '@wordpress/icons';
 
-export const ShepherdTable = (): React.ReactNode => {
-	const onChangeView = (): void => {
-		/* React to user changes. */
+import { getFields, getTasks, getPaginationInfo } from '../data';
+
+
+export const ShepherdTable = (arg1, arg2): React.ReactNode => {
+	const onChangeView = (...args): void => {
+		console.log( 'View changed', args );
 	};
 
-	const data = [
-		{
-			id: 1,
-			title: 'Title',
-			author: 'Admin',
-			date: '2012-04-23T18:25:43.511Z',
-		},
-	];
+	const data = getTasks( 1, 10 );
 
-	const STATUSES = [
-		{ value: 'draft', label: __( 'Draft' ) },
-		{ value: 'future', label: __( 'Scheduled' ) },
-		{ value: 'pending', label: __( 'Pending Review' ) },
-		{ value: 'private', label: __( 'Private' ) },
-		{ value: 'publish', label: __( 'Published' ) },
-		{ value: 'trash', label: __( 'Trash' ) },
-	];
-	const fields = [
-		{
-			id: 'title',
-			label: 'Title',
-			enableHiding: false,
-		},
-		{
-			id: 'date',
-			label: 'Date',
-			render: ( { item } ) => {
-				return <time>{ item.date }</time>;
-			},
-		},
-		{
-			id: 'author',
-			label: 'Author',
-			render: ( { item } ) => {
-				return <a href="...">{ item.author }</a>;
-			},
-			elements: [
-				{ value: 1, label: 'Admin' },
-				{ value: 2, label: 'User' },
-			],
-			filterBy: {
-				operators: [ 'is', 'isNot' ],
-			},
-			enableSorting: false,
-		},
-		{
-			id: 'status',
-			label: 'Status',
-			getValue: ( { item } ) =>
-				STATUSES.find( ( { value } ) => value === item.status )?.label ??
-				item.status,
-			elements: STATUSES,
-			filterBy: {
-				operators: [ 'isAny' ],
-			},
-			enableSorting: false,
-		},
-	];
+	const fields = getFields();
+
+	// const fields = [
+	// 	{
+	// 		id: 'title',
+	// 		label: 'Title',
+	// 		enableHiding: false,
+	// 	},
+	// 	{
+	// 		id: 'date',
+	// 		label: 'Date',
+	// 		render: ( { item } ) => {
+	// 			return <time>{ item.date }</time>;
+	// 		},
+	// 	},
+	// 	{
+	// 		id: 'author',
+	// 		label: 'Author',
+	// 		render: ( { item } ) => {
+	// 			return <a href="...">{ item.author }</a>;
+	// 		},
+	// 		elements: [
+	// 			{ value: 1, label: 'Admin' },
+	// 			{ value: 2, label: 'User' },
+	// 		],
+	// 		filterBy: {
+	// 			operators: [ 'is', 'isNot' ],
+	// 		},
+	// 		enableSorting: false,
+	// 	},
+	// 	{
+	// 		id: 'status',
+	// 		label: 'Status',
+	// 		getValue: ( { item } ) =>
+	// 			STATUSES.find( ( { value } ) => value === item.status )?.label ??
+	// 			item.status,
+	// 		elements: STATUSES,
+	// 		filterBy: {
+	// 			operators: [ 'isAny' ],
+	// 		},
+	// 		enableSorting: false,
+	// 	},
+	// ];
 
 	const view = {
 		type: 'table',
 		search: '',
-		filters: [
-			{ field: 'author', operator: 'is', value: 2 },
-			{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft' ] },
-		],
+		// filters: [
+		// 	{ field: 'author', operator: 'is', value: 2 },
+		// 	{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft' ] },
+		// ],
 		page: 1,
-		perPage: 5,
+		perPage: 10,
 		sort: {
-			field: 'date',
+			field: 'id',
 			direction: 'desc',
 		},
-		titleField: 'title',
-		fields: [ 'author', 'status' ],
+		titleField: 'id',
+		fields: [ 'action_id', 'task_type', 'current_try', 'status', 'scheduled_at' ],
 		layout: {},
 	};
 
 	const defaultLayouts = {
 		table: {
 			showMedia: false,
-		},
-		grid: {
-			showMedia: true,
 		},
 	};
 
@@ -101,7 +88,7 @@ export const ShepherdTable = (): React.ReactNode => {
 			label: 'View',
 			isPrimary: true,
 			icon: <Icon icon={ details } />,
-			isEligible: ( item ) => item.status === 'published',
+			isEligible: ( item ) => item.logs.length > 0,
 			callback: ( items ) => {
 				console.log( 'Viewing item:', items[ 0 ] );
 			},
@@ -137,17 +124,17 @@ export const ShepherdTable = (): React.ReactNode => {
 			),
 		},
 	];
-	const paginationInfo = [];
+	const paginationInfo = getPaginationInfo();
 
-    return (
-        <DataViews
-            data={ data }
-            fields={ fields }
-            view={ view }
-            onChangeView={ onChangeView }
-            defaultLayouts={ defaultLayouts }
-            actions={ actions }
-            paginationInfo={ paginationInfo }
-        />
-    );
+	return (
+		<DataViews
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
+			actions={ actions }
+			paginationInfo={ paginationInfo }
+		/>
+	);
 };

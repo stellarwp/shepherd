@@ -14,7 +14,6 @@ namespace StellarWP\Pigeon;
 use StellarWP\Pigeon\Abstracts\Provider_Abstract;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
 use StellarWP\Pigeon\Admin\Provider as Admin_Provider;
-use RuntimeException;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Contracts\Logger;

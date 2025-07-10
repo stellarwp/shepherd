@@ -74,7 +74,7 @@ class Action_Scheduler_Methods {
 		$action = $store->fetch_action( $action_id );
 
 		if ( ! $action instanceof ActionScheduler_Action ) {
-			throw new RuntimeException( 'Action not found.' );
+			throw new RuntimeException( __( 'Action not found.', 'stellarwp-pigeon' ) );
 		}
 
 		return $action;
