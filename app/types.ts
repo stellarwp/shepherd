@@ -6,9 +6,9 @@ export type TaskData = {
 };
 
 export type ValidStatusSlug =
+	| 'complete'
 	| 'pending'
-	| 'running'
-	| 'success'
+	| 'in-progress'
 	| 'failed'
 	| 'cancelled';
 
