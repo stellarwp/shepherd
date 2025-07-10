@@ -66,16 +66,15 @@ class Config_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_get_and_set_render_admin_ui(): void {
-		// Test default value.
-		$this->assertTrue( Config::get_render_admin_ui() );
-
-		// Test setting to false.
-		Config::set_render_admin_ui( false );
 		$this->assertFalse( Config::get_render_admin_ui() );
 
-		// Reset to default.
+		// Test setting to false.
 		Config::set_render_admin_ui( true );
 		$this->assertTrue( Config::get_render_admin_ui() );
+
+		// Reset to default.
+		Config::set_render_admin_ui( false );
+		$this->assertFalse( Config::get_render_admin_ui() );
 	}
 
 	/**

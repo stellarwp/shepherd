@@ -25,7 +25,15 @@ class Provider_Test extends WPTestCase {
 	 */
 	public function fake_admin_context(): void {
 		$this->set_fn_return( 'is_admin', true );
+		Config::set_render_admin_ui( true );
 		$this->get_admin_provider()->register();
+	}
+
+	/**
+	 * @after
+	 */
+	public function reset_config(): void {
+		Config::set_render_admin_ui( false );
 	}
 
 	protected function get_admin_provider(): Provider {
@@ -122,14 +130,6 @@ class Provider_Test extends WPTestCase {
 	public function it_should_enqueue_admin_page_assets(): void {
 		global $wp_scripts, $wp_styles;
 
-		// Mock the asset data.
-		$asset_data = [
-			'dependencies' => [ 'wp-components', 'wp-data' ],
-			'version'      => '1.0.0',
-		];
-
-		$this->set_fn_return( 'require', fn() => $asset_data, true );
-
 		$provider = $this->get_admin_provider();
 		$provider->enqueue_admin_page_assets();
 
@@ -147,14 +147,6 @@ class Provider_Test extends WPTestCase {
 	 */
 	public function it_should_localize_script_data(): void {
 		global $wp_scripts;
-
-		// Mock the asset data.
-		$asset_data = [
-			'dependencies' => [],
-			'version'      => '1.0.0',
-		];
-
-		$this->set_fn_return( 'require', fn() => $asset_data, true );
 
 		$provider = $this->get_admin_provider();
 		$provider->enqueue_admin_page_assets();
