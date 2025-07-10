@@ -1,8 +1,8 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import type { Field, PaginationInfo } from '@wordpress/dataviews';
+import type { Field } from '@wordpress/dataviews';
 import { getSettings, humanTimeDiff, dateI18n, getDate } from '@wordpress/date';
-import type { Task } from './types';
+import type { Task, PaginationInfo } from './types';
 
 /**
  * Returns the fields for the Shepherd table.
@@ -159,8 +159,8 @@ export const getTasks = ( $page: number, $per_page: number ): Task[] => {
 };
 
 export const getPaginationInfo = (): PaginationInfo => {
-	const totalItems = window?.shepherdData?.totalItems;
-	const totalPages = window?.shepherdData?.totalPages;
+	const totalItems = window?.shepherdData?.totalItems ?? 0;
+	const totalPages = window?.shepherdData?.totalPages ?? 0;
 
 	return {
 		totalItems,

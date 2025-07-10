@@ -1,7 +1,6 @@
 import React from 'react';
 import { DataViews } from '@wordpress/dataviews/wp';
 import { Icon, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { details, edit } from '@wordpress/icons';
 
 import { getFields, getTasks, getPaginationInfo } from '../data';
@@ -102,7 +101,6 @@ export const ShepherdTable = (): React.ReactNode => {
 			id: 'edit',
 			label: 'Edit',
 			icon: <Icon icon={ edit } />,
-			supportsBulk: true,
 			callback: ( items ) => {
 				console.log( 'Editing items:', items );
 			},

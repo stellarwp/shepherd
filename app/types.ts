@@ -48,3 +48,8 @@ export type Task = {
 	scheduled_at: Date | null;
 	logs: Log[];
 };
+
+export type PaginationInfo = {
+	totalItems: number;
+	totalPages: number;
+};
