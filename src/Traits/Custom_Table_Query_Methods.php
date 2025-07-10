@@ -356,15 +356,27 @@ trait Custom_Table_Query_Methods {
 	 * @since TBD
 	 *
 	 * @param array<string,mixed> $args The query arguments.
+	 * @param string              $join_table The table to join.
+	 * @param string              $join_condition The condition to join on.
 	 *
 	 * @return int The total number of items in the table.
+	 *
+	 * @throws InvalidArgumentException If the table to join is the same as the current table.
 	 */
-	public static function get_total_items( array $args = [] ): int {
+	public static function get_total_items( array $args = [], string $join_table = '', string $join_condition = '' ): int {
+		$is_join = (bool) $join_table;
+
+		if ( $is_join && static::table_name( true ) === $join_table::table_name( true ) ) {
+			throw new InvalidArgumentException( 'The table to join must be different from the current table.' );
+		}
+
 		$where = static::build_where_from_args( $args );
+
+		[ $join ] = $is_join ? static::get_join_parts( $join_table, $join_condition ) : [ '' ];
 
 		return (int) DB::get_var(
 			DB::prepare(
-				"SELECT COUNT(*) FROM %i a {$where}",
+				"SELECT COUNT(*) FROM %i a {$join} {$where}",
 				static::table_name( true )
 			)
 		);
