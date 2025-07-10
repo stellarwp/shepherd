@@ -67,16 +67,79 @@ class Log extends Model_Abstract implements Log_Model {
 	 *
 	 * @since TBD
 	 *
+	 * @var string
+	 */
+	public const TYPE_CREATED = 'created';
+
+	/**
+	 * The log type for when the task is started.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const TYPE_STARTED = 'started';
+
+	/**
+	 * The log type for when the task is finished.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const TYPE_FINISHED = 'finished';
+
+	/**
+	 * The log type for when the task is failed.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const TYPE_FAILED = 'failed';
+
+	/**
+	 * The log type for when the task is rescheduled.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const TYPE_RESCHEDULED = 'rescheduled';
+
+	/**
+	 * The log type for when the task is cancelled.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const TYPE_CANCELLED = 'cancelled';
+
+	/**
+	 * The log type for when the task is retrying.
+	 *
+	 * @since TBD
+	 *
+	 * @var string
+	 */
+	public const TYPE_RETRYING = 'retrying';
+
+	/**
+	 * The valid log types.
+	 *
+	 * @since TBD
+	 *
 	 * @var array<string>
 	 */
 	public const VALID_TYPES = [
-		'created',
-		'started',
-		'finished',
-		'failed',
-		'rescheduled',
-		'cancelled',
-		'retrying',
+		self::TYPE_CREATED,
+		self::TYPE_STARTED,
+		self::TYPE_FINISHED,
+		self::TYPE_FAILED,
+		self::TYPE_RESCHEDULED,
+		self::TYPE_CANCELLED,
+		self::TYPE_RETRYING,
 	];
 
 	/**

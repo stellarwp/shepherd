@@ -127,6 +127,61 @@ Action Scheduler uses its own tables. If you need custom table names, configure 
 
 By default, Action Scheduler processes one task at a time. To increase concurrency you can explore the [Action Scheduler documentation](https://actionscheduler.org/api/).
 
+## Admin UI Configuration
+
+Pigeon includes an optional admin interface for managing tasks. By default, the admin UI is enabled and appears under the WordPress Tools menu.
+
+### Enable/Disable Admin UI
+
+```php
+use StellarWP\Pigeon\Config;
+
+// Disable the admin UI
+Config::set_render_admin_ui( false );
+
+// Enable the admin UI (default)
+Config::set_render_admin_ui( true );
+```
+
+### Access Control
+
+Control who can access the admin page using WordPress capabilities:
+
+```php
+// Allow editors and above to access (default: 'manage_options')
+Config::set_admin_page_capability( 'edit_posts' );
+
+// Restrict to administrators only
+Config::set_admin_page_capability( 'administrator' );
+```
+
+### Customize Page Titles
+
+You can customize all three title elements of the admin page:
+
+```php
+// Browser tab title
+Config::set_admin_page_title_callback( function() {
+    return __( 'My Task Manager', 'my-domain' );
+} );
+
+// Menu item title in WordPress sidebar
+Config::set_admin_menu_title_callback( function() {
+    return __( 'Tasks', 'my-domain' );
+} );
+
+// H1 title displayed on the page
+Config::set_admin_page_in_page_title_callback( function() {
+    return __( 'Background Task Dashboard', 'my-domain' );
+} );
+```
+
+**Default titles:**
+
+- Page Title: `Pigeon ({hook_prefix})`
+- Menu Title: `Pigeon ({hook_prefix})`
+- In-Page Title: `Pigeon Task Manager (via {hook_prefix})`
+
 ## Complete Configuration Example
 
 Here's a complete example of configuring Pigeon:
