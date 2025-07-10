@@ -21,6 +21,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
+    "@wordpress/api-fetch": "^7.26.0",
     "@wordpress/dataviews": "^4.22.0",
     "@wordpress/scripts": "^30.14.1",
     "postcss-import": "^16.1.1",
