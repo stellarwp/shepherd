@@ -89,6 +89,19 @@ class Tasks extends Table {
 	protected static $uid_column = 'id';
 
 	/**
+	 * An array of all the columns that are searchable.
+	 *
+	 * @since TBD
+	 *
+	 * @return string[]
+	 */
+	public static function get_searchable_columns(): array {
+		return [
+			'data',
+		];
+	}
+
+	/**
 	 * An array of all the columns in the table.
 	 *
 	 * @since TBD
