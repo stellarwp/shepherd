@@ -31,15 +31,7 @@ export const ShepherdTable = (): React.ReactNode => {
 	} );
 
 	const args = useMemo( () => {
-		const filters = [];
-
-		if ( view?.filters ) {
-			view.filters.forEach( ( filter ) => {
-				filter.operator
-				filter.field
-				filter.value
-			} );
-		}
+		const filters = view?.filters ?? [];
 
 		return {
 			perPage: view.perPage ?? 10,
@@ -47,7 +39,7 @@ export const ShepherdTable = (): React.ReactNode => {
 			order: view.sort?.direction ?? 'desc',
 			orderby: view.sort?.field ?? 'id',
 			search: view.search ?? '',
-			filters: filters,
+			filters: JSON.stringify( filters ),
 		};
 	}, [ view ] );
 

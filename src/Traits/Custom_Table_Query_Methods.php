@@ -335,7 +335,7 @@ trait Custom_Table_Query_Methods {
 			$order = 'ASC';
 		}
 
-		$where = static::build_where_from_args( $args );
+		$where = static::build_where_from_args( $args, $join_table );
 
 		[ $join, $secondary_columns ] = $is_join ? static::get_join_parts( $join_table, $join_condition, $selectable_joined_columns ) : [ '', '' ];
 
@@ -370,7 +370,7 @@ trait Custom_Table_Query_Methods {
 			throw new InvalidArgumentException( 'The table to join must be different from the current table.' );
 		}
 
-		$where = static::build_where_from_args( $args );
+		$where = static::build_where_from_args( $args, $join_table );
 
 		[ $join ] = $is_join ? static::get_join_parts( $join_table, $join_condition ) : [ '' ];
 
@@ -388,10 +388,11 @@ trait Custom_Table_Query_Methods {
 	 * @since TBD
 	 *
 	 * @param array<string,mixed> $args   The query arguments.
+	 * @param string              $join_table The table to join.
 	 *
 	 * @return string The WHERE clause.
 	 */
-	protected static function build_where_from_args( array $args = [] ): string {
+	protected static function build_where_from_args( array $args = [], string $join_table = '' ): string {
 		$query_operator = strtoupper( $args['query_operator'] ?? 'AND' );
 
 		if ( ! in_array( $query_operator, [ 'AND', 'OR' ], true ) ) {
@@ -404,7 +405,8 @@ trait Custom_Table_Query_Methods {
 			return '';
 		}
 
-		$joined_prefix = 'a.';
+		$joined_prefix    = 'a.';
+		$secondary_prefix = $join_table ? 'b.' : '';
 
 		$where = [];
 
@@ -423,7 +425,8 @@ trait Custom_Table_Query_Methods {
 			}
 		}
 
-		$columns = array_keys( static::get_columns() );
+		$columns           = array_keys( static::get_columns() );
+		$secondary_columns = $join_table ? array_keys( $join_table::get_columns() ) : [];
 
 		foreach ( $args as $arg ) {
 			if ( ! is_array( $arg ) ) {
@@ -434,9 +437,11 @@ trait Custom_Table_Query_Methods {
 				continue;
 			}
 
-			if ( ! in_array( $arg['column'], $columns, true ) ) {
+			if ( ! in_array( $arg['column'], array_merge( $columns, $secondary_columns ), true ) ) {
 				continue;
 			}
+
+			$prefix = in_array( $arg['column'], $secondary_columns, true ) ? $secondary_prefix : $joined_prefix;
 
 			if ( empty( $arg['value'] ) ) {
 				// We check that the column has any value then.
@@ -458,7 +463,7 @@ trait Custom_Table_Query_Methods {
 			$value       = $arg['value'];
 			$placeholder = is_numeric( $value ) ? '%d' : '%s'; // Only integers and strings are supported currently.
 
-			$where[] = DB::prepare( "{$joined_prefix}{$column} {$operator} {$placeholder}", $value );
+			$where[] = DB::prepare( "{$prefix}{$column} {$operator} {$placeholder}", $value );
 		}
 
 		if ( empty( $where ) ) {
