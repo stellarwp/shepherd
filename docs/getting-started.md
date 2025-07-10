@@ -160,9 +160,9 @@ $task_id = pigeon()->get_last_scheduled_task_id();
 
 // Retrieve task logs
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 
-$logger = Provider::get_container()->get( Logger::class );
+$logger = Config::get_container()->get( Logger::class );
 $logs = $logger->retrieve_logs( $task_id );
 ```
 

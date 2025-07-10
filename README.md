@@ -15,6 +15,26 @@ Pigeon is a lightweight and powerful background processing library for WordPress
 
 For a guide on how to install Pigeon and get started with creating and dispatching your first task, please see our [Getting Started guide](./docs/getting-started.md).
 
+### Development Setup
+
+If you're contributing to Pigeon or building the admin UI:
+
+1. **Use the correct Node version**:
+   ```bash
+   nvm use
+   ```
+   This will switch to Node 18.17.0 as specified in `.nvmrc`
+
+2. **Install dependencies**:
+   ```bash
+   npm ci
+   ```
+
+3. **Run development build**:
+   ```bash
+   npm run dev
+   ```
+
 ## Advanced Usage
 
 For more detailed information on advanced features like task retries, debouncing, unique tasks, and logging, please refer to our [Advanced Usage guide](./docs/advanced-usage.md).

@@ -13,6 +13,7 @@ namespace StellarWP\Pigeon;
 
 use StellarWP\Pigeon\Abstracts\Provider_Abstract;
 use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
+use StellarWP\Pigeon\Admin\Provider as Admin_Provider;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
 use StellarWP\Pigeon\Contracts\Logger;
@@ -70,9 +71,14 @@ class Provider extends Provider_Abstract {
 		Schema_Config::set_db( DB::class );
 		$this->container->singleton( Logger::class, Config::get_logger() );
 		$this->container->singleton( Tables_Provider::class );
+		$this->container->singleton( Admin_Provider::class );
 		$this->container->singleton( Regulator::class );
 		$this->container->get( Tables_Provider::class )->register();
 		$this->container->get( Regulator::class )->register();
+
+		if ( is_admin() ) {
+			$this->container->get( Admin_Provider::class )->register();
+		}
 
 		self::$has_registered = true;
 	}

@@ -158,13 +158,13 @@ Email tasks are automatically logged with these events:
 
 ```php
 use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Pigeon\Config;
 
 // Get task ID after dispatching
 $task_id = pigeon()->get_last_scheduled_task_id();
 
 // Retrieve logs
-$logger = Provider::get_container()->get( Logger::class );
+$logger = Config::get_container()->get( Logger::class );
 $logs = $logger->retrieve_logs( $task_id );
 
 foreach ( $logs as $log ) {
