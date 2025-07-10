@@ -2,8 +2,6 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getFields, getTasks, getPaginationInfo } from '../../../app/data';
-import type { Field } from '@wordpress/dataviews';
-import type { Task } from '../../../app/types';
 
 // Mock WordPress dependencies
 jest.mock( '@wordpress/i18n', () => ( {
