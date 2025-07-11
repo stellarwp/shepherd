@@ -19,12 +19,25 @@ class Email_Test extends WPTestCase {
 	use With_Clock_Mock;
 	use With_Log_Snapshot;
 
+	private static $backup = [];
+
 	/**
 	 * @before
 	 */
 	public function setup(): void {
 		$this->freeze_time( tests_pigeon_get_dt() );
 		pigeon()->bust_runtime_cached_tasks();
+		global $wp_actions;
+
+		self::$backup['wp_actions'] = $wp_actions;
+	}
+
+	/**
+	 * @after
+	 */
+	public function cleanup(): void {
+		global $wp_actions;
+		$wp_actions = self::$backup['wp_actions'];
 	}
 
 	private function get_logger(): Logger {
