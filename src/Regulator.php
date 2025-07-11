@@ -23,6 +23,7 @@ use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Shepherd\Traits\Loggable;
+use StellarWP\Shepherd\Tasks\Herding;
 
 /**
  * Shepherd's regulator.
@@ -96,6 +97,7 @@ class Regulator extends Provider_Abstract {
 		add_action( 'action_scheduler_execution_ignored', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_failed_execution', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_after_process_queue', [ $this, 'handle_reschedule_of_failed_task' ], 1, 0 );
+		add_action( 'init', [ $this, 'schedule_cleanup_task' ], 20, 0 );
 	}
 
 	/**
@@ -448,5 +450,14 @@ class Regulator extends Provider_Abstract {
 		$this->failed_tasks[] = $task;
 
 		return true;
+	}
+
+	/**
+	 * Schedules the cleanup task.
+	 *
+	 * @since TBD
+	 */
+	public function schedule_cleanup_task(): void {
+		$this->dispatch( new Herding(), 6 * HOUR_IN_SECONDS );
 	}
 }
