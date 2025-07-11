@@ -2,12 +2,18 @@ import React from 'react';
 import { __ } from '@wordpress/i18n';
 import type { Field, Option } from '@wordpress/dataviews';
 import { getSettings, humanTimeDiff, dateI18n, getDate } from '@wordpress/date';
-import type { Task, PaginationInfo, TaskArgs, AjaxTasksResponse } from './types';
+import type {
+	Task,
+	PaginationInfo,
+	TaskArgs,
+	AjaxTasksResponse,
+} from './types';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Returns the fields for the Shepherd table.
  *
+ * @param data
  * @since TBD
  *
  * @return Field< any >[] The fields.
@@ -151,14 +157,16 @@ export const getFields = ( data: Task[] ): Field< any >[] => {
  *
  * @since TBD
  *
- * @var TaskArgs
+ * @member TaskArgs
  */
 const defaultArgs = window?.shepherdData?.defaultArgs ?? {};
 
-const defaultArgsHash = ( JSON.stringify( defaultArgs ) );
+const defaultArgsHash = JSON.stringify( defaultArgs );
 
-export const getTasks = async ( args: TaskArgs ): Promise< { data: Task[]; paginationInfo: PaginationInfo } > => {
-	const argsHash = ( JSON.stringify( args ) );
+export const getTasks = async (
+	args: TaskArgs
+): Promise< { data: Task[]; paginationInfo: PaginationInfo } > => {
+	const argsHash = JSON.stringify( args );
 
 	if ( argsHash === defaultArgsHash ) {
 		const tasks = window?.shepherdData?.tasks;
@@ -205,13 +213,11 @@ export const getTasks = async ( args: TaskArgs ): Promise< { data: Task[]; pagin
 	}
 
 	try {
-		const response = await apiFetch< AjaxTasksResponse >(
-			{
-				url: window.ajaxurl,
-				body: url,
-				method: 'POST',
-			}
-		);
+		const response = await apiFetch< AjaxTasksResponse >( {
+			url: window.ajaxurl,
+			body: url,
+			method: 'POST',
+		} );
 
 		if ( ! response.success ) {
 			console.error( response );
@@ -269,14 +275,19 @@ export const getPaginationInfo = (): PaginationInfo => {
 
 const uniqueValues = {};
 
-export const getUniqueValuesOfData = ( field: string, data: Task[] ): Option[] => {
+export const getUniqueValuesOfData = (
+	field: string,
+	data: Task[]
+): Option[] => {
 	const values = data.map( ( item ) => item[ field ] ?? item.data[ field ] );
 
 	if ( ! uniqueValues[ field ] ) {
 		uniqueValues[ field ] = [];
 	}
 
-	uniqueValues[ field ] = [ ...new Set( [ ...uniqueValues[ field ], ...values ] ) ];
+	uniqueValues[ field ] = [
+		...new Set( [ ...uniqueValues[ field ], ...values ] ),
+	];
 
 	return uniqueValues[ field ].map( ( value ) => {
 		return {

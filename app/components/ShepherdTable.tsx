@@ -51,18 +51,28 @@ export const ShepherdTable = (): React.ReactNode => {
 	} );
 
 	useEffect( () => {
-		const promise = async (): Promise< { data: Task[]; fields: Field< any >[], paginationInfo: PaginationInfo } > => {
+		const promise = async (): Promise< {
+			data: Task[];
+			fields: Field< any >[];
+			paginationInfo: PaginationInfo;
+		} > => {
 			const { data, paginationInfo } = await getTasks( args );
 			const fields = getFields( data );
 
 			return { data, fields, paginationInfo };
 		};
 
-		promise().then( ( args: { data: Task[]; fields: Field< any >[], paginationInfo: PaginationInfo } ): void => {
-			setData( args.data );
-			setFields( args.fields );
-			setPaginationInfo( args.paginationInfo );
-		} );
+		promise().then(
+			( args: {
+				data: Task[];
+				fields: Field< any >[];
+				paginationInfo: PaginationInfo;
+			} ): void => {
+				setData( args.data );
+				setFields( args.fields );
+				setPaginationInfo( args.paginationInfo );
+			}
+		);
 	}, [ args ] );
 
 	const defaultLayouts = {

@@ -1,0 +1,48 @@
+name: 'JavaScript & CSS Linting'
+
+on:
+  pull_request:
+
+jobs:
+  js-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fix and Push JavaScript formatting issues
+        continue-on-error: true
+        run: |
+          npm run format:js
+
+      - name: Fix and Push CSS formatting issues
+        continue-on-error: true
+        run: |
+          npm run format:css
+
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+
+      - name: JavaScript Linting
+        run: |
+          npm run lint:js
+
+      - name: CSS Linting
+        run: |
+          npm run lint:css
