@@ -45,7 +45,7 @@ class Table_Abstract_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_get_correct_table_name_and_slug() {
-		$this->assertEquals( 'wp_pi_test_dummy_table', Dummy_Table::table_name() );
+		$this->assertEquals( 'wp_pi_tes_dummy_table', Dummy_Table::table_name() );
 		$this->assertEquals( 'shepherd-test-dummy-table', Dummy_Table::get_schema_slug() );
 	}
 
@@ -56,7 +56,7 @@ class Table_Abstract_Test extends WPTestCase {
 		$table = new Dummy_Table();
 		$definition = $table->get_definition();
 
-		$this->assertStringContainsString( 'CREATE TABLE `wp_pi_test_dummy_table`', $definition );
+		$this->assertStringContainsString( 'CREATE TABLE `wp_pi_tes_dummy_table`', $definition );
 		$this->assertStringContainsString( '`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT', $definition );
 		$this->assertStringContainsString( '`name` varchar(255) NOT NULL', $definition );
 		$this->assertStringContainsString( 'PRIMARY KEY (`id`)', $definition );
@@ -99,12 +99,12 @@ class Table_Abstract_Test extends WPTestCase {
 	 */
 	public function it_should_not_trim_short_hook_prefix() {
 		// Set a short hook prefix that won't exceed the limit
-		$short_prefix = 'short';
+		$short_prefix = 'sho';
 		Config::set_hook_prefix( $short_prefix );
 
 		$table_name = Dummy_Table::table_name();
 
 		// The table name should contain the full hook prefix
-		$this->assertEquals( 'wp_pi_short_dummy_table', $table_name );
+		$this->assertEquals( 'wp_pi_sho_dummy_table', $table_name );
 	}
 }

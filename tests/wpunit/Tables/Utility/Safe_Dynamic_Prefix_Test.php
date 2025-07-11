@@ -14,17 +14,17 @@ class Safe_Dynamic_Prefix_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_calculate_max_hook_prefix_length(): void {
-		$this->assertEquals( 5, Config::get_container()->get( Safe_Dynamic_Prefix::class )->get_max_length() );
+		$this->assertEquals( 3, Config::get_container()->get( Safe_Dynamic_Prefix::class )->get_max_length() );
 	}
 
 	/**
 	 * @test
 	 */
 	public function it_should_return_safe_hook_prefix_for_short_prefix(): void {
-		Config::set_hook_prefix( 'short' );
+		Config::set_hook_prefix( 'sho' );
 
 		// Short prefix should be returned as-is
-		$this->assertEquals( 'short', Config::get_container()->get( Safe_Dynamic_Prefix::class )->get() );
+		$this->assertEquals( 'sho', Config::get_container()->get( Safe_Dynamic_Prefix::class )->get() );
 	}
 
 	/**
@@ -35,7 +35,7 @@ class Safe_Dynamic_Prefix_Test extends WPTestCase {
 		Config::set_hook_prefix( $very_long_prefix );
 
 		// Safe prefix should be trimmed to max length
-		$this->assertEquals( 'aaaaa', Config::get_container()->get( Safe_Dynamic_Prefix::class )->get() );
+		$this->assertEquals( 'aaa', Config::get_container()->get( Safe_Dynamic_Prefix::class )->get() );
 	}
 
 	/**
