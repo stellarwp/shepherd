@@ -85,7 +85,6 @@ class HTTP_Request extends Task_Abstract {
 		$method       = $this->get_method();
 		$request_args = array_merge( self::DEFAULT_ARGS, $this->get_request_args() );
 
-		// Set the HTTP method.
 		$request_args['method'] = $method;
 
 		if ( ! ( isset( $request_args['headers'] ) && is_array( $request_args['headers'] ) ) ) {
@@ -96,10 +95,8 @@ class HTTP_Request extends Task_Abstract {
 
 		$request_args['headers']['X-Shepherd-Task-ID'] = $this->get_id();
 
-		// Make the HTTP request.
 		$response = wp_remote_request( $url, $request_args );
 
-		// Check for WP_Error.
 		if ( is_wp_error( $response ) ) {
 			/**
 			 * Filters whether to retry the HTTP request on WP_Error.
@@ -145,11 +142,10 @@ class HTTP_Request extends Task_Abstract {
 			);
 		}
 
-		// Get response code.
 		$response_code    = wp_remote_retrieve_response_code( $response );
 		$response_message = wp_remote_retrieve_response_message( $response );
 
-		// Check for HTTP error status codes (4xx, 5xx).
+		// Client errors (4xx) fail immediately, server errors (5xx) are retried.
 		if ( $response_code >= 400 && $response_code < 500 ) {
 			/**
 			 * Filters whether to retry the HTTP request on HTTP error status codes (4xx, 5xx).
@@ -229,12 +225,10 @@ class HTTP_Request extends Task_Abstract {
 			throw new InvalidArgumentException( __( 'URL is required.', 'stellarwp-shepherd' ) );
 		}
 
-		// Validate request arguments.
 		if ( isset( $args[1] ) && ! is_array( $args[1] ) ) {
 			throw new InvalidArgumentException( __( 'Request arguments must be an array.', 'stellarwp-shepherd' ) );
 		}
 
-		// Validate HTTP method.
 		if ( isset( $args[2] ) && ! in_array( strtoupper( $args[2] ), self::VALID_METHODS, true ) ) {
 			throw new InvalidArgumentException(
 				sprintf(

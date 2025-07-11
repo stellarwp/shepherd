@@ -74,11 +74,11 @@ class Herding extends Task_Abstract {
 	}
 
 	/**
-	 * Gets the email task's hook prefix.
+	 * Gets the herding task's hook prefix.
 	 *
 	 * @since TBD
 	 *
-	 * @return string The email task's hook prefix.
+	 * @return string The herding task's hook prefix.
 	 */
 	public function get_task_prefix(): string {
 		return 'shepherd_tidy_';
