@@ -1,7 +1,9 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { getFields, getTasks, getPaginationInfo } from '../../../app/data';
+// Data functions imported per test to avoid module cache issues
+import type { Field } from '@wordpress/dataviews';
+import type { Task } from '../../../app/types';
 
 // Mock WordPress dependencies
 jest.mock( '@wordpress/i18n', () => ( {
@@ -25,15 +27,35 @@ jest.mock( '@wordpress/date', () => ( {
 	} ),
 } ) );
 
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+
 describe( 'data.tsx', () => {
 	beforeEach( () => {
 		// Reset global window object
-		global.window.shepherdData = undefined;
+		delete global.window.shepherdData;
+		global.window.ajaxurl = 'http://example.com/wp-admin/admin-ajax.php';
+		jest.clearAllMocks();
+		// Clear module cache to reset unique values and defaultArgs
+		jest.resetModules();
 	} );
 
 	describe( 'getFields', () => {
+		const mockData = [
+			{
+				id: 1,
+				data: { task_class: 'TestTask' },
+				status: 'pending',
+			},
+			{
+				id: 2,
+				data: { task_class: 'AnotherTask' },
+				status: 'complete',
+			},
+		];
+
 		it( 'should return all field definitions', () => {
-			const fields = getFields();
+			const { getFields } = require( '../../../app/data' );
+			const fields = getFields( mockData );
 
 			expect( fields ).toHaveLength( 7 );
 			expect( fields.map( ( f ) => f.id ) ).toEqual( [
@@ -48,7 +70,8 @@ describe( 'data.tsx', () => {
 		} );
 
 		it( 'should configure task ID field correctly', () => {
-			const fields = getFields();
+			const { getFields } = require( '../../../app/data' );
+			const fields = getFields( mockData );
 			const idField = fields.find( ( f ) => f.id === 'id' );
 
 			expect( idField ).toBeDefined();
@@ -57,12 +80,18 @@ describe( 'data.tsx', () => {
 			expect( idField.enableSorting ).toBe( true );
 		} );
 
-		it( 'should configure task type field with getValue', () => {
-			const fields = getFields();
+		it( 'should configure task type field with getValue and elements', () => {
+			const { getFields } = require( '../../../app/data' );
+			const fields = getFields( mockData );
 			const taskTypeField = fields.find( ( f ) => f.id === 'task_type' );
 
 			expect( taskTypeField ).toBeDefined();
 			expect( taskTypeField.getValue ).toBeDefined();
+			expect( taskTypeField.filterBy ).toEqual( {
+				operators: [ 'is' ],
+				isPrimary: true,
+			} );
+			expect( taskTypeField.elements ).toBeDefined();
 
 			// Test getValue function
 			const item = { data: { task_class: 'MyTask' } };
@@ -70,7 +99,8 @@ describe( 'data.tsx', () => {
 		} );
 
 		it( 'should configure task args field with custom render', () => {
-			const fields = getFields();
+			const { getFields } = require( '../../../app/data' );
+			const fields = getFields( mockData );
 			const argsField = fields.find( ( f ) => f.id === 'task_args' );
 
 			expect( argsField ).toBeDefined();
@@ -88,8 +118,9 @@ describe( 'data.tsx', () => {
 			} );
 		} );
 
-		it( 'should configure status field with elements', () => {
-			const fields = getFields();
+		it( 'should configure status field with elements and filtering', () => {
+			const { getFields } = require( '../../../app/data' );
+			const fields = getFields( mockData );
 			const statusField = fields.find( ( f ) => f.id === 'status' );
 
 			expect( statusField ).toBeDefined();
@@ -98,10 +129,15 @@ describe( 'data.tsx', () => {
 				value: 'pending',
 				label: 'Pending',
 			} );
+			expect( statusField.filterBy ).toEqual( {
+				operators: [ 'is', 'isNot' ],
+				isPrimary: true,
+			} );
 		} );
 
 		it( 'should configure scheduled_at field with date rendering', () => {
-			const fields = getFields();
+			const { getFields } = require( '../../../app/data' );
+			const fields = getFields( mockData );
 			const scheduledField = fields.find( ( f ) => f.id === 'scheduled_at' );
 
 			expect( scheduledField ).toBeDefined();
@@ -135,72 +171,117 @@ describe( 'data.tsx', () => {
 	} );
 
 	describe( 'getTasks', () => {
-		it( 'should return empty array when no data', () => {
-			const tasks = getTasks( 1, 10 );
-			expect( tasks ).toEqual( [] );
-		} );
+		const apiFetch = require( '@wordpress/api-fetch' );
 
-		it( 'should return empty array when shepherdData has no tasks', () => {
-			global.window.shepherdData = {};
-			const tasks = getTasks( 1, 10 );
-			expect( tasks ).toEqual( [] );
-		} );
+		it( 'should return data from window when using default args', async () => {
+			const defaultArgs = {
+				perPage: 10,
+				page: 1,
+				order: 'desc',
+				orderby: 'id',
+				search: '',
+				filters: '[]',
+			};
 
-		it( 'should transform tasks correctly', () => {
 			global.window.shepherdData = {
+				defaultArgs,
 				tasks: [
 					{
 						id: 1,
 						action_id: 100,
 						data: { task_class: 'TestTask', args: [ 'arg1' ] },
 						current_try: 1,
-						status: { slug: 'pending', label: 'Pending' },
+						status: 'pending',
 						scheduled_at: { date: '2024-01-01 12:00:00' },
 						logs: [],
 					},
-					{
-						id: 2,
-						action_id: 101,
-						data: { task_class: 'AnotherTask', args: [] },
-						current_try: 2,
-						status: { slug: 'running', label: 'Running' },
-						scheduled_at: null,
-						logs: [ { id: 1 } ],
-					},
 				],
+				totalItems: 1,
+				totalPages: 1,
 			};
 
-			const tasks = getTasks( 1, 10 );
+			// Import fresh module after setting window data
+			const { getTasks } = require( '../../../app/data' );
+			const result = await getTasks( defaultArgs );
 
-			expect( tasks ).toHaveLength( 2 );
-			expect( tasks[ 0 ] ).toMatchObject( {
-				id: 1,
-				action_id: 100,
-				current_try: 1,
-				status: { slug: 'pending', label: 'Pending' },
-			} );
-			expect( tasks[ 0 ].scheduled_at ).toBeInstanceOf( Date );
-			expect( tasks[ 1 ].scheduled_at ).toBeNull();
+			expect( result.data ).toHaveLength( 1 );
+			expect( result.data[ 0 ].id ).toBe( 1 );
+			expect( result.data[ 0 ].scheduled_at ).toBeInstanceOf( Date );
+			expect( result.paginationInfo.totalItems ).toBe( 1 );
+			expect( apiFetch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should handle scheduled_at date conversion', () => {
+
+		it( 'should handle API errors gracefully', async () => {
+			global.window.shepherdData = {
+				defaultArgs: { perPage: 10 },
+				nonce: 'test-nonce',
+			};
+
+			// Import fresh module after setting window data
+			const { getTasks } = require( '../../../app/data' );
+
+			apiFetch.mockRejectedValue( new Error( 'Network error' ) );
+
+			const result = await getTasks( { perPage: 20 } );
+
+			expect( result.data ).toEqual( [] );
+			expect( result.paginationInfo ).toEqual( {
+				totalItems: 0,
+				totalPages: 0,
+			} );
+		} );
+
+		it( 'should handle unsuccessful API response', async () => {
+			global.window.shepherdData = {
+				defaultArgs: { perPage: 10 },
+				nonce: 'test-nonce',
+			};
+
+			// Import fresh module after setting window data
+			const { getTasks } = require( '../../../app/data' );
+
+			apiFetch.mockResolvedValue( {
+				success: false,
+				data: { message: 'Error occurred' },
+			} );
+
+			const result = await getTasks( { perPage: 20 } );
+
+			expect( result.data ).toEqual( [] );
+			expect( result.paginationInfo ).toEqual( {
+				totalItems: 0,
+				totalPages: 0,
+			} );
+		} );
+
+		it( 'should handle scheduled_at date conversion', async () => {
 			const { getDate } = require( '@wordpress/date' );
 			const mockDate = new Date( '2024-01-01T12:00:00Z' );
 			getDate.mockReturnValue( mockDate );
 
+			const defaultArgs = { perPage: 10, page: 1, order: 'desc', orderby: 'id', search: '', filters: '[]' };
 			global.window.shepherdData = {
+				defaultArgs,
 				tasks: [
 					{
 						id: 1,
+						action_id: 100,
+						data: { task_class: 'TestTask', args: [] },
+						current_try: 1,
+						status: 'pending',
 						scheduled_at: { date: '2024-01-01 12:00:00' },
+						logs: [],
 					},
 				],
 			};
 
-			const tasks = getTasks( 1, 10 );
+			// Import fresh module after setting window data
+			const { getTasks } = require( '../../../app/data' );
+			const result = await getTasks( defaultArgs );
 
 			expect( getDate ).toHaveBeenCalledWith( '2024-01-01 12:00:00' );
-			expect( tasks[ 0 ].scheduled_at ).toBe( mockDate );
+			expect( result.data[ 0 ].scheduled_at ).toBe( mockDate );
 		} );
 	} );
 
@@ -211,6 +292,7 @@ describe( 'data.tsx', () => {
 				totalPages: 10,
 			};
 
+			const { getPaginationInfo } = require( '../../../app/data' );
 			const paginationInfo = getPaginationInfo();
 
 			expect( paginationInfo ).toEqual( {
@@ -219,12 +301,13 @@ describe( 'data.tsx', () => {
 			} );
 		} );
 
-		it( 'should return undefined values when no data', () => {
+		it( 'should return zero values when no data', () => {
+			const { getPaginationInfo } = require( '../../../app/data' );
 			const paginationInfo = getPaginationInfo();
 
 			expect( paginationInfo ).toEqual( {
-				totalItems: undefined,
-				totalPages: undefined,
+				totalItems: 0,
+				totalPages: 0,
 			} );
 		} );
 
@@ -233,12 +316,76 @@ describe( 'data.tsx', () => {
 				totalItems: 50,
 			};
 
+			const { getPaginationInfo } = require( '../../../app/data' );
 			const paginationInfo = getPaginationInfo();
 
 			expect( paginationInfo ).toEqual( {
 				totalItems: 50,
-				totalPages: undefined,
+				totalPages: 0,
 			} );
+		} );
+	} );
+
+	describe( 'getUniqueValuesOfData', () => {
+		const mockTasks = [
+			{ id: 1, status: 'pending', data: { task_class: 'EmailTask' } },
+			{ id: 2, status: 'complete', data: { task_class: 'EmailTask' } },
+			{ id: 3, status: 'pending', data: { task_class: 'HTTPTask' } },
+			{ id: 4, status: 'failed', data: { task_class: 'HTTPTask' } },
+		];
+
+
+		it( 'should extract unique values from top-level fields', () => {
+			const { getUniqueValuesOfData } = require( '../../../app/data' );
+			const result = getUniqueValuesOfData( 'status', mockTasks );
+
+			expect( result ).toHaveLength( 3 );
+			expect( result ).toEqual( [
+				{ label: 'pending', value: 'pending' },
+				{ label: 'complete', value: 'complete' },
+				{ label: 'failed', value: 'failed' },
+			] );
+		} );
+
+		it( 'should extract unique values from nested data fields', () => {
+			const { getUniqueValuesOfData } = require( '../../../app/data' );
+			const result = getUniqueValuesOfData( 'task_class', mockTasks );
+
+			expect( result ).toHaveLength( 2 );
+			expect( result ).toEqual( [
+				{ label: 'EmailTask', value: 'EmailTask' },
+				{ label: 'HTTPTask', value: 'HTTPTask' },
+			] );
+		} );
+
+		it( 'should cache unique values across multiple calls', () => {
+			const { getUniqueValuesOfData } = require( '../../../app/data' );
+			// First call
+			getUniqueValuesOfData( 'status', mockTasks.slice( 0, 2 ) );
+			
+			// Second call with additional data
+			const result = getUniqueValuesOfData( 'status', mockTasks.slice( 2, 4 ) );
+
+			// Should have all unique values from both calls
+			expect( result ).toHaveLength( 3 );
+		} );
+
+		it( 'should handle undefined values', () => {
+			const { getUniqueValuesOfData } = require( '../../../app/data' );
+			const tasksWithUndefined = [
+				{ id: 1, status: 'pending', data: {} },
+				{ id: 2, data: {} }, // status is undefined
+				{ id: 3, status: 'complete', data: {} },
+			];
+
+			const result = getUniqueValuesOfData( 'status', tasksWithUndefined );
+
+			expect( result ).toHaveLength( 3 );
+			expect( result ).toEqual( [
+				{ label: 'pending', value: 'pending' },
+				{ label: undefined, value: undefined },
+				{ label: 'complete', value: 'complete' },
+			] );
 		} );
 	} );
 } );
@@ -250,6 +397,9 @@ declare global {
 			tasks?: any[];
 			totalItems?: number;
 			totalPages?: number;
+			defaultArgs?: any;
+			nonce?: string;
 		};
+		ajaxurl?: string;
 	}
 }
