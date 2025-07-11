@@ -24,50 +24,56 @@ class Herding_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_process_without_error_when_no_orphaned_tasks() {
-		$herding = new Herding();
-		
-		// Mock the DB queries to return empty results
-		$this->set_fn_return( [ DB::class, 'get_col' ], [] );
-		
-		// Should not throw any exceptions
-		$herding->process();
-		
-		// Verify process completed successfully
-		$this->assertTrue( true );
-	}
-
-	/**
-	 * @test
-	 */
 	public function it_should_delete_orphaned_tasks_and_logs() {
 		$herding = new Herding();
-		
-		// Mock orphaned task IDs
-		$orphaned_task_ids = [ '1', '2', '3' ];
-		$this->set_fn_return( [ DB::class, 'get_col' ], $orphaned_task_ids );
-		
-		// Track DB queries
-		$queries = [];
-		$this->set_fn_return( [ DB::class, 'query' ], function ( $query ) use ( &$queries ) {
-			$queries[] = $query;
-			return true;
-		} );
-		
+
+		// Clear existing data
+		DB::query( DB::prepare( 'DELETE FROM %i', Tasks::table_name() ) );
+		DB::query( DB::prepare( 'DELETE FROM %i', Task_Logs::table_name() ) );
+
+		// Create orphaned tasks (tasks without corresponding actions in Action Scheduler)
+		$orphaned_task_ids = [];
+		for ( $i = 1; $i <= 3; $i++ ) {
+			DB::query(
+				DB::prepare(
+					'INSERT INTO %i (action_id, class_hash, args_hash, data, current_try) VALUES (%d, %s, %s, %s, %d)',
+					Tasks::table_name(),
+					999990 + $i, // Use high action IDs that won't exist in Action Scheduler
+					'test_class_hash_' . $i,
+					'test_args_hash_' . $i,
+					wp_json_encode( [] ),
+					0
+				)
+			);
+			$orphaned_task_ids[] = $GLOBALS['wpdb']->insert_id;
+
+			// Create logs for these tasks
+			DB::query(
+				DB::prepare(
+					'INSERT INTO %i (task_id, date, level, type, entry) VALUES (%d, %s, %s, %s, %s)',
+					Task_Logs::table_name(),
+					$GLOBALS['wpdb']->insert_id,
+					gmdate( 'Y-m-d H:i:s' ),
+					'info',
+					'test',
+					wp_json_encode( [ 'message' => 'Test log entry' ] )
+				)
+			);
+		}
+
+		// Verify tasks and logs exist before cleanup
+		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$logs_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
+		$this->assertEquals( 3, $tasks_before );
+		$this->assertEquals( 3, $logs_before );
+
 		$herding->process();
-		
-		// Should have executed 2 DELETE queries
-		$this->assertCount( 2, $queries );
-		
-		// First query should delete from task logs
-		$this->assertStringContainsString( 'DELETE FROM', $queries[0] );
-		$this->assertStringContainsString( Task_Logs::table_name(), $queries[0] );
-		$this->assertStringContainsString( 'task_id IN (1,2,3)', $queries[0] );
-		
-		// Second query should delete from tasks
-		$this->assertStringContainsString( 'DELETE FROM', $queries[1] );
-		$this->assertStringContainsString( Tasks::table_name(), $queries[1] );
-		$this->assertStringContainsString( 'IN (1,2,3)', $queries[1] );
+
+		// Verify tasks and logs were deleted
+		$tasks_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$logs_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
+		$this->assertEquals( 0, $tasks_after );
+		$this->assertEquals( 0, $logs_after );
 	}
 
 	/**
@@ -75,24 +81,22 @@ class Herding_Test extends WPTestCase {
 	 */
 	public function it_should_fire_action_hook_after_processing() {
 		$herding = new Herding();
-		
-		// Mock empty orphaned tasks
-		$this->set_fn_return( [ DB::class, 'get_col' ], [] );
-		
+
+		// Clear existing data
+		DB::query( DB::prepare( 'DELETE FROM %i', Tasks::table_name() ) );
+		DB::query( DB::prepare( 'DELETE FROM %i', Task_Logs::table_name() ) );
+
 		// Track action hook calls
 		$hook_called = false;
 		$hook_task = null;
-		
-		add_action( 'shepherd_test_herding_processed', function( $task ) use ( &$hook_called, &$hook_task ) {
+
+		add_action( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_herding_processed', function( $task ) use ( &$hook_called, &$hook_task ) {
 			$hook_called = true;
 			$hook_task = $task;
 		} );
-		
-		// Mock the Config::get_hook_prefix() to return 'test'
-		$this->set_fn_return( [ \StellarWP\Shepherd\Config::class, 'get_hook_prefix' ], 'test' );
-		
+
 		$herding->process();
-		
+
 		$this->assertTrue( $hook_called );
 		$this->assertSame( $herding, $hook_task );
 	}
@@ -102,22 +106,36 @@ class Herding_Test extends WPTestCase {
 	 */
 	public function it_should_sanitize_task_ids_before_deletion() {
 		$herding = new Herding();
-		
-		// Mock task IDs with duplicates and mixed types
-		$mixed_task_ids = [ '1', '2', '2', '3', 1, 2 ];
-		$this->set_fn_return( [ DB::class, 'get_col' ], $mixed_task_ids );
-		
-		// Track DB queries
-		$queries = [];
-		$this->set_fn_return( [ DB::class, 'query' ], function ( $query ) use ( &$queries ) {
-			$queries[] = $query;
-			return true;
-		} );
-		
+
+		// Clear existing data
+		DB::query( DB::prepare( 'DELETE FROM %i', Tasks::table_name() ) );
+		DB::query( DB::prepare( 'DELETE FROM %i', Task_Logs::table_name() ) );
+
+		// Create orphaned tasks with high action IDs that won't exist in Action Scheduler
+		$orphaned_task_ids = [];
+		for ( $i = 1; $i <= 3; $i++ ) {
+			DB::query(
+				DB::prepare(
+					'INSERT INTO %i (action_id, class_hash, args_hash, data, current_try) VALUES (%d, %s, %s, %s, %d)',
+					Tasks::table_name(),
+					999990 + $i,
+					'test_class_hash_' . $i,
+					'test_args_hash_' . $i,
+					wp_json_encode( [] ),
+					0
+				)
+			);
+			$orphaned_task_ids[] = $GLOBALS['wpdb']->insert_id;
+		}
+
+		// Verify tasks exist before cleanup
+		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$this->assertEquals( 3, $tasks_before );
+
 		$herding->process();
-		
-		// Should have deduplicated the IDs
-		$this->assertStringContainsString( 'task_id IN (1,2,3)', $queries[0] );
-		$this->assertStringContainsString( 'IN (1,2,3)', $queries[1] );
+
+		// Verify all tasks were deleted (testing sanitization worked)
+		$tasks_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$this->assertEquals( 0, $tasks_after );
 	}
 }

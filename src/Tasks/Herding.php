@@ -43,6 +43,14 @@ class Herding extends Task_Abstract {
 		);
 
 		if ( empty( $task_ids ) ) {
+			/**
+			 * Fires when the herding task is processed.
+			 *
+			 * @since TBD
+			 *
+			 * @param Herding $task The herding task that was processed.
+			 */
+			do_action( 'shepherd_' . Config::get_hook_prefix() . '_herding_processed', $this );
 			return;
 		}
 

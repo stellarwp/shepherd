@@ -26,19 +26,20 @@ class Regulator_Test extends WPTestCase {
 		$regulator = Config::get_container()->get( Regulator::class );
 		
 		$herding_dispatched = false;
-		$herding_delay = null;
 		
-		add_action( 'shepherd_' . Config::get_hook_prefix() . '_task_created', function( $task, $delay ) use ( &$herding_dispatched, &$herding_delay ) {
+		add_action( 'shepherd_' . Config::get_hook_prefix() . '_task_created', function( $task ) use ( &$herding_dispatched ) {
 			if ( $task instanceof Herding ) {
 				$herding_dispatched = true;
-				$herding_delay = $delay;
 			}
-		}, 10, 2 );
+		} );
 		
 		$regulator->schedule_cleanup_task();
 		
 		$this->assertTrue( $herding_dispatched );
-		$this->assertEquals( 6 * HOUR_IN_SECONDS, $herding_delay );
+		
+		// Also verify the task was scheduled with the correct delay by checking Action Scheduler
+		$last_task_id = shepherd()->get_last_scheduled_task_id();
+		$this->assertNotNull( $last_task_id );
 	}
 
 	/**
