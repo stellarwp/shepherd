@@ -7,12 +7,12 @@ alwaysApply: false
 - **Existing Patterns**: Follow the existing code structure, naming conventions, and architectural patterns found in the codebase. Consistency is key.
 - **Bail Early**: Use early returns in functions and methods to improve readability and reduce cognitive load.
 ---
-description: Rules for implementing Pigeon tasks and features in PHP.
+description: Rules for implementing Shepherd tasks and features in PHP.
 globs:
   - "src/**/*.php"
 ---
 ### Tasks
-- All tasks **must** extend `StellarWP\Pigeon\Abstracts\Task_Abstract`.
+- All tasks **must** extend `StellarWP\Shepherd\Abstracts\Task_Abstract`.
 - Task arguments must be passed to `parent::__construct()` to ensure they are correctly stored.
 - The core logic of a task resides in the `process()` method.
 - To trigger a retry, a task **must** overwrite the `get_max_retries` method.

@@ -72,7 +72,7 @@ jobs:
           ${SLIC_BIN} config
       - name: Start the Chrome container
         run: ${SLIC_BIN} up chrome
-      - name: Set up StellarWP Pigeon
+      - name: Set up StellarWP Shepherd
         run: |
           ${SLIC_BIN} use shepherd
           ${SLIC_BIN} composer install

@@ -2,20 +2,20 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use RuntimeException;
 use StellarWP\ContainerContract\ContainerInterface;
-use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
-use StellarWP\Pigeon\Loggers\Null_Logger;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\Null_Logger;
 
 class Config_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
 	public function it_should_get_the_container(): void {
-		$container = tests_pigeon_get_container();
+		$container = tests_shepherd_get_container();
 
 		$this->assertInstanceOf( ContainerInterface::class, $container );
 		$this->assertInstanceOf( ContainerInterface::class, Config::get_container() );
@@ -67,13 +67,13 @@ class Config_Test extends WPTestCase {
 	 */
 	public function it_should_set_and_get_logger_when_null(): void {
 		Config::reset();
-		Config::set_container( tests_pigeon_get_container() );
+		Config::set_container( tests_shepherd_get_container() );
 	}
 
 	/**
 	 * @after
 	 */
 	public function reset(): void {
-		tests_pigeon_reset_config();
+		tests_shepherd_reset_config();
 	}
 }

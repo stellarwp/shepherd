@@ -1,8 +1,8 @@
-# StellarWP Pigeon - AI Assistant Context
+# StellarWP Shepherd - AI Assistant Context
 
 ## Project Overview
 
-Pigeon is a lightweight background processing library for WordPress built on top of Action Scheduler. It provides a clean, fluent API for defining and dispatching asynchronous tasks with built-in support for retries, debouncing, and logging.
+Shepherd is a lightweight background processing library for WordPress built on top of Action Scheduler. It provides a clean, fluent API for defining and dispatching asynchronous tasks with built-in support for retries, debouncing, and logging.
 
 ## Key Features
 
@@ -26,8 +26,8 @@ Pigeon is a lightweight background processing library for WordPress built on top
 
 ### Database Schema
 
-- `pigeon_{prefix}_tasks`: Stores task data and retry information
-- `pigeon_{prefix}_task_logs`: Tracks task lifecycle events
+- `shepherd_{prefix}_tasks`: Stores task data and retry information
+- `shepherd_{prefix}_task_logs`: Tracks task lifecycle events
 
 ### Task Lifecycle States
 
@@ -44,18 +44,18 @@ Pigeon is a lightweight background processing library for WordPress built on top
 ### Installation
 
 ```bash
-composer require stellarwp/pigeon
+composer require stellarwp/shepherd
 ```
 
 ### Registration
 
-Pigeon requires a DI container implementing `StellarWP\ContainerContract\ContainerInterface`. Register it on the `plugins_loaded` action at the LATEST:
+Shepherd requires a DI container implementing `StellarWP\ContainerContract\ContainerInterface`. Register it on the `plugins_loaded` action at the LATEST:
 
 ```php
-\StellarWP\Pigeon\Config::set_hook_prefix( 'my_app' ); // Needs to be set before the container is registered.
+\StellarWP\Shepherd\Config::set_hook_prefix( 'my_app' ); // Needs to be set before the container is registered.
 $container = get_my_apps_container(); // Your container instance
-$container->singleton( \StellarWP\Pigeon\Provider::class );
-$container->get( \StellarWP\Pigeon\Provider::class )->register();
+$container->singleton( \StellarWP\Shepherd\Provider::class );
+$container->get( \StellarWP\Shepherd\Provider::class )->register();
 ```
 
 ## Creating Tasks
@@ -76,7 +76,7 @@ class My_Task extends Task_Abstract {
 
         // Task logic here
         if ( ! $result ) {
-            throw new PigeonTaskException( 'Task failed' );
+            throw new ShepherdTaskException( 'Task failed' );
         }
     }
 
@@ -100,14 +100,14 @@ class My_Task extends Task_Abstract {
 
 ```php
 // Dispatch a task immediately
-pigeon()->dispatch(new My_Task($arg1, $arg2));
+shepherd()->dispatch(new My_Task($arg1, $arg2));
 
 // Dispatch with delay (in seconds)
-pigeon()->dispatch(new My_Task($arg1, $arg2), 300); // 5 minutes
+shepherd()->dispatch(new My_Task($arg1, $arg2), 300); // 5 minutes
 
 // Retrieve task logs
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Provider;
 
 $logger = Provider::get_container()->get( Logger::class );
 $logs = $logger->retrieve_logs( $task_id );
@@ -120,7 +120,7 @@ $logs = $logger->retrieve_logs( $task_id );
 Sends emails asynchronously with automatic retries (up to 5 attempts):
 
 ```php
-use StellarWP\Pigeon\Tasks\Email;
+use StellarWP\Shepherd\Tasks\Email;
 
 $email_task = new Email(
     'recipient@example.com',
@@ -130,14 +130,14 @@ $email_task = new Email(
     ['/path/to/attachment.pdf']
 );
 
-pigeon()->dispatch($email_task);
+shepherd()->dispatch($email_task);
 ```
 
 ## Logging System
 
 ### Default Logger Change (TBD)
 
-Pigeon now uses `ActionScheduler_DB_Logger` as the default logger instead of `DB_Logger`. This change:
+Shepherd now uses `ActionScheduler_DB_Logger` as the default logger instead of `DB_Logger`. This change:
 
 - **Reduces database overhead** by reusing Action Scheduler's existing `actionscheduler_logs` table
 - **Maintains compatibility** with the existing Logger interface
@@ -146,14 +146,14 @@ Pigeon now uses `ActionScheduler_DB_Logger` as the default logger instead of `DB
 ### Logger Options
 
 ```php
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
 
 // Default: Use Action Scheduler's logs table
 Config::set_logger( new ActionScheduler_DB_Logger() );
 
-// Alternative: Use Pigeon's dedicated logs table
+// Alternative: Use Shepherd's dedicated logs table
 Config::set_logger( new DB_Logger() );
 ```
 
@@ -162,17 +162,17 @@ Config::set_logger( new DB_Logger() );
 When using `ActionScheduler_DB_Logger`, logs are stored in a special format within the `message` column:
 
 ```
-pigeon_{hook_prefix}||{task_id}||{type}||{level}||{json_entry}
+shepherd_{hook_prefix}||{task_id}||{type}||{level}||{json_entry}
 ```
 
-This format allows Pigeon to store its metadata while maintaining compatibility with Action Scheduler's table structure.
+This format allows Shepherd to store its metadata while maintaining compatibility with Action Scheduler's table structure.
 
 ## Development Commands
 
 ### Testing
 
 ```bash
-# You need to have slic installed and configured to use pigeon.
+# You need to have slic installed and configured to use shepherd.
 
 # Then you can run each suite like:
 slic run wpunit
@@ -202,7 +202,7 @@ composer install --ignore-platform-req=ext-uopz
 
 ## Important Files and Locations
 
-- **Main entry point**: `pigeon.php`
+- **Main entry point**: `shepherd.php`
 - **Core logic**: `src/Regulator.php`
 - **Task base class**: `src/Abstracts/Task_Abstract.php`
 - **Database schemas**: `src/Tables/`
@@ -222,7 +222,7 @@ composer install --ignore-platform-req=ext-uopz
 - Follows WordPress coding standards and more Specifically StellarWP's coding standards.
 - Uses PHPStan for static analysis (level defined in `phpstan.neon.dist`)
 - PHP 7.4+ compatibility required
-- PSR-4 autoloading under `StellarWP\Pigeon` namespace
+- PSR-4 autoloading under `StellarWP\Shepherd` namespace
 
 ## Dependencies
 
@@ -239,7 +239,7 @@ composer install --ignore-platform-req=ext-uopz
 1. Create a new class extending `Task_Abstract` in `src/Tasks/`
 2. Implement required methods (`process()`, `get_task_prefix()`)
 3. Optionally override retry configuration methods
-4. If implemented withing Pigeon, add tests in `tests/unit/Tasks/`
+4. If implemented withing Shepherd, add tests in `tests/unit/Tasks/`
 
 ### Modifying Database Schema
 
@@ -265,14 +265,14 @@ composer install --ignore-platform-req=ext-uopz
 You can implement a custom logger by implementing the `Logger` interface:
 
 ```php
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Contracts\Logger;
 
 class My_Custom_Logger implements Logger {
     // Implement required methods
 }
 
 // Set before Provider::register()
-\StellarWP\Pigeon\Config::set_logger( new My_Custom_Logger() );
+\StellarWP\Shepherd\Config::set_logger( new My_Custom_Logger() );
 ```
 
 ## Task Behavior Details

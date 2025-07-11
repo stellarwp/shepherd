@@ -1,0 +1,6 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+Shpeherd is a background offloading API. It's a wrapper of WooCommerce's Action Scheduler and on top of AS adds more functionality.

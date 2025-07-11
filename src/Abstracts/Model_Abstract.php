@@ -1,26 +1,26 @@
 <?php
 /**
- * The Pigeon model abstract.
+ * The Shepherd model abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Abstracts;
+ * @package StellarWP\Shepherd\Abstracts;
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
-use StellarWP\Pigeon\Contracts\Model;
+use StellarWP\Shepherd\Contracts\Model;
 use StellarWP\DB\DB;
 use RuntimeException;
 
 /**
- * The Pigeon model abstract.
+ * The Shepherd model abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Abstracts;
+ * @package StellarWP\Shepherd\Abstracts;
  */
 abstract class Model_Abstract implements Model {
 	/**

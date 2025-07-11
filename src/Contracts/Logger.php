@@ -1,25 +1,25 @@
 <?php
 /**
- * The Pigeon logger contract.
+ * The Shepherd logger contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts
+ * @package StellarWP\Shepherd\Contracts
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Contracts;
+namespace StellarWP\Shepherd\Contracts;
 
 use Psr\Log\LoggerInterface;
-use StellarWP\Pigeon\Log;
+use StellarWP\Shepherd\Log;
 
 /**
- * The Pigeon logger contract.
+ * The Shepherd logger contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts
+ * @package StellarWP\Shepherd\Contracts
  */
 interface Logger extends LoggerInterface {
 	/**

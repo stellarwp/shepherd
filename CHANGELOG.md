@@ -10,4 +10,4 @@ All notable changes to this project will be documented in this file. This projec
 * Docs - Documentation
 * Tests - Automated tests
 
-[1.0.0]: https://github.com/stellarwp/pigeon/releases/tag/1.0.0
+[1.0.0]: https://github.com/stellarwp/shepherd/releases/tag/1.0.0

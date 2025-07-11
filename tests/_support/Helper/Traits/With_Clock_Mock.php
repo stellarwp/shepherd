@@ -3,7 +3,7 @@
  * Wraps the Clock Mock library for easier use in testing.
  */
 
-namespace StellarWP\Pigeon\Tests\Traits;
+namespace StellarWP\Shepherd\Tests\Traits;
 
 use SlopeIt\ClockMock\ClockMock;
 use DateTimeInterface;

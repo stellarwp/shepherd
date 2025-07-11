@@ -1,7 +1,7 @@
 <?php
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tests;
+namespace StellarWP\Shepherd\Tests;
 
 use tad\Codeception\SnapshotAssertions\JsonSnapshot;
 use PHPUnit\Framework\TestCase;
@@ -11,10 +11,10 @@ use RuntimeException;
 use tad\Codeception\SnapshotAssertions\Configuration;
 use ReflectionMethod;
 use Codeception\Snapshot;
-use StellarWP\Pigeon\Tests\Traits\With_Log_Snapshot;
+use StellarWP\Shepherd\Tests\Traits\With_Log_Snapshot;
 use tad\Codeception\SnapshotAssertions\AbstractSnapshot;
 
-class PigeonJsonSnapshot extends JsonSnapshot {
+class ShepherdJsonSnapshot extends JsonSnapshot {
 
 	protected static string $traitClass = With_Log_Snapshot::class;
 

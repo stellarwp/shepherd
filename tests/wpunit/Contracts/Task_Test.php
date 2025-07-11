@@ -2,10 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Contracts;
+namespace StellarWP\Shepherd\Contracts;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Abstracts\Table_Abstract;
+use StellarWP\Shepherd\Abstracts\Table_Abstract;
 
 
 class Task_Test extends WPTestCase {

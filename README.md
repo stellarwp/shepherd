@@ -1,6 +1,6 @@
-# Pigeon
+# Shepherd
 
-Pigeon is a lightweight and powerful background processing library for WordPress, built on top of Action Scheduler. It provides a simple, fluent API for defining and dispatching asynchronous tasks, with built-in support for retries, debouncing, and logging.
+Shepherd is a lightweight and powerful background processing library for WordPress, built on top of Action Scheduler. It provides a simple, fluent API for defining and dispatching asynchronous tasks, with built-in support for retries, debouncing, and logging.
 
 ## Features
 
@@ -13,7 +13,7 @@ Pigeon is a lightweight and powerful background processing library for WordPress
 
 ## Getting Started
 
-For a guide on how to install Pigeon and get started with creating and dispatching your first task, please see our [Getting Started guide](./docs/getting-started.md).
+For a guide on how to install Shepherd and get started with creating and dispatching your first task, please see our [Getting Started guide](./docs/getting-started.md).
 
 ## Advanced Usage
 
@@ -21,7 +21,7 @@ For more detailed information on advanced features like task retries, debouncing
 
 ## Built-in Tasks
 
-Pigeon comes with a set of pre-packaged tasks to handle common background operations. For more information, please see our [Tasks guide](./docs/tasks.md).
+Shepherd comes with a set of pre-packaged tasks to handle common background operations. For more information, please see our [Tasks guide](./docs/tasks.md).
 
 ## Contributing
 

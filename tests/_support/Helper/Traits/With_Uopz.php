@@ -1,6 +1,6 @@
 <?php
 
-namespace StellarWP\Pigeon\Tests\Traits;
+namespace StellarWP\Shepherd\Tests\Traits;
 
 use Closure;
 use PHPUnit\Framework\Assert;

@@ -1,10 +1,10 @@
 # Advanced Usage
 
-This guide covers the advanced features of Pigeon for more complex use cases.
+This guide covers the advanced features of Shepherd for more complex use cases.
 
 ## Automatic Retries
 
-Pigeon can automatically retry failed tasks. A task is considered failed when it throws any exception during the `process()` method.
+Shepherd can automatically retry failed tasks. A task is considered failed when it throws any exception during the `process()` method.
 
 ### Configuring Retries
 
@@ -17,7 +17,7 @@ Override the `get_max_retries()` method on your task class. The default is `0` (
 
 namespace My\App\Tasks;
 
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
 
 class My_Retryable_Task extends Task_Abstract {
     public function get_max_retries(): int {
@@ -40,7 +40,7 @@ class My_Retryable_Task extends Task_Abstract {
 
 ### Retry Delays
 
-By default, Pigeon uses exponential backoff for retries. You can customize this by overriding `get_retry_delay()`:
+By default, Shepherd uses exponential backoff for retries. You can customize this by overriding `get_retry_delay()`:
 
 ```php
 public function get_retry_delay(): int {
@@ -76,7 +76,7 @@ Organize related tasks into groups by overriding the `get_group()` method:
 
 ```php
 public function get_group(): string {
-    return 'my_custom_group'; // Default: 'pigeon_{prefix}_queue_default'
+    return 'my_custom_group'; // Default: 'shepherd_{prefix}_queue_default'
 }
 ```
 
@@ -88,9 +88,9 @@ Groups help with:
 
 ## Unique Tasks
 
-Pigeon prevents duplicate tasks from being scheduled. A task is considered a duplicate if it has the same class and arguments as an existing scheduled task.
+Shepherd prevents duplicate tasks from being scheduled. A task is considered a duplicate if it has the same class and arguments as an existing scheduled task.
 
-When you try to dispatch a duplicate task, Pigeon will:
+When you try to dispatch a duplicate task, Shepherd will:
 
 - Check if an identical task already exists (same class + arguments)
 - If it exists, silently ignore the dispatch request. You can listen to an action to be notified when this happens. See [API Reference](api-reference.md) for more information.
@@ -100,27 +100,27 @@ This behavior prevents accidental task duplication and is enabled by default for
 
 ## Logging
 
-Pigeon includes comprehensive logging that tracks the complete lifecycle of each task.
+Shepherd includes comprehensive logging that tracks the complete lifecycle of each task.
 
 ### Built-in Logging
 
 By default, logs are stored in Action Scheduler's `actionscheduler_logs` table using the `ActionScheduler_DB_Logger`. This reduces database overhead by reusing existing infrastructure. The following events are automatically logged:
 
-- `created`: Task scheduled (triggers `pigeon_{prefix}_task_created` action)
-- `started`: Task execution begins (triggers `pigeon_{prefix}_task_started` action)
-- `finished`: Task completed successfully (triggers `pigeon_{prefix}_task_finished` action)
-- `failed`: Task failed (all retries exhausted, triggers `pigeon_{prefix}_task_failed` action)
-- `rescheduled`: Task rescheduled (triggers `pigeon_{prefix}_task_rescheduled` action)
+- `created`: Task scheduled (triggers `shepherd_{prefix}_task_created` action)
+- `started`: Task execution begins (triggers `shepherd_{prefix}_task_started` action)
+- `finished`: Task completed successfully (triggers `shepherd_{prefix}_task_finished` action)
+- `failed`: Task failed (all retries exhausted, triggers `shepherd_{prefix}_task_failed` action)
+- `rescheduled`: Task rescheduled (triggers `shepherd_{prefix}_task_rescheduled` action)
 - `retrying`: Retry attempt starting
 - `cancelled`: Task cancelled
 
-Note: Tasks that fail without retry (e.g., HTTP 4xx errors) trigger `pigeon_{prefix}_task_failed_without_retry` instead of being rescheduled.
+Note: Tasks that fail without retry (e.g., HTTP 4xx errors) trigger `shepherd_{prefix}_task_failed_without_retry` instead of being rescheduled.
 
 ### Retrieving Logs
 
 ```php
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Provider;
 
 // Get the logger instance
 $logger = Provider::get_container()->get( Logger::class );
@@ -142,7 +142,7 @@ $logs = $logger->retrieve_logs( $task_id );
 You can implement a custom logger by implementing the `Logger` interface:
 
 ```php
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Contracts\Logger;
 use Psr\Log\AbstractLogger;
 
 class My_Custom_Logger extends AbstractLogger implements Logger {
@@ -157,24 +157,24 @@ class My_Custom_Logger extends AbstractLogger implements Logger {
     }
 }
 
-// Set your custom logger before registering Pigeon
+// Set your custom logger before registering Shepherd
 Config::set_logger( new My_Custom_Logger() );
 ```
 
 ### Switching Between Loggers
 
-Pigeon provides multiple logger implementations:
+Shepherd provides multiple logger implementations:
 
 ```php
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
-use StellarWP\Pigeon\Loggers\Null_Logger;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
+use StellarWP\Shepherd\Loggers\Null_Logger;
 
 // Use Action Scheduler's logs table (default)
 Config::set_logger( new ActionScheduler_DB_Logger() );
 
-// Use Pigeon's dedicated logs table
+// Use Shepherd's dedicated logs table
 Config::set_logger( new DB_Logger() );
 
 // Disable logging entirely
@@ -238,38 +238,38 @@ The task tables include indexes on:
 
 ### WordPress Hooks
 
-Pigeon fires several WordPress actions during task lifecycle:
+Shepherd fires several WordPress actions during task lifecycle:
 
 ```php
 $prefix = Config::get_hook_prefix();
 
 // Task starts processing (fired by Regulator)
-add_action( "pigeon_{$prefix}_task_started", function( $task, $action_id ) {
+add_action( "shepherd_{$prefix}_task_started", function( $task, $action_id ) {
     // Log, monitor, or prepare for task execution
 }, 10, 2 );
 
 // Task finished processing successfully (fired by Regulator)
-add_action( "pigeon_{$prefix}_task_finished", function( $task, $action_id ) {
+add_action( "shepherd_{$prefix}_task_finished", function( $task, $action_id ) {
     // Cleanup, notify, or trigger dependent tasks
 }, 10, 2 );
 
 // Task failed with retries exhausted (fired by Regulator)
-add_action( "pigeon_{$prefix}_task_failed", function( $task, $exception ) {
+add_action( "shepherd_{$prefix}_task_failed", function( $task, $exception ) {
     // Handle permanent task failure
 }, 10, 2 );
 
 // Task failed without retry (fired by Regulator)
-add_action( "pigeon_{$prefix}_task_failed_without_retry", function( $task, $exception ) {
+add_action( "shepherd_{$prefix}_task_failed_without_retry", function( $task, $exception ) {
     // Handle non-retryable failures (e.g., 4xx errors)
 }, 10, 2 );
 
 // Email sent (fired by Email task)
-add_action( "pigeon_{$prefix}_email_processed", function( $task ) {
+add_action( "shepherd_{$prefix}_email_processed", function( $task ) {
     // Do something after the email is processed
 }, 10, 1 );
 
 // HTTP request completed (fired by HTTP_Request task)
-add_action( "pigeon_{$prefix}_http_request_processed", function( $task, $response ) {
+add_action( "shepherd_{$prefix}_http_request_processed", function( $task, $response ) {
     // Handle successful HTTP response
 }, 10, 2 );
 ```

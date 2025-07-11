@@ -2,23 +2,23 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Traits;
+namespace StellarWP\Shepherd\Traits;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Abstracts\Table_Abstract;
+use StellarWP\Shepherd\Abstracts\Table_Abstract;
 use StellarWP\Schema\Register;
-use StellarWP\Pigeon\Contracts\Model;
+use StellarWP\Shepherd\Contracts\Model;
 
 class Dummy_Query_Table extends Table_Abstract {
 	use Custom_Table_Query_Methods;
 
-	protected static $base_table_name = 'pigeon_query_table_%s';
-	protected static $schema_slug = 'pigeon-query-table-%s';
+	protected static $base_table_name = 'shepherd_query_table_%s';
+	protected static $schema_slug = 'shepherd-query-table-%s';
 	protected static $uid_column = 'id';
 
 	const SCHEMA_VERSION = '0.0.1-dev';
 
-	protected static $group = 'stellarwp_pigeon';
+	protected static $group = 'stellarwp_shepherd';
 
 	public static function get_columns(): array {
 		return [

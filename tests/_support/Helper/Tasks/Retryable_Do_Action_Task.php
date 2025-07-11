@@ -1,9 +1,9 @@
 <?php
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tests\Tasks;
+namespace StellarWP\Shepherd\Tests\Tasks;
 
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use Exception;
 
 class Retryable_Do_Action_Task extends Task_Abstract {
@@ -15,7 +15,7 @@ class Retryable_Do_Action_Task extends Task_Abstract {
 	}
 
 	public function get_task_name(): string {
-		return 'pigeon_retry_do_action_task';
+		return 'shepherd_retry_do_action_task';
 	}
 
 	public function get_max_retries(): int {

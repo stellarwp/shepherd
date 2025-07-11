@@ -1,6 +1,6 @@
 # Built-in Tasks
 
-Pigeon comes with pre-packaged tasks to handle common background operations. Each task is designed to be reliable, well-tested, and includes automatic retry logic.
+Shepherd comes with pre-packaged tasks to handle common background operations. Each task is designed to be reliable, well-tested, and includes automatic retry logic.
 
 ## Available Tasks
 
@@ -18,7 +18,7 @@ Sends emails asynchronously using WordPress's `wp_mail()` function.
 **Quick Example:**
 
 ```php
-use StellarWP\Pigeon\Tasks\Email;
+use StellarWP\Shepherd\Tasks\Email;
 
 $email = new Email(
     'user@example.com',
@@ -27,7 +27,7 @@ $email = new Email(
     ['Content-Type: text/html; charset=UTF-8']
 );
 
-pigeon()->dispatch( $email );
+shepherd()->dispatch( $email );
 ```
 
 ### [HTTP Request Task](./tasks/http-request.md)
@@ -46,11 +46,11 @@ Makes HTTP requests asynchronously using WordPress's `wp_remote_request()` funct
 **Quick Example:**
 
 ```php
-use StellarWP\Pigeon\Tasks\HTTP_Request;
+use StellarWP\Shepherd\Tasks\HTTP_Request;
 
 // Simple GET request (uses default 3s timeout)
 $request = new HTTP_Request( 'https://api.example.com/status' );
-pigeon()->dispatch( $request );
+shepherd()->dispatch( $request );
 
 // POST request with JSON data and custom timeout
 $webhook = new HTTP_Request(
@@ -62,7 +62,7 @@ $webhook = new HTTP_Request(
     ],
     'POST'
 );
-pigeon()->dispatch( $webhook );
+shepherd()->dispatch( $webhook );
 
 // Custom authentication (extend the class)
 class Authenticated_HTTP_Request extends HTTP_Request {
@@ -83,7 +83,7 @@ To create custom tasks, extend the `Task_Abstract` class:
 
 namespace My\App\Tasks;
 
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
 
 class My_Custom_Task extends Task_Abstract {
     public function __construct( string $data ) {
@@ -156,7 +156,7 @@ class Process_Everything extends Task_Abstract {
 }
 ```
 
-Instead of doing everything in one task, you can create multiple tasks that are more focused and easier to test. On each task's `process()` method, you can fire an `action` than next tasks can listen to, or directly schedule the next task to be processed via `pigeon()->dispatch()`.
+Instead of doing everything in one task, you can create multiple tasks that are more focused and easier to test. On each task's `process()` method, you can fire an `action` than next tasks can listen to, or directly schedule the next task to be processed via `shepherd()->dispatch()`.
 
 ### 4. Proper Argument Validation
 
@@ -183,7 +183,7 @@ protected function validate_args(): void {
 
 ## Contributing Tasks
 
-If you've created a useful task that could benefit others, consider contributing it to the Pigeon library:
+If you've created a useful task that could benefit others, consider contributing it to the Shepherd library:
 
 1. Ensure your task follows WordPress coding standards
 2. Include comprehensive PHPDoc comments
@@ -200,4 +200,4 @@ Planned tasks for future releases:
 - **Cache Warming Task**: Pre-populate caches
 - **Bulk Operations Task**: Handle large data sets in chunks
 
-Have ideas for built-in tasks? [Open an issue](https://github.com/stellarwp/pigeon/issues) to discuss your suggestions.
+Have ideas for built-in tasks? [Open an issue](https://github.com/stellarwp/shepherd/issues) to discuss your suggestions.

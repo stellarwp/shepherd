@@ -1,6 +1,6 @@
 # API Reference
 
-This document provides a comprehensive reference for all public classes, interfaces, and methods in the Pigeon library.
+This document provides a comprehensive reference for all public classes, interfaces, and methods in the Shepherd library.
 
 ## Table of Contents
 
@@ -25,11 +25,11 @@ Schedules a task for execution.
 - **Parameters:**
   - `$task` - The task instance to schedule
   - `$delay` - Delay in seconds before execution (default: 0)
-- **Throws:** and **Catches:** `PigeonTaskAlreadyExistsException` if duplicate task exists
+- **Throws:** and **Catches:** `ShepherdTaskAlreadyExistsException` if duplicate task exists
 - **Throws:** and **Catches:** `RuntimeException` if task fails to be scheduled or inserted into the database.
 - You can listen for those errors above, by listening to the following actions:
-  - `pigeon_{prefix}_task_scheduling_failed`
-  - `pigeon_{prefix}_task_already_exists`
+  - `shepherd_{prefix}_task_scheduling_failed`
+  - `shepherd_{prefix}_task_already_exists`
 
 ##### `get_last_scheduled_task_id(): ?int`
 
@@ -47,7 +47,7 @@ Clears the runtime cache of task data.
 
 ### `Config`
 
-Static configuration management for Pigeon.
+Static configuration management for Shepherd.
 
 #### Methods
 
@@ -71,7 +71,7 @@ Returns the hook prefix trimmed to a safe length to ensure table names don't exc
 Returns the maximum safe length for a hook prefix based on:
 
 - WordPress table prefix length
-- The longest Pigeon table name
+- The longest Shepherd table name
 
 ##### `set_logger( ?Logger $logger ): void`
 
@@ -98,13 +98,13 @@ Service provider for dependency injection and initialization.
 
 #### Constants
 
-- `VERSION` - Pigeon's current version
+- `VERSION` - Shepherd's current version
 
 #### Methods
 
 ##### `register(): void`
 
-Initializes Pigeon and registers all components.
+Initializes Shepherd and registers all components.
 
 ##### `set_container( ContainerInterface $container ): void`
 
@@ -116,7 +116,7 @@ Returns the container instance.
 
 ##### `is_registered(): bool`
 
-Checks if Pigeon has been registered.
+Checks if Shepherd has been registered.
 
 ---
 
@@ -138,15 +138,15 @@ public function __construct(
 
 #### Configuration
 
-- **Task Prefix:** `pigeon_email_`
+- **Task Prefix:** `shepherd_email_`
 - **Max Retries:** 4
 - **Retry Delay:** 30 seconds (exponential backoff: 30s then 60s then 120s then 240s and so on)
-- **Group:** `pigeon_{prefix}_queue_default`
+- **Group:** `shepherd_{prefix}_queue_default`
 - **Priority:** 10
 
 #### WordPress Hooks
 
-- `pigeon_{prefix}_email_processed` - Fired after a successful call to `wp_mail()`
+- `shepherd_{prefix}_email_processed` - Fired after a successful call to `wp_mail()`
 
 ---
 
@@ -166,12 +166,12 @@ public function __construct(
 
 #### Configuration
 
-- **Task Prefix:** `pigeon_http_`
+- **Task Prefix:** `shepherd_http_`
 - **Max Retries:** 10
 - **Retry Delay:** Exponential backoff
 - **Default Timeout:** 3 seconds
 - **Default Args:** Compression enabled, 5 redirects, reject unsafe URLs
-- **Group:** `pigeon_{prefix}_queue_default`
+- **Group:** `shepherd_{prefix}_queue_default`
 - **Priority:** 10
 
 #### Supported Methods
@@ -189,20 +189,20 @@ public function get_auth_headers(): array
 
 #### Error Handling
 
-- **WP_Error responses**: Fail immediately without retry (throws `PigeonTaskFailWithoutRetryException`)
-- **4xx HTTP errors**: Fail immediately without retry (throws `PigeonTaskFailWithoutRetryException`)
-- **5xx HTTP errors**: Retry with exponential backoff (throws `PigeonTaskException`)
-- **Other non-2xx**: Retry with exponential backoff (throws `PigeonTaskException`)
+- **WP_Error responses**: Fail immediately without retry (throws `ShepherdTaskFailWithoutRetryException`)
+- **4xx HTTP errors**: Fail immediately without retry (throws `ShepherdTaskFailWithoutRetryException`)
+- **5xx HTTP errors**: Retry with exponential backoff (throws `ShepherdTaskException`)
+- **Other non-2xx**: Retry with exponential backoff (throws `ShepherdTaskException`)
 
 #### WordPress Hooks
 
-- `pigeon_{prefix}_http_request_processed` - Fired after successful HTTP request
-- `pigeon_{prefix}_task_failed_without_retry` - Fired when task fails without retry (4xx errors, WP_Error)
+- `shepherd_{prefix}_http_request_processed` - Fired after successful HTTP request
+- `shepherd_{prefix}_task_failed_without_retry` - Fired when task fails without retry (4xx errors, WP_Error)
 
 #### Special Features
 
 - **Authentication Headers**: Override `get_auth_headers()` to add auth without storing credentials in database
-- **Task ID Header**: Automatically adds `X-Pigeon-Task-ID` header with task ID
+- **Task ID Header**: Automatically adds `X-Shepherd-Task-ID` header with task ID
 - **Security Defaults**: URL validation, compression, and redirect limits enabled by default
 
 ---
@@ -293,7 +293,7 @@ Abstract method - return a unique prefix (max 15 characters).
 
 ##### `get_group(): string`
 
-Returns the task group (default: `pigeon_{prefix}_queue_default`).
+Returns the task group (default: `shepherd_{prefix}_queue_default`).
 
 ##### `get_priority(): int`
 
@@ -315,19 +315,19 @@ Protected method for custom argument validation.
 
 ## Exceptions
 
-### `PigeonTaskException`
+### `ShepherdTaskException`
 
 General exception for task-related errors.
 
 ```php
-throw new PigeonTaskException( 'Task processing failed' );
+throw new ShepherdTaskException( 'Task processing failed' );
 ```
 
-### `PigeonTaskAlreadyExistsException`
+### `ShepherdTaskAlreadyExistsException`
 
 Thrown and caught when attempting to schedule a duplicate task.
 
-### `PigeonTaskFailWithoutRetryException`
+### `ShepherdTaskFailWithoutRetryException`
 
 Thrown when a task encounters an error that should not be retried (e.g., 4xx HTTP errors, WP_Error responses).
 
@@ -335,16 +335,16 @@ Thrown when a task encounters an error that should not be retried (e.g., 4xx HTT
 
 ## Helper Functions
 
-### `pigeon(): Regulator`
+### `shepherd(): Regulator`
 
 Global helper function to access the Regulator instance.
 
 ```php
 // Dispatch a task
-pigeon()->dispatch( new My_Task() );
+shepherd()->dispatch( new My_Task() );
 
 // Get last task ID
-$task_id = pigeon()->get_last_scheduled_task_id();
+$task_id = shepherd()->get_last_scheduled_task_id();
 ```
 
 ---
@@ -355,7 +355,7 @@ $task_id = pigeon()->get_last_scheduled_task_id();
 
 Default logger that stores logs in the database.
 
-- Table: `pigeon_{prefix}_task_logs`
+- Table: `shepherd_{prefix}_task_logs`
 - Implements PSR-3 log levels
 - Stores logs as JSON
 
@@ -373,7 +373,7 @@ Config::set_logger( new Null_Logger() );
 
 ### Tasks Table
 
-Table name: `pigeon_{prefix}_tasks`
+Table name: `shepherd_{prefix}_tasks`
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -386,7 +386,7 @@ Table name: `pigeon_{prefix}_tasks`
 
 ### Task Logs Table
 
-Table name: `pigeon_{prefix}_task_logs`
+Table name: `shepherd_{prefix}_task_logs`
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -403,30 +403,30 @@ Table name: `pigeon_{prefix}_task_logs`
 
 ### Actions
 
-- `pigeon_{prefix}_task_scheduling_failed` - Fired when a task fails to be scheduled
+- `shepherd_{prefix}_task_scheduling_failed` - Fired when a task fails to be scheduled
   - Parameters: `$task`, `$exception`
 
-- `pigeon_{prefix}_task_already_scheduled` - Fired when a task already exists
+- `shepherd_{prefix}_task_already_scheduled` - Fired when a task already exists
   - Parameters: `$task`
 
-- `pigeon_{prefix}_task_started` - Fired when a task starts being processed
+- `shepherd_{prefix}_task_started` - Fired when a task starts being processed
   - Parameters: `$task`, `$action_id` (int)
 
-- `pigeon_{prefix}_task_finished` - Fired when a task finishes processing successfully
+- `shepherd_{prefix}_task_finished` - Fired when a task finishes processing successfully
   - Parameters: `$task`, `$action_id` (int)
 
-- `pigeon_{prefix}_task_failed` - Fired when a task fails
+- `shepherd_{prefix}_task_failed` - Fired when a task fails
   - Parameters: `$task`, `$exception`
 
-- `pigeon_{prefix}_task_failed_without_retry` - Fired when a task fails without retry
-  - Parameters: `$task`, `$exception` (PigeonTaskFailWithoutRetryException)
+- `shepherd_{prefix}_task_failed_without_retry` - Fired when a task fails without retry
+  - Parameters: `$task`, `$exception` (ShepherdTaskFailWithoutRetryException)
 
-- `pigeon_{prefix}_email_processed` - Fired after a successful call to `wp_mail()`
+- `shepherd_{prefix}_email_processed` - Fired after a successful call to `wp_mail()`
   - Parameters: `$task` (Email instance)
 
-- `pigeon_{prefix}_http_request_processed` - Fired after successful HTTP request
+- `shepherd_{prefix}_http_request_processed` - Fired after successful HTTP request
   - Parameters: `$task` (HTTP_Request instance), `$response` (wp_remote_request response array)
 
 ### Filters
 
-Currently, Pigeon does not provide any filters.
+Currently, Shepherd does not provide any filters.

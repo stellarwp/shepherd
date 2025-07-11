@@ -71,12 +71,12 @@ jobs:
       - name: Install WooCommerce
         run: ${SLIC_BIN} site-cli plugin install woocommerce
 
-      - name: Get Pigeon's AS Version from composer.json
+      - name: Get Shepherd's AS Version from composer.json
         run: |
           cd ${GITHUB_WORKSPACE}/
-          PIGEON_AS_VERSION=$(grep -E '"woocommerce/action-scheduler": "[0-9]+\.[0-9]+\.[0-9]+"' composer.json | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
-          echo "Pigeon's AS Version: $PIGEON_AS_VERSION"
-          echo "PIGEON_AS_VERSION=$PIGEON_AS_VERSION" >> $GITHUB_ENV
+          SHEPHERD_AS_VERSION=$(grep -E '"woocommerce/action-scheduler": "[0-9]+\.[0-9]+\.[0-9]+"' composer.json | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Shepherd's AS Version: $SHEPHERD_AS_VERSION"
+          echo "SHEPHERD_AS_VERSION=$SHEPHERD_AS_VERSION" >> $GITHUB_ENV
 
       - name: Get WooCommerce's AS Version php eval
         run: |
@@ -89,10 +89,10 @@ jobs:
           echo "WooCommerce's AS Version: $WC_AS_VERSION"
           echo "WC_AS_VERSION=$WC_AS_VERSION" >> $GITHUB_ENV
 
-      - name: Compare Pigeon's and WooCommerce's AS Versions
+      - name: Compare Shepherd's and WooCommerce's AS Versions
         run: |
-          if [ "$PIGEON_AS_VERSION" != "$WC_AS_VERSION" ]; then
-            echo "Pigeon's AS Version: $PIGEON_AS_VERSION"
+          if [ "$SHEPHERD_AS_VERSION" != "$WC_AS_VERSION" ]; then
+            echo "Shepherd's AS Version: $SHEPHERD_AS_VERSION"
             echo "WooCommerce's AS Version: $WC_AS_VERSION"
             exit 1
           fi

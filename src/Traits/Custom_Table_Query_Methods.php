@@ -4,24 +4,24 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Traits;
+ * @package StellarWP\Shepherd\Traits;
  */
 
-namespace StellarWP\Pigeon\Traits;
+namespace StellarWP\Shepherd\Traits;
 
 use Generator;
 use StellarWP\DB\DB;
 use InvalidArgumentException;
 use DateTimeInterface;
-use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
-use StellarWP\Pigeon\Contracts\Model;
+use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Shepherd\Contracts\Model;
 
 /**
  * Trait Custom_Table_Query_Methods.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Traits;
+ * @package StellarWP\Shepherd\Traits;
  */
 trait Custom_Table_Query_Methods {
 	/**

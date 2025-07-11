@@ -4,13 +4,13 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
-use StellarWP\Pigeon\Contracts\Task;
+use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Shepherd\Contracts\Task;
 use InvalidArgumentException;
 
 /**
@@ -18,7 +18,7 @@ use InvalidArgumentException;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 class Tasks extends Table {
 	/**
@@ -59,7 +59,7 @@ class Tasks extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $base_table_name = 'pigeon_%s_tasks';
+	protected static $base_table_name = 'shepherd_%s_tasks';
 
 	/**
 	 * The table group.
@@ -68,7 +68,7 @@ class Tasks extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $group = 'stellarwp_pigeon';
+	protected static $group = 'stellarwp_shepherd';
 
 	/**
 	 * The slug used to identify the custom table.
@@ -77,7 +77,7 @@ class Tasks extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $schema_slug = 'stellarwp-pigeon-%s-tasks';
+	protected static $schema_slug = 'stellarwp-shepherd-%s-tasks';
 
 	/**
 	 * The field that uniquely identifies a row in the table.

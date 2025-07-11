@@ -2,14 +2,14 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Contracts\Task;
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Contracts\Task;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 use InvalidArgumentException;
 
 class Dummy_Task extends Task_Abstract implements Task {
@@ -130,7 +130,7 @@ class Tasks_Test extends WPTestCase {
 		$container           = Config::get_container();
 		$safe_dynamic_prefix = $container->get( Safe_Dynamic_Prefix::class );
 		$safe_prefix         = $safe_dynamic_prefix->get();
-		$expected            = DB::prefix( 'pigeon_' . $safe_prefix . '_tasks' );
+		$expected            = DB::prefix( 'shepherd_' . $safe_prefix . '_tasks' );
 		$this->assertEquals( $expected, $table_name );
 	}
 
@@ -138,6 +138,6 @@ class Tasks_Test extends WPTestCase {
 	 * @after
 	 */
 	public function reset() {
-		Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
+		Config::set_hook_prefix( tests_shepherd_get_hook_prefix() );
 	}
 }

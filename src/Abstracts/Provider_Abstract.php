@@ -4,12 +4,12 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Abstracts
+ * @package StellarWP\Shepherd\Abstracts
  */
 
 declare(strict_types=1);
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
 use StellarWP\ContainerContract\ContainerInterface as Container;
 
@@ -18,7 +18,7 @@ use StellarWP\ContainerContract\ContainerInterface as Container;
 /**
  * Class Provider_Abstract
  *
- * @package StellarWP\Pigeon\Abstracts
+ * @package StellarWP\Shepherd\Abstracts
  */
 abstract class Provider_Abstract {
 	/**

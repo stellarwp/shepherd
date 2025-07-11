@@ -17,6 +17,6 @@ modules:
             dbPassword: "%WP_TEST_DB_PASSWORD%"
             tablePrefix: "%WP_TABLE_PREFIX%"
             domain: "%WP_DOMAIN%"
-            title: stellarwp/pigeon tests
+            title: stellarwp/shepherd tests
             configFile: tests/config.php
             theme: kadence

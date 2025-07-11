@@ -2,10 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Log;
+use StellarWP\Shepherd\Log;
 use StellarWP\DB\DB;
 
 class Task_Logs_Test extends WPTestCase {

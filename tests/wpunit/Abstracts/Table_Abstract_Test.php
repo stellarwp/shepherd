@@ -2,17 +2,17 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Contracts\Model;
-use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Contracts\Model;
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 use StellarWP\DB\DB;
 
 class Dummy_Table extends Table_Abstract {
 	protected static $base_table_name = 'pi_%s_dummy_table';
-	protected static $schema_slug = 'pigeon-%s-dummy-table';
+	protected static $schema_slug = 'shepherd-%s-dummy-table';
 	protected static $uid_column = 'id';
 
 	public static function get_columns(): array {
@@ -38,15 +38,15 @@ class Table_Abstract_Test extends WPTestCase {
 	 * @after
 	 */
 	public function reset_config(): void {
-		Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
+		Config::set_hook_prefix( tests_shepherd_get_hook_prefix() );
 	}
 
 	/**
 	 * @test
 	 */
 	public function it_should_get_correct_table_name_and_slug() {
-		$this->assertEquals( 'wp_pi_test_dummy_table', Dummy_Table::table_name() );
-		$this->assertEquals( 'pigeon-test-dummy-table', Dummy_Table::get_schema_slug() );
+		$this->assertEquals( 'wp_pi_tes_dummy_table', Dummy_Table::table_name() );
+		$this->assertEquals( 'shepherd-test-dummy-table', Dummy_Table::get_schema_slug() );
 	}
 
 	/**
@@ -56,7 +56,7 @@ class Table_Abstract_Test extends WPTestCase {
 		$table = new Dummy_Table();
 		$definition = $table->get_definition();
 
-		$this->assertStringContainsString( 'CREATE TABLE `wp_pi_test_dummy_table`', $definition );
+		$this->assertStringContainsString( 'CREATE TABLE `wp_pi_tes_dummy_table`', $definition );
 		$this->assertStringContainsString( '`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT', $definition );
 		$this->assertStringContainsString( '`name` varchar(255) NOT NULL', $definition );
 		$this->assertStringContainsString( 'PRIMARY KEY (`id`)', $definition );
@@ -99,12 +99,12 @@ class Table_Abstract_Test extends WPTestCase {
 	 */
 	public function it_should_not_trim_short_hook_prefix() {
 		// Set a short hook prefix that won't exceed the limit
-		$short_prefix = 'short';
+		$short_prefix = 'sho';
 		Config::set_hook_prefix( $short_prefix );
 
 		$table_name = Dummy_Table::table_name();
 
 		// The table name should contain the full hook prefix
-		$this->assertEquals( 'wp_pi_short_dummy_table', $table_name );
+		$this->assertEquals( 'wp_pi_sho_dummy_table', $table_name );
 	}
 }

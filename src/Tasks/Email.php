@@ -1,29 +1,29 @@
 <?php
 /**
- * Pigeon's email task.
+ * Shepherd's email task.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tasks;
+ * @package StellarWP\Shepherd\Tasks;
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tasks;
+namespace StellarWP\Shepherd\Tasks;
 
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
-use StellarWP\Pigeon\Exceptions\PigeonTaskException;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
 use InvalidArgumentException;
 
 // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 
 /**
- * Pigeon's email task.
+ * Shepherd's email task.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tasks;
+ * @package StellarWP\Shepherd\Tasks;
  */
 class Email extends Task_Abstract {
 	/**
@@ -48,14 +48,14 @@ class Email extends Task_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @throws PigeonTaskException If the email fails to send.
+	 * @throws ShepherdTaskException If the email fails to send.
 	 */
 	public function process(): void {
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.wp_mail_wp_mail
 		$result = wp_mail( ...$this->get_args() );
 
 		if ( ! $result ) {
-			throw new PigeonTaskException( __( 'Failed to send email.', 'stellarwp-pigeon' ) );
+			throw new ShepherdTaskException( __( 'Failed to send email.', 'stellarwp-shepherd' ) );
 		}
 
 		/**
@@ -65,7 +65,7 @@ class Email extends Task_Abstract {
 		 *
 		 * @param Email $task The email task that was processed.
 		 */
-		do_action( 'pigeon_' . Config::get_hook_prefix() . '_email_processed', $this );
+		do_action( 'shepherd_' . Config::get_hook_prefix() . '_email_processed', $this );
 	}
 
 	/**
@@ -78,19 +78,19 @@ class Email extends Task_Abstract {
 	protected function validate_args(): void {
 		$args = $this->get_args();
 		if ( count( $args ) < 3 ) {
-			throw new InvalidArgumentException( __( 'Email task requires at least 3 arguments.', 'stellarwp-pigeon' ) );
+			throw new InvalidArgumentException( __( 'Email task requires at least 3 arguments.', 'stellarwp-shepherd' ) );
 		}
 
 		if ( ! is_email( $args[0] ) ) {
-			throw new InvalidArgumentException( __( 'Email address is invalid.', 'stellarwp-pigeon' ) );
+			throw new InvalidArgumentException( __( 'Email address is invalid.', 'stellarwp-shepherd' ) );
 		}
 
 		if ( ! is_string( $args[1] ) ) {
-			throw new InvalidArgumentException( __( 'Email subject must be a string.', 'stellarwp-pigeon' ) );
+			throw new InvalidArgumentException( __( 'Email subject must be a string.', 'stellarwp-shepherd' ) );
 		}
 
 		if ( ! is_string( $args[2] ) ) {
-			throw new InvalidArgumentException( __( 'Email body must be a string.', 'stellarwp-pigeon' ) );
+			throw new InvalidArgumentException( __( 'Email body must be a string.', 'stellarwp-shepherd' ) );
 		}
 	}
 
@@ -102,7 +102,7 @@ class Email extends Task_Abstract {
 	 * @return string The email task's hook prefix.
 	 */
 	public function get_task_prefix(): string {
-		return 'pigeon_email_';
+		return 'shepherd_email_';
 	}
 
 	/**
