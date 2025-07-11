@@ -1,18 +1,16 @@
 # Getting Started with Shepherd
 
-This guide will walk you through the basics of installing and using Shepherd to run your first background task.
+Install and use Shepherd to run your first background task.
 
 ## Installation
 
-Shepherd is a Composer package that provides a robust background task processing system for WordPress applications. To install it, you'll need to have Composer in your project. If you don't have it already, you can follow the instructions on the [Composer website](https://getcomposer.org/).
-
-Once you have Composer set up, you can add Shepherd to your project by running the following command in your project's root directory:
+Shepherd provides robust background task processing for WordPress. Install via Composer:
 
 ```bash
 composer require stellarwp/shepherd
 ```
 
-After installing Shepherd, you need to make sure you're including the Composer autoloader in your plugin or theme. This is typically done by adding the following line to your main plugin file or `functions.php`:
+Include the Composer autoloader in your plugin or theme:
 
 ```php
 require_once __DIR__ . '/vendor/autoload.php';
@@ -20,7 +18,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 ## Configuration and Registration
 
-Shepherd requires a DI container that implements `StellarWP\ContainerContract\ContainerInterface`. You need to configure and register Shepherd before using it. This is typically done in your plugin's main file:
+Shepherd requires a DI container implementing `StellarWP\ContainerContract\ContainerInterface`. Register Shepherd in your plugin:
 
 ```php
 use StellarWP\Shepherd\Config;
@@ -53,7 +51,7 @@ add_action( 'plugins_loaded', function() {
 
 ### Configuration Options
 
-Before registering Shepherd, you can configure it using the `Config` class:
+Configure Shepherd before registration:
 
 ```php
 // Set a custom logger (optional - defaults to DB_Logger)
@@ -65,9 +63,7 @@ $prefix = Config::get_hook_prefix();
 
 ## Creating Your First Task
 
-Tasks in Shepherd are classes that extend the `StellarWP\Shepherd\Abstracts\Task_Abstract` class. At a minimum, you need to implement the `process()` method and `get_task_prefix()` method.
-
-Let's create a simple task that logs a message:
+Tasks extend `Task_Abstract` and implement `process()` and `get_task_prefix()` methods:
 
 ```php
 <?php
@@ -124,7 +120,7 @@ class Log_Message_Task extends Task_Abstract {
 
 ## Dispatching Your Task
 
-Once you've created your task, you can dispatch it using the `shepherd()` helper function:
+Dispatch tasks using the `shepherd()` helper:
 
 ```php
 use My\App\Tasks\Log_Message_Task;
@@ -143,16 +139,16 @@ shepherd()->dispatch( $my_task, 5 * MINUTE_IN_SECONDS ); // Execute after 5 minu
 ### What Happens Next?
 
 1. Shepherd schedules your task with Action Scheduler
-2. WordPress cron (or another Action Scheduler's runner, like CLI) picks up the task
-3. Your task's `process()` method is executed
-4. The task lifecycle is logged in the database
-5. If the task fails, it may be retried based on your configuration
+2. WordPress cron picks up the task
+3. Your task's `process()` method executes
+4. The lifecycle is logged in the database
+5. Failed tasks may be retried based on configuration
 
-Check your `debug.log` file, and you should see the message "Shepherd Task: Hello, World! with code 200".
+Check `debug.log` for the message "Shepherd Task: Hello, World! with code 200".
 
 ## Verifying Task Execution
 
-You can check if your task was scheduled successfully:
+Check if your task was scheduled successfully:
 
 ```php
 // Get the last scheduled task ID
@@ -168,9 +164,9 @@ $logs = $logger->retrieve_logs( $task_id );
 
 ## Next Steps
 
-- Learn about [Advanced Usage](./advanced-usage.md) including retries, debouncing, and custom configuration
-- Explore the [Built-in Tasks](./tasks.md) that come with Shepherd
-- Read the [API Reference](./api-reference.md) for detailed information about all classes and methods
+- [Advanced Usage](./advanced-usage.md) - retries, debouncing, custom configuration
+- [Built-in Tasks](./tasks.md) - tasks included with Shepherd
+- [API Reference](./api-reference.md) - detailed class and method documentation
 
 ## Troubleshooting
 

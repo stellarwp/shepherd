@@ -1,33 +1,33 @@
 # Herding Task
 
-The Herding task is a built-in maintenance task that cleans up orphaned data from Shepherd's database tables. This task automatically runs every 6 hours to ensure database integrity and prevent accumulation of stale data.
+Built-in maintenance task that cleans up orphaned data from Shepherd's database tables. Runs automatically every 6 hours to ensure database integrity.
 
 ## Purpose
 
-Over time, tasks may be removed from Action Scheduler (due to various reasons like manual cleanup, database corruption, or external modifications) while their corresponding data remains in Shepherd's tables. The Herding task identifies and removes these orphaned records to maintain a clean database state.
+Removes orphaned records when tasks are deleted from Action Scheduler but remain in Shepherd's tables (due to manual cleanup, database corruption, or external modifications).
 
 ## What it Cleans
 
-The Herding task removes:
+Removes:
 
-1. **Orphaned Task Records**: Tasks in the `shepherd_tasks` table that no longer have corresponding entries in Action Scheduler
-2. **Orphaned Log Records**: Log entries in the `shepherd_task_logs` table for tasks that no longer exist
+1. **Orphaned Task Records**: Tasks in `shepherd_tasks` without corresponding Action Scheduler entries
+2. **Orphaned Log Records**: Log entries in `shepherd_task_logs` for deleted tasks
 
 ## Automatic Scheduling
 
-The Herding task is automatically scheduled during WordPress initialization:
+Automatically scheduled during WordPress initialization:
 
 - **Frequency**: Every 6 hours
-- **Hook**: Attached to WordPress `init` action with priority 20
-- **Automatic**: No manual intervention required
+- **Hook**: WordPress `init` action (priority 20)
+- **Manual intervention**: Not required
 
 ## Process Flow
 
-1. **Identify Orphaned Tasks**: Query for task IDs that exist in Shepherd's tasks table but not in Action Scheduler
-2. **Skip if Clean**: If no orphaned tasks found, complete gracefully
+1. **Identify Orphaned Tasks**: Query for task IDs in Shepherd's table but not in Action Scheduler
+2. **Skip if Clean**: Complete gracefully if no orphaned tasks found
 3. **Sanitize IDs**: Clean and deduplicate task IDs for safe deletion
-4. **Remove Logs**: Delete all log entries for orphaned tasks
-5. **Remove Tasks**: Delete the orphaned task records
+4. **Remove Logs**: Delete log entries for orphaned tasks
+5. **Remove Tasks**: Delete orphaned task records
 6. **Fire Hook**: Trigger completion hook for extensibility
 
 ## Hooks

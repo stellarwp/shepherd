@@ -1,6 +1,6 @@
 # Built-in Tasks
 
-Shepherd comes with pre-packaged tasks to handle common background operations. Each task is designed to be reliable, well-tested, and includes automatic retry logic.
+Shepherd includes reliable, well-tested tasks for common background operations with automatic retry logic.
 
 ## Available Tasks
 
@@ -32,7 +32,7 @@ shepherd()->dispatch( $email );
 
 ### [HTTP Request Task](./tasks/http-request.md)
 
-Makes HTTP requests asynchronously using WordPress's `wp_remote_request()` function.
+Makes asynchronous HTTP requests using WordPress's `wp_remote_request()`.
 
 **Key Features:**
 
@@ -76,7 +76,7 @@ class Authenticated_HTTP_Request extends HTTP_Request {
 
 ### [Herding Task](./tasks/herding.md)
 
-Maintains database integrity by automatically cleaning up orphaned task data.
+Automatically cleans up orphaned task data to maintain database integrity.
 
 **Key Features:**
 
@@ -105,9 +105,9 @@ shepherd()->dispatch( new Herding() );
 shepherd()->dispatch( new Herding(), HOUR_IN_SECONDS );
 ```
 
-## Creating Your Own Tasks
+## Creating Custom Tasks
 
-To create custom tasks, extend the `Task_Abstract` class:
+Extend `Task_Abstract` for custom tasks:
 
 ```php
 <?php
@@ -144,11 +144,11 @@ class My_Custom_Task extends Task_Abstract {
 
 ## Task Design Principles
 
-When creating tasks, follow these principles:
+Follow these principles when creating tasks:
 
 ### 1. Idempotent Operations
 
-A Task's `process()` method should be safe to run multiple times with different arguments:
+Tasks should be safe to run multiple times:
 
 ### 2. Clear Error Handling
 
@@ -187,14 +187,11 @@ class Process_Everything extends Task_Abstract {
 }
 ```
 
-Instead of doing everything in one task, you can create multiple tasks that are more focused and easier to test. On each task's `process()` method, you can fire an `action` than next tasks can listen to, or directly schedule the next task to be processed via `shepherd()->dispatch()`.
+Create multiple focused tasks instead. Chain tasks by firing actions or directly scheduling via `shepherd()->dispatch()`.
 
 ### 4. Proper Argument Validation
 
-Validate inputs by:
-
-1. Calling the parent constructor.
-2. Overriding the `validate_args()` method.
+Validate inputs by calling the parent constructor and overriding `validate_args()`:
 
 ```php
 public function __construct( string $email, int $user_id ) {
@@ -214,12 +211,12 @@ protected function validate_args(): void {
 
 ## Contributing Tasks
 
-If you've created a useful task that could benefit others, consider contributing it to the Shepherd library:
+To contribute useful tasks to Shepherd:
 
-1. Ensure your task follows WordPress coding standards
+1. Follow WordPress coding standards
 2. Include comprehensive PHPDoc comments
-3. Add integration tests for your task in the `tests/integration/Tasks/` directory
-4. Update documentation in the `docs/` directory
+3. Add integration tests in `tests/integration/Tasks/`
+4. Update documentation in `docs/`
 5. Submit a pull request
 
 ## Future Built-in Tasks
@@ -231,4 +228,4 @@ Planned tasks for future releases:
 - **Cache Warming Task**: Pre-populate caches
 - **Bulk Operations Task**: Handle large data sets in chunks
 
-Have ideas for built-in tasks? [Open an issue](https://github.com/stellarwp/shepherd/issues) to discuss your suggestions.
+Have ideas? [Open an issue](https://github.com/stellarwp/shepherd/issues) to discuss suggestions.

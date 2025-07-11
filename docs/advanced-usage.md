@@ -1,16 +1,16 @@
 # Advanced Usage
 
-This guide covers the advanced features of Shepherd for more complex use cases.
+Advanced Shepherd features for complex use cases.
 
 ## Automatic Retries
 
-Shepherd can automatically retry failed tasks. A task is considered failed when it throws any exception during the `process()` method.
+Shepherd automatically retries failed tasks (tasks that throw exceptions during `process()`).
 
 ### Configuring Retries
 
-Override the `get_max_retries()` method on your task class. The default is `0` (no retries).
+Override `get_max_retries()` in your task class. Default is `0` (no retries).
 
-**Important**: This method returns the number of _additional_ attempts, not the total attempts. A task with 2 retries will execute up to 3 times total.
+**Important**: Returns additional attempts, not total. A task with 2 retries executes up to 3 times total.
 
 ```php
 <?php
@@ -40,7 +40,7 @@ class My_Retryable_Task extends Task_Abstract {
 
 ### Retry Delays
 
-By default, Shepherd uses exponential backoff for retries. You can customize this by overriding `get_retry_delay()`:
+Default uses exponential backoff. Customize by overriding `get_retry_delay()`:
 
 ```php
 public function get_retry_delay(): int {
@@ -88,23 +88,22 @@ Groups help with:
 
 ## Unique Tasks
 
-Shepherd prevents duplicate tasks from being scheduled. A task is considered a duplicate if it has the same class and arguments as an existing scheduled task.
+Shepherd prevents duplicate tasks (same class and arguments) from being scheduled.
 
-When you try to dispatch a duplicate task, Shepherd will:
+When dispatching a duplicate task:
 
-- Check if an identical task already exists (same class + arguments)
-- If it exists, silently ignore the dispatch request. You can listen to an action to be notified when this happens. See [API Reference](api-reference.md) for more information.
-- If it doesn't exist, schedule the task normally
+- Identical task exists: Silently ignored (listen to action for notification - see [API Reference](api-reference.md))
+- No identical task: Scheduled normally
 
-This behavior prevents accidental task duplication and is enabled by default for all tasks.
+Prevents accidental duplication and is enabled by default.
 
 ## Logging
 
-Shepherd includes comprehensive logging that tracks the complete lifecycle of each task.
+Comprehensive logging tracks the complete task lifecycle.
 
 ### Built-in Logging
 
-By default, logs are stored in Action Scheduler's `actionscheduler_logs` table using the `ActionScheduler_DB_Logger`. This reduces database overhead by reusing existing infrastructure. The following events are automatically logged:
+Default logs are stored in Action Scheduler's `actionscheduler_logs` table using `ActionScheduler_DB_Logger`. Reduces database overhead by reusing existing infrastructure. Automatically logged events:
 
 - `created`: Task scheduled (triggers `shepherd_{prefix}_task_created` action)
 - `started`: Task execution begins (triggers `shepherd_{prefix}_task_started` action)
