@@ -16,6 +16,8 @@ use StellarWP\Shepherd\Tables\Provider as Tables_Provider;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Tables\Task_Logs;
+use StellarWP\Shepherd\Tables\Tasks;
 
 /**
  * Main Service Provider
@@ -74,6 +76,8 @@ class Provider extends Provider_Abstract {
 		$this->container->get( Tables_Provider::class )->register();
 		$this->container->get( Regulator::class )->register();
 
+		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
+
 		self::$has_registered = true;
 	}
 
@@ -108,5 +112,44 @@ class Provider extends Provider_Abstract {
 	 */
 	public static function is_registered(): bool {
 		return self::$has_registered;
+	}
+
+	/**
+	 * Deletes tasks on action deletion.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $action_id The action ID.
+	 */
+	public function delete_tasks_on_action_deletion( int $action_id ): void {
+		$task_ids = DB::get_col(
+			DB::prepare(
+				'SELECT DISTINCT(%i) FROM %i WHERE %i = %d',
+				Tasks::uid_column(),
+				Tasks::table_name(),
+				'action_id',
+		) );
+
+		if ( empty( $task_ids ) ) {
+			return;
+		}
+
+		$task_ids = implode( ',', array_unique( array_map( 'intval', $task_ids ) ) );
+
+		DB::query(
+			DB::prepare(
+				"DELETE FROM %i WHERE %i IN ({$task_ids})",
+				Task_Logs::table_name(),
+				'task_id',
+			)
+		);
+
+		DB::query(
+			DB::prepare(
+				"DELETE FROM %i WHERE %i IN ({$task_ids})",
+				Tasks::table_name(),
+				Tasks::uid_column(),
+			)
+		);
 	}
 }
