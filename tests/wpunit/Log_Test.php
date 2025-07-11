@@ -2,13 +2,13 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Psr\Log\LogLevel;
 use InvalidArgumentException;
-use StellarWP\Pigeon\Contracts\Log_Model;
-use StellarWP\Pigeon\Tables\AS_Logs;
+use StellarWP\Shepherd\Contracts\Log_Model;
+use StellarWP\Shepherd\Tables\AS_Logs;
 
 class Log_Test extends WPTestCase {
 	private function get_log_instance(): Log {

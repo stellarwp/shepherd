@@ -1,34 +1,34 @@
 <?php
 /**
- * Pigeon's HTTP request task.
+ * Shepherd's HTTP request task.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tasks;
+ * @package StellarWP\Shepherd\Tasks;
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tasks;
+namespace StellarWP\Shepherd\Tasks;
 
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
-use StellarWP\Pigeon\Exceptions\PigeonTaskException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use InvalidArgumentException;
 use WP_Error;
 
 // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 
 /**
- * Pigeon's HTTP request task.
+ * Shepherd's HTTP request task.
  *
  * This task makes HTTP requests using WordPress's wp_remote_request() function
  * with built-in retry logic for failed requests.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tasks;
+ * @package StellarWP\Shepherd\Tasks;
  */
 class HTTP_Request extends Task_Abstract {
 	/**
@@ -77,8 +77,8 @@ class HTTP_Request extends Task_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @throws PigeonTaskException                 If the HTTP request fails but should be retried.
-	 * @throws PigeonTaskFailWithoutRetryException If the HTTP request fails without retry.
+	 * @throws ShepherdTaskException                 If the HTTP request fails but should be retried.
+	 * @throws ShepherdTaskFailWithoutRetryException If the HTTP request fails without retry.
 	 */
 	public function process(): void {
 		$url          = $this->get_url();
@@ -94,7 +94,7 @@ class HTTP_Request extends Task_Abstract {
 
 		$request_args['headers'] = array_merge( $request_args['headers'], $this->get_auth_headers() );
 
-		$request_args['headers']['X-Pigeon-Task-ID'] = $this->get_id();
+		$request_args['headers']['X-Shepherd-Task-ID'] = $this->get_id();
 
 		// Make the HTTP request.
 		$response = wp_remote_request( $url, $request_args );
@@ -112,12 +112,12 @@ class HTTP_Request extends Task_Abstract {
 			 */
 			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_wp_error', false, $response, $this );
 
-			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+			$expection_class = $should_retry ? ShepherdTaskException::class : ShepherdTaskFailWithoutRetryException::class;
 
 			throw new $expection_class(
 				sprintf(
 					/* translators: %1$s: HTTP method, %2$s: URL, %3$s: Error message */
-					__( 'HTTP %1$s request to %2$s failed with code: `%3$s` and message: `%4$s`', 'stellarwp-pigeon' ),
+					__( 'HTTP %1$s request to %2$s failed with code: `%3$s` and message: `%4$s`', 'stellarwp-shepherd' ),
 					$method,
 					$url,
 					$response->get_error_code(),
@@ -138,10 +138,10 @@ class HTTP_Request extends Task_Abstract {
 			 */
 			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_invalid_response', false, $response, $this );
 
-			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+			$expection_class = $should_retry ? ShepherdTaskException::class : ShepherdTaskFailWithoutRetryException::class;
 
 			throw new $expection_class(
-				__( 'HTTP request returned an invalid response.', 'stellarwp-pigeon' )
+				__( 'HTTP request returned an invalid response.', 'stellarwp-shepherd' )
 			);
 		}
 
@@ -162,12 +162,12 @@ class HTTP_Request extends Task_Abstract {
 			 */
 			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_http_error_status_codes', false, $response, $this );
 
-			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+			$expection_class = $should_retry ? ShepherdTaskException::class : ShepherdTaskFailWithoutRetryException::class;
 
 			throw new $expection_class(
 				sprintf(
 					/* translators: %1$s: HTTP method, %2$s: URL, %3$d: Response code, %4$s: Response message */
-					__( 'HTTP %1$s request to %2$s returned error %3$d: `%4$s`', 'stellarwp-pigeon' ),
+					__( 'HTTP %1$s request to %2$s returned error %3$d: `%4$s`', 'stellarwp-shepherd' ),
 					$method,
 					$url,
 					$response_code,
@@ -188,12 +188,12 @@ class HTTP_Request extends Task_Abstract {
 			 */
 			$should_retry = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_http_request_should_retry_on_non_2xx_response_codes', true, $response, $this );
 
-			$expection_class = $should_retry ? PigeonTaskException::class : PigeonTaskFailWithoutRetryException::class;
+			$expection_class = $should_retry ? ShepherdTaskException::class : ShepherdTaskFailWithoutRetryException::class;
 
 			throw new $expection_class(
 				sprintf(
 					/* translators: %1$s: HTTP method, %2$s: URL, %3$d: Response code, %4$s: Response message */
-					__( 'HTTP %1$s request to %2$s returned error %3$d: `%4$s`', 'stellarwp-pigeon' ),
+					__( 'HTTP %1$s request to %2$s returned error %3$d: `%4$s`', 'stellarwp-shepherd' ),
 					$method,
 					$url,
 					$response_code,
@@ -210,7 +210,7 @@ class HTTP_Request extends Task_Abstract {
 		 * @param HTTP_Request $task     The HTTP request task that was processed.
 		 * @param array        $response The wp_remote_request response array.
 		 */
-		do_action( 'pigeon_' . Config::get_hook_prefix() . '_http_request_processed', $this, $response );
+		do_action( 'shepherd_' . Config::get_hook_prefix() . '_http_request_processed', $this, $response );
 	}
 
 	// phpcs:enable Squiz.Commenting.FunctionCommentThrowTag.Missing
@@ -226,12 +226,12 @@ class HTTP_Request extends Task_Abstract {
 		$args = $this->get_args();
 
 		if ( empty( $args[0] ) ) {
-			throw new InvalidArgumentException( __( 'URL is required.', 'stellarwp-pigeon' ) );
+			throw new InvalidArgumentException( __( 'URL is required.', 'stellarwp-shepherd' ) );
 		}
 
 		// Validate request arguments.
 		if ( isset( $args[1] ) && ! is_array( $args[1] ) ) {
-			throw new InvalidArgumentException( __( 'Request arguments must be an array.', 'stellarwp-pigeon' ) );
+			throw new InvalidArgumentException( __( 'Request arguments must be an array.', 'stellarwp-shepherd' ) );
 		}
 
 		// Validate HTTP method.
@@ -239,7 +239,7 @@ class HTTP_Request extends Task_Abstract {
 			throw new InvalidArgumentException(
 				sprintf(
 					/* translators: %s: Valid HTTP methods */
-					__( 'HTTP method must be one of: %s', 'stellarwp-pigeon' ),
+					__( 'HTTP method must be one of: %s', 'stellarwp-shepherd' ),
 					implode( ', ', self::VALID_METHODS )
 				)
 			);
@@ -254,7 +254,7 @@ class HTTP_Request extends Task_Abstract {
 	 * @return string The HTTP request task's hook prefix.
 	 */
 	public function get_task_prefix(): string {
-		return 'pigeon_http_';
+		return 'shepherd_http_';
 	}
 
 	/**

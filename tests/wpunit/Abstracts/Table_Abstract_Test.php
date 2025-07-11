@@ -2,17 +2,17 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Contracts\Model;
-use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Contracts\Model;
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 use StellarWP\DB\DB;
 
 class Dummy_Table extends Table_Abstract {
 	protected static $base_table_name = 'pi_%s_dummy_table';
-	protected static $schema_slug = 'pigeon-%s-dummy-table';
+	protected static $schema_slug = 'shepherd-%s-dummy-table';
 	protected static $uid_column = 'id';
 
 	public static function get_columns(): array {
@@ -38,7 +38,7 @@ class Table_Abstract_Test extends WPTestCase {
 	 * @after
 	 */
 	public function reset_config(): void {
-		Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
+		Config::set_hook_prefix( tests_shepherd_get_hook_prefix() );
 	}
 
 	/**
@@ -46,7 +46,7 @@ class Table_Abstract_Test extends WPTestCase {
 	 */
 	public function it_should_get_correct_table_name_and_slug() {
 		$this->assertEquals( 'wp_pi_test_dummy_table', Dummy_Table::table_name() );
-		$this->assertEquals( 'pigeon-test-dummy-table', Dummy_Table::get_schema_slug() );
+		$this->assertEquals( 'shepherd-test-dummy-table', Dummy_Table::get_schema_slug() );
 	}
 
 	/**

@@ -2,12 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Loggers;
+namespace StellarWP\Shepherd\Loggers;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Log;
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Log;
+use StellarWP\Shepherd\Config;
 use Psr\Log\InvalidArgumentException;
 use StellarWP\DB\DB;
 
@@ -16,7 +16,7 @@ class ActionScheduler_DB_Logger_Test extends WPTestCase {
 	 * @before
 	 */
 	public function set_action_scheduler_db_logger_as_default(): void {
-		tests_pigeon_get_container()->singleton( Logger::class, ActionScheduler_DB_Logger::class );
+		tests_shepherd_get_container()->singleton( Logger::class, ActionScheduler_DB_Logger::class );
 	}
 
 	/**
@@ -129,7 +129,7 @@ class ActionScheduler_DB_Logger_Test extends WPTestCase {
 
 		// Verify the log was saved in the correct format
 		$prefix = Config::get_hook_prefix();
-		$expected_message_prefix = 'pigeon_' . $prefix . '||' . $task_id . '||started||warning||';
+		$expected_message_prefix = 'shepherd_' . $prefix . '||' . $task_id . '||started||warning||';
 		
 		$result = DB::get_row(
 			DB::prepare(

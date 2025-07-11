@@ -1,17 +1,17 @@
 <?php
 
-namespace StellarWP\Pigeon\Tests\Traits;
+namespace StellarWP\Shepherd\Tests\Traits;
 
-use StellarWP\Pigeon\Contracts\Task;
-use StellarWP\Pigeon\Abstracts\Task_Model_Abstract;
-use StellarWP\Pigeon\Action_Scheduler_Methods;
+use StellarWP\Shepherd\Contracts\Task;
+use StellarWP\Shepherd\Abstracts\Task_Model_Abstract;
+use StellarWP\Shepherd\Action_Scheduler_Methods;
 use ActionScheduler_Action;
 use ActionScheduler_QueueRunner as Runner;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Provider;
 use StellarWP\DB\DB;
 use PHPUnit\Framework\Assert;
-use function StellarWP\Pigeon\pigeon;
+use function StellarWP\Shepherd\shepherd;
 
 trait With_AS_Assertions {
 	/**
@@ -21,7 +21,7 @@ trait With_AS_Assertions {
 	protected function delete_actions_between_runs(): void {
 		Config::get_container()->get( Task_Model_Abstract::TABLE_INTERFACE )->empty_table();
 		DB::query( DB::prepare( "DELETE FROM %i", DB::prefix( 'actionscheduler_actions' ) ) );
-		remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started' );
+		remove_all_actions( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_started' );
 	}
 
 	protected function get_task_from_id( int $task_id ): Task {
@@ -44,7 +44,7 @@ trait With_AS_Assertions {
 		$task = $this->get_task_from_id( $task_id );
 		$action = $this->get_action_from_task( $task );
 
-		$this->assertEquals( pigeon()->get_hook(), $action->get_hook() );
+		$this->assertEquals( shepherd()->get_hook(), $action->get_hook() );
 
 		$this->assertFalse( $action->is_finished() );
 	}
@@ -53,7 +53,7 @@ trait With_AS_Assertions {
 		$task = $this->get_task_from_id( $task_id );
 		$action = $this->get_action_from_task( $task );
 
-		$this->assertEquals( pigeon()->get_hook(), $action->get_hook() );
+		$this->assertEquals( shepherd()->get_hook(), $action->get_hook() );
 
 		$this->assertTrue( $action->is_finished() );
 	}
@@ -120,11 +120,11 @@ trait With_AS_Assertions {
 	}
 
 	protected function add_listener( int $action_id, int $task_id ): void {
-		add_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started', function( Task $task, int $aid ) use ( $action_id, $task_id ) {
+		add_action( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_started', function( Task $task, int $aid ) use ( $action_id, $task_id ) {
 			Assert::assertSame( $action_id, $aid );
 			Assert::assertSame( $action_id, $task->get_action_id() );
 			Assert::assertSame( $task_id, $task->get_id() );
-			remove_all_actions( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_started' );
+			remove_all_actions( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_started' );
 		}, 10, 2 );
 	}
 

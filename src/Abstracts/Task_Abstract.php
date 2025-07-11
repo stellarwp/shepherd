@@ -1,27 +1,27 @@
 <?php
 /**
- * Pigeon's task abstract.
+ * Shepherd's task abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
 use InvalidArgumentException;
-use StellarWP\Pigeon\Contracts\Task;
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Contracts\Task;
+use StellarWP\Shepherd\Config;
 use JsonSerializable;
 
 /**
- * Pigeon's task abstract.
+ * Shepherd's task abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Abstracts;
+ * @package StellarWP\Shepherd\Abstracts;
  */
 abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	/**
@@ -58,7 +58,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 * @return string The task's group.
 	 */
 	public function get_group(): string {
-		return sprintf( 'pigeon_%s_queue_default', Config::get_hook_prefix() );
+		return sprintf( 'shepherd_%s_queue_default', Config::get_hook_prefix() );
 	}
 
 	/**

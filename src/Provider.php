@@ -1,28 +1,28 @@
 <?php
 /**
- * Pigeon's main service provider.
+ * Shepherd's main service provider.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
-use StellarWP\Pigeon\Abstracts\Provider_Abstract;
-use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
+use StellarWP\Shepherd\Abstracts\Provider_Abstract;
+use StellarWP\Shepherd\Tables\Provider as Tables_Provider;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Contracts\Logger;
 
 /**
  * Main Service Provider
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon;
+ * @package StellarWP\Shepherd;
  */
 class Provider extends Provider_Abstract {
 	/**
@@ -53,7 +53,7 @@ class Provider extends Provider_Abstract {
 	private static bool $has_registered = false;
 
 	/**
-	 * Registers Pigeon's specific providers and starts core functionality
+	 * Registers Shepherd's specific providers and starts core functionality
 	 *
 	 * @since TBD
 	 *
@@ -100,7 +100,7 @@ class Provider extends Provider_Abstract {
 	}
 
 	/**
-	 * Checks if Pigeon is registered.
+	 * Checks if Shepherd is registered.
 	 *
 	 * @since TBD
 	 *

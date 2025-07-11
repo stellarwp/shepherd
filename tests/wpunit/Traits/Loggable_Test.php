@@ -2,11 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Traits;
+namespace StellarWP\Shepherd\Traits;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Contracts\Logger;
 use Psr\Log\LogLevel;
 
 class Dummy_Loggable {

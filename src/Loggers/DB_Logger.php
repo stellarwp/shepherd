@@ -1,26 +1,26 @@
 <?php
 /**
- * Pigeon DB Logger
+ * Shepherd DB Logger
  *
- * @package StellarWP\Pigeon\Loggers
+ * @package StellarWP\Shepherd\Loggers
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Loggers;
+namespace StellarWP\Shepherd\Loggers;
 
-use StellarWP\Pigeon\Contracts\Logger as LoggerContract;
+use StellarWP\Shepherd\Contracts\Logger as LoggerContract;
 use Psr\Log\LoggerTrait;
 use Psr\Log\InvalidArgumentException;
-use StellarWP\Pigeon\Log;
-use StellarWP\Pigeon\Tables\Task_Logs;
+use StellarWP\Shepherd\Log;
+use StellarWP\Shepherd\Tables\Task_Logs;
 
 /**
- * Pigeon DB Logger
+ * Shepherd DB Logger
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Loggers
+ * @package StellarWP\Shepherd\Loggers
  */
 class DB_Logger implements LoggerContract {
 	use LoggerTrait;

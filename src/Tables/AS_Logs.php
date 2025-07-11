@@ -4,14 +4,14 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
-use StellarWP\Pigeon\Log;
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Shepherd\Log;
+use StellarWP\Shepherd\Config;
 use StellarWP\DB\DB;
 use DateTime;
 
@@ -22,7 +22,7 @@ use DateTime;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 class AS_Logs extends Table {
 	/**
@@ -98,7 +98,7 @@ class AS_Logs extends Table {
 	public static function get_by_task_id( int $task_id ): array {
 		$results = [];
 
-		foreach ( self::fetch_all_where( DB::prepare( 'WHERE message LIKE %s', 'pigeon_' . Config::get_hook_prefix() . '||' . $task_id . '||%' ), 50, ARRAY_A, 'log_date_gmt ASC' ) as $log_array ) {
+		foreach ( self::fetch_all_where( DB::prepare( 'WHERE message LIKE %s', 'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%' ), 50, ARRAY_A, 'log_date_gmt ASC' ) as $log_array ) {
 			$results[] = self::get_model_from_array( $log_array );
 		}
 

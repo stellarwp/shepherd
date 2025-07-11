@@ -2,12 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tables\Utility;
+namespace StellarWP\Shepherd\Tables\Utility;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Tables;
-use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Tables;
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 
 class Safe_Dynamic_Prefix_Test extends WPTestCase {
 	/**
@@ -42,6 +42,6 @@ class Safe_Dynamic_Prefix_Test extends WPTestCase {
 	 * @after
 	 */
 	public function reset(): void {
-		Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
+		Config::set_hook_prefix( tests_shepherd_get_hook_prefix() );
 	}
 }

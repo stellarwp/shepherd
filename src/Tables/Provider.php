@@ -1,27 +1,27 @@
 <?php
 /**
- * Pigeon Tables Service Provider
+ * Shepherd Tables Service Provider
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 
 declare(strict_types=1);
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Pigeon\Abstracts\Provider_Abstract;
+use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Schema\Register;
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
 
 /**
- * Pigeon Tables Service Provider
+ * Shepherd Tables Service Provider
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 class Provider extends Provider_Abstract {
 	/**

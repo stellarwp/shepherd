@@ -1,15 +1,15 @@
 <?php
 /**
- * Pigeon's wrapper of Action Scheduler methods.
+ * Shepherd's wrapper of Action Scheduler methods.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon;
+ * @package StellarWP\Shepherd;
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use ActionScheduler;
 use ActionScheduler_Action;
@@ -17,11 +17,11 @@ use ActionScheduler_FinishedAction;
 use RuntimeException;
 
 /**
- * Pigeon's wrapper of Action Scheduler methods.
+ * Shepherd's wrapper of Action Scheduler methods.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon;
+ * @package StellarWP\Shepherd;
  */
 class Action_Scheduler_Methods {
 	/**

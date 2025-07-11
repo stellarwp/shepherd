@@ -1,10 +1,10 @@
 <?php
 
-namespace StellarWP\Pigeon\Tests\Traits;
+namespace StellarWP\Shepherd\Tests\Traits;
 
 use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
-use StellarWP\Pigeon\Log;
-use StellarWP\Pigeon\Tests\PigeonJsonSnapshot;
+use StellarWP\Shepherd\Log;
+use StellarWP\Shepherd\Tests\ShepherdJsonSnapshot;
 
 trait With_Log_Snapshot {
 	use SnapshotAssertions;
@@ -83,7 +83,7 @@ trait With_Log_Snapshot {
 	 */
 	protected function assertMatchesJsonSnapshot($current, callable $dataVisitor = null)
 	{
-		$jsonSnapshot = new PigeonJsonSnapshot($current);
+		$jsonSnapshot = new ShepherdJsonSnapshot($current);
 		if ($dataVisitor !== null) {
 			$jsonSnapshot->setDataVisitor($dataVisitor);
 		}

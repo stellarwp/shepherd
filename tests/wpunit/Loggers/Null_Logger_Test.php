@@ -2,10 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Loggers;
+namespace StellarWP\Shepherd\Loggers;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Contracts\Logger;
 
 class Null_Logger_Test extends WPTestCase {
 	/**

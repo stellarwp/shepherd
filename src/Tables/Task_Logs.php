@@ -4,13 +4,13 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
-use StellarWP\Pigeon\Log;
+use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Shepherd\Log;
 use StellarWP\DB\DB;
 use DateTime;
 
@@ -19,7 +19,7 @@ use DateTime;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 class Task_Logs extends Table {
 	/**
@@ -64,7 +64,7 @@ class Task_Logs extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $base_table_name = 'pigeon_%s_task_logs';
+	protected static $base_table_name = 'shepherd_%s_task_logs';
 
 	/**
 	 * The table group.
@@ -73,7 +73,7 @@ class Task_Logs extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $group = 'stellarwp_pigeon';
+	protected static $group = 'stellarwp_shepherd';
 
 	/**
 	 * The slug used to identify the custom table.
@@ -82,7 +82,7 @@ class Task_Logs extends Table {
 	 *
 	 * @var string
 	 */
-	protected static $schema_slug = 'stellarwp-pigeon-%s-task-logs';
+	protected static $schema_slug = 'stellarwp-shepherd-%s-task-logs';
 
 	/**
 	 * The field that uniquely identifies a row in the table.

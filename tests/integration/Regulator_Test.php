@@ -2,24 +2,24 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
-use StellarWP\Pigeon\Provider;
-use StellarWP\Pigeon\Tests\Tasks\Do_Action_Task;
-use StellarWP\Pigeon\Tests\Tasks\Always_Fail_Task;
-use StellarWP\Pigeon\Tests\Tasks\Do_Prefixed_Action_Task;
-use StellarWP\Pigeon\Tests\Tasks\Retryable_Do_Action_Task;
-use StellarWP\Pigeon\Tests\Tasks\Internal_Counting_Task;
-use StellarWP\Pigeon\Tests\Traits\With_AS_Assertions;
-use StellarWP\Pigeon\Tests\Traits\With_Clock_Mock;
-use StellarWP\Pigeon\Tests\Traits\With_Log_Snapshot;
-use StellarWP\Pigeon\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
+use StellarWP\Shepherd\Provider;
+use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
+use StellarWP\Shepherd\Tests\Tasks\Always_Fail_Task;
+use StellarWP\Shepherd\Tests\Tasks\Do_Prefixed_Action_Task;
+use StellarWP\Shepherd\Tests\Tasks\Retryable_Do_Action_Task;
+use StellarWP\Shepherd\Tests\Tasks\Internal_Counting_Task;
+use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
+use StellarWP\Shepherd\Tests\Traits\With_Clock_Mock;
+use StellarWP\Shepherd\Tests\Traits\With_Log_Snapshot;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use Exception;
 
-use function StellarWP\Pigeon\pigeon;
+use function StellarWP\Shepherd\shepherd;
 
 class Regulator_Test extends WPTestCase {
 	use With_AS_Assertions;
@@ -32,14 +32,14 @@ class Regulator_Test extends WPTestCase {
 	 * @after
 	 */
 	public function reset(): void {
-		pigeon()->bust_runtime_cached_tasks();
+		shepherd()->bust_runtime_cached_tasks();
 	}
 
 	/**
 	 * @before
 	 */
 	public function freeze(): void {
-		$this->freeze_time( tests_pigeon_get_dt() );
+		$this->freeze_time( tests_shepherd_get_dt() );
 	}
 
 	private function get_logger(): Logger {
@@ -50,13 +50,13 @@ class Regulator_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_schedule_and_process_task_without_args(): void {
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Do_Action_Task();
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 
@@ -87,16 +87,16 @@ class Regulator_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_schedule_same_task_only_once(): void {
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Internal_Counting_Task();
 
-		$this->assertSame( 0, did_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled' ) );
-		$pigeon->dispatch( $dummy_task );
-		$this->assertSame( 0, did_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled' ) );
+		$this->assertSame( 0, did_action( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_already_scheduled' ) );
+		$shepherd->dispatch( $dummy_task );
+		$this->assertSame( 0, did_action( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_already_scheduled' ) );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 
@@ -104,13 +104,13 @@ class Regulator_Test extends WPTestCase {
 
 		$this->assertTaskIsScheduledForExecutionAt( $last_scheduled_task_id, time() );
 
-		$pigeon->dispatch( $dummy_task );
-		$this->assertSame( 1, did_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled' ) );
-		$this->assertEquals( $pigeon->get_last_scheduled_task_id(), $last_scheduled_task_id );
+		$shepherd->dispatch( $dummy_task );
+		$this->assertSame( 1, did_action( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_already_scheduled' ) );
+		$this->assertEquals( $shepherd->get_last_scheduled_task_id(), $last_scheduled_task_id );
 
-		$pigeon->dispatch( new Internal_Counting_Task() );
-		$this->assertSame( 2, did_action( 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled' ) );
-		$this->assertEquals( $pigeon->get_last_scheduled_task_id(), $last_scheduled_task_id );
+		$shepherd->dispatch( new Internal_Counting_Task() );
+		$this->assertSame( 2, did_action( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_already_scheduled' ) );
+		$this->assertEquals( $shepherd->get_last_scheduled_task_id(), $last_scheduled_task_id );
 
 		$this->assertSame( 0, did_action( $dummy_task->get_task_name() ) );
 
@@ -135,14 +135,14 @@ class Regulator_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_schedule_and_process_task_with_args(): void {
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Do_Prefixed_Action_Task( 'dimi' );
 
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 
@@ -173,13 +173,13 @@ class Regulator_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_retry_task_and_mark_as_failed(): void {
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Always_Fail_Task( 'arg1', 'arg2', 55, 44 );
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 
@@ -211,13 +211,13 @@ class Regulator_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_retry_task_and_succeed(): void {
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Retryable_Do_Action_Task();
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 

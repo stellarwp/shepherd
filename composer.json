@@ -1,5 +1,5 @@
 {
-  "name": "stellarwp/pigeon",
+  "name": "stellarwp/shepherd",
   "description": "A library for offloading tasks to background processes.",
   "type": "library",
   "license": "GPL-2.0",
@@ -13,7 +13,7 @@
   },
   "autoload": {
     "psr-4": {
-      "StellarWP\\Pigeon\\": "src/"
+      "StellarWP\\Shepherd\\": "src/"
     },
     "files": [
       "src/functions.php"
@@ -21,7 +21,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "StellarWP\\Pigeon\\Tests\\": "tests/_support/Helper/"
+      "StellarWP\\Shepherd\\Tests\\": "tests/_support/Helper/"
     }
   },
   "authors": [

@@ -30,12 +30,12 @@ public function __construct(
 
 ## Configuration
 
-- **Task Prefix**: `pigeon_http_`
+- **Task Prefix**: `shepherd_http_`
 - **Max Retries**: 10 additional attempts (11 total attempts)
 - **Retry Delay**: Exponential backoff using base class defaults
 - **Default Timeout**: 3 seconds
 - **Priority**: 10 (default)
-- **Group**: `pigeon_{prefix}_queue_default`
+- **Group**: `shepherd_{prefix}_queue_default`
 
 ## Default Request Arguments
 
@@ -60,26 +60,26 @@ The HTTP_Request task uses intelligent error handling:
 - **WP_Error responses**: Network failures, DNS issues, etc.
 - **4xx HTTP errors**: Client errors (400, 401, 403, 404, etc.)
 
-These throw `PigeonTaskFailWithoutRetryException` and do not retry.
+These throw `ShepherdTaskFailWithoutRetryException` and do not retry.
 
 ### Retryable Failures
 
 - **5xx HTTP errors**: Server errors (500, 502, 503, etc.)
 - **Other non-2xx responses**: Redirects that exceed limits, etc.
 
-These throw `PigeonTaskException` and retry up to 10 times with exponential backoff.
+These throw `ShepherdTaskException` and retry up to 10 times with exponential backoff.
 
 ## Usage Examples
 
 ### Basic GET Request
 
 ```php
-use StellarWP\Pigeon\Tasks\HTTP_Request;
-use function StellarWP\Pigeon\pigeon;
+use StellarWP\Shepherd\Tasks\HTTP_Request;
+use function StellarWP\Shepherd\shepherd;
 
 // Simple GET request with 3-second timeout
 $request = new HTTP_Request( 'https://api.example.com/status' );
-pigeon()->dispatch( $request );
+shepherd()->dispatch( $request );
 ```
 
 ### POST Request with JSON Body
@@ -102,7 +102,7 @@ $webhook = new HTTP_Request(
     ],
     'POST'
 );
-pigeon()->dispatch( $webhook );
+shepherd()->dispatch( $webhook );
 ```
 
 ### Custom Authentication
@@ -124,14 +124,14 @@ $request = new Authenticated_API_Request(
     'https://api.example.com/protected',
     ['timeout' => 30]
 );
-pigeon()->dispatch( $request );
+shepherd()->dispatch( $request );
 ```
 
 ## Special Features
 
 ### Task ID Header
 
-Every request automatically includes an `X-Pigeon-Task-ID` header containing the task's database ID. This helps with debugging and request tracking.
+Every request automatically includes an `X-Shepherd-Task-ID` header containing the task's database ID. This helps with debugging and request tracking.
 
 ### Security Defaults
 
@@ -153,7 +153,7 @@ When a request completes successfully (2xx response), this action fires:
  * @param HTTP_Request $task     The task instance
  * @param array        $response Full wp_remote_request response
  */
-do_action( 'pigeon_{prefix}_http_request_processed', $task, $response );
+do_action( 'shepherd_{prefix}_http_request_processed', $task, $response );
 ```
 
 ### Failure Hook
@@ -165,9 +165,9 @@ When a request fails without retry (4xx errors, WP_Error):
  * Fires when HTTP request fails without retry.
  *
  * @param HTTP_Request                        $task      The task instance
- * @param PigeonTaskFailWithoutRetryException $exception The exception
+ * @param ShepherdTaskFailWithoutRetryException $exception The exception
  */
-do_action( 'pigeon_{prefix}_task_failed_without_retry', $task, $exception );
+do_action( 'shepherd_{prefix}_task_failed_without_retry', $task, $exception );
 ```
 
 ## Error Examples
@@ -176,10 +176,10 @@ do_action( 'pigeon_{prefix}_task_failed_without_retry', $task, $exception );
 
 ```php
 $request = new HTTP_Request( 'https://api.example.com/nonexistent' );
-pigeon()->dispatch( $request );
+shepherd()->dispatch( $request );
 
 // If API returns 404, task fails immediately:
-// PigeonTaskFailWithoutRetryException:
+// ShepherdTaskFailWithoutRetryException:
 // HTTP GET request to https://api.example.com/nonexistent returned error 404: `Not Found`
 ```
 
@@ -187,10 +187,10 @@ pigeon()->dispatch( $request );
 
 ```php
 $request = new HTTP_Request( 'https://unstable-api.example.com/data' );
-pigeon()->dispatch( $request );
+shepherd()->dispatch( $request );
 
 // If API returns 500, task retries up to 10 times:
-// PigeonTaskException:
+// ShepherdTaskException:
 // HTTP GET request to https://unstable-api.example.com/data returned error 500: `Internal Server Error`
 ```
 
@@ -198,10 +198,10 @@ pigeon()->dispatch( $request );
 
 ```php
 $request = new HTTP_Request( 'https://nonexistent-domain.invalid' );
-pigeon()->dispatch( $request );
+shepherd()->dispatch( $request );
 
 // DNS failure results in immediate failure:
-// PigeonTaskFailWithoutRetryException:
+// ShepherdTaskFailWithoutRetryException:
 // HTTP GET request to https://nonexistent-domain.invalid failed with code: `http_request_failed` and message: `Could not resolve host`
 ```
 

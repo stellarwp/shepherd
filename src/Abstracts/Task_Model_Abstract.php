@@ -1,30 +1,30 @@
 <?php
 /**
- * The Pigeon task model abstract.
+ * The Shepherd task model abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Abstracts;
+ * @package StellarWP\Shepherd\Abstracts;
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
-use StellarWP\Pigeon\Contracts\Task_Model;
+use StellarWP\Shepherd\Contracts\Task_Model;
 use RuntimeException;
-use StellarWP\Pigeon\Tables\Tasks as Tasks_Table;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Contracts\Task;
-use StellarWP\Pigeon\Action_Scheduler_Methods;
-use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
+use StellarWP\Shepherd\Tables\Tasks as Tasks_Table;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Contracts\Task;
+use StellarWP\Shepherd\Action_Scheduler_Methods;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
 
 /**
- * The Pigeon task model abstract.
+ * The Shepherd task model abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Abstracts;
+ * @package StellarWP\Shepherd\Abstracts;
  */
 abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model {
 	/**
@@ -250,7 +250,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	 *
 	 * @return int The id of the saved task.
 	 *
-	 * @throws PigeonTaskAlreadyExistsException If multiple tasks are found with the same arguments hash.
+	 * @throws ShepherdTaskAlreadyExistsException If multiple tasks are found with the same arguments hash.
 	 * @throws RuntimeException                 If multiple tasks are found with the same arguments hash.
 	 */
 	public function save(): int {
@@ -268,7 +268,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 		$number_of_unique_actions = count( array_unique( $action_ids ) );
 
 		if ( $number_of_actions !== $number_of_unique_actions ) {
-			throw new PigeonTaskAlreadyExistsException( 'Multiple tasks found with the same arguments hash.' );
+			throw new ShepherdTaskAlreadyExistsException( 'Multiple tasks found with the same arguments hash.' );
 		}
 
 		$pending_actions = Action_Scheduler_Methods::get_pending_actions_by_ids( $action_ids );
