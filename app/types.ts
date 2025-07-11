@@ -1,4 +1,4 @@
-import type { Operator, SortDirection } from '@wordpress/dataviews';
+import type { SortDirection } from '@wordpress/dataviews';
 
 export type TaskData = {
 	args: any[];
@@ -67,11 +67,7 @@ export type TaskArgs = {
 	order?: SortDirection;
 	orderby?: string;
 	search?: string;
-	filters?: {
-		field: string;
-		operator: Operator;
-		value: any;
-	}[];
+	filters?: string;
 };
 
 export type AjaxTasksResponse = {

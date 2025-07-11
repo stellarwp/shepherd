@@ -220,6 +220,7 @@ export const getTasks = async (
 		} );
 
 		if ( ! response.success ) {
+			// eslint-disable-next-line no-console
 			console.error( response );
 
 			return {
@@ -251,6 +252,7 @@ export const getTasks = async (
 			},
 		};
 	} catch ( error ) {
+		// eslint-disable-next-line no-console
 		console.error( error );
 
 		return {

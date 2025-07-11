@@ -56,24 +56,28 @@ export const ShepherdTable = (): React.ReactNode => {
 			fields: Field< any >[];
 			paginationInfo: PaginationInfo;
 		} > => {
-			const { data, paginationInfo } = await getTasks( args );
-			const fields = getFields( data );
+			const pageData = await getTasks( args );
+			const fieldsData = getFields( data );
 
-			return { data, fields, paginationInfo };
+			return {
+				data: pageData.data,
+				fields: fieldsData,
+				paginationInfo: pageData.paginationInfo,
+			};
 		};
 
 		promise().then(
-			( args: {
+			( resolvedData: {
 				data: Task[];
 				fields: Field< any >[];
 				paginationInfo: PaginationInfo;
 			} ): void => {
-				setData( args.data );
-				setFields( args.fields );
-				setPaginationInfo( args.paginationInfo );
+				setData( resolvedData.data );
+				setFields( resolvedData.fields );
+				setPaginationInfo( resolvedData.paginationInfo );
 			}
 		);
-	}, [ args ] );
+	}, [ args, data ] );
 
 	const defaultLayouts = {
 		table: {
