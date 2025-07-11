@@ -8,6 +8,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
 use StellarWP\Shepherd\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
 use StellarWP\DB\DB;
 
 class Provider_Test extends WPTestCase {
@@ -33,7 +34,6 @@ class Provider_Test extends WPTestCase {
 	public function it_should_register_action_deletion_hook(): void {
 		$provider = Config::get_container()->get( Provider::class );
 		
-		// Check that the action_scheduler_deleted_action hook is registered
 		$this->assertTrue( has_action( 'action_scheduler_deleted_action', [ $provider, 'delete_tasks_on_action_deletion' ] ) );
 	}
 
@@ -42,33 +42,69 @@ class Provider_Test extends WPTestCase {
 	 */
 	public function it_should_delete_tasks_on_action_deletion_when_tasks_exist(): void {
 		$provider = Config::get_container()->get( Provider::class );
-		$action_id = 123;
+		$shepherd = shepherd();
 		
-		// Mock task IDs that would be found
-		$task_ids = [ '1', '2', '3' ];
-		$this->set_fn_return( [ DB::class, 'get_col' ], $task_ids );
+		// Create real tasks using Shepherd's API.
+		$test_task_1 = new Do_Action_Task();
+		$shepherd->dispatch( $test_task_1 );
+		$task_id_1 = $shepherd->get_last_scheduled_task_id();
 		
-		// Track DB queries
-		$queries = [];
-		$this->set_fn_return( [ DB::class, 'query' ], function ( $query ) use ( &$queries ) {
-			$queries[] = $query;
-			return true;
-		} );
+		$test_task_2 = new Do_Action_Task();
+		$shepherd->dispatch( $test_task_2 );
+		$task_id_2 = $shepherd->get_last_scheduled_task_id();
 		
-		$provider->delete_tasks_on_action_deletion( $action_id );
+		$test_task_3 = new Do_Action_Task();
+		$shepherd->dispatch( $test_task_3 );
+		$task_id_3 = $shepherd->get_last_scheduled_task_id();
 		
-		// Should have executed 2 DELETE queries
-		$this->assertCount( 2, $queries );
+		// Get actual action IDs from the tasks.
+		$action_id_1 = $this->get_task_action_id( $task_id_1 );
+		$action_id_2 = $this->get_task_action_id( $task_id_2 );
+		$action_id_3 = $this->get_task_action_id( $task_id_3 );
 		
-		// First query should delete from task logs
-		$this->assertStringContainsString( 'DELETE FROM', $queries[0] );
-		$this->assertStringContainsString( Task_Logs::table_name(), $queries[0] );
-		$this->assertStringContainsString( 'task_id IN (1,2,3)', $queries[0] );
+		// Set them all to the same action ID for testing.
+		DB::query(
+			DB::prepare(
+				'UPDATE %i SET action_id = %d WHERE %i IN (%d, %d, %d)',
+				Tasks::table_name(),
+				$action_id_1,
+				Tasks::uid_column(),
+				$task_id_1,
+				$task_id_2,
+				$task_id_3
+			)
+		);
 		
-		// Second query should delete from tasks
-		$this->assertStringContainsString( 'DELETE FROM', $queries[1] );
-		$this->assertStringContainsString( Tasks::table_name(), $queries[1] );
-		$this->assertStringContainsString( 'IN (1,2,3)', $queries[1] );
+		$tasks_before = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE action_id = %d',
+				Tasks::table_name(),
+				$action_id_1
+			)
+		);
+		$this->assertEquals( 3, $tasks_before );
+		
+		$provider->delete_tasks_on_action_deletion( $action_id_1 );
+		
+		$tasks_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE action_id = %d',
+				Tasks::table_name(),
+				$action_id_1
+			)
+		);
+		$this->assertEquals( 0, $tasks_after );
+		
+		$logs_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE task_id IN (%d, %d, %d)',
+				Task_Logs::table_name(),
+				$task_id_1,
+				$task_id_2,
+				$task_id_3
+			)
+		);
+		$this->assertEquals( 0, $logs_after );
 	}
 
 	/**
@@ -78,20 +114,25 @@ class Provider_Test extends WPTestCase {
 		$provider = Config::get_container()->get( Provider::class );
 		$action_id = 456;
 		
-		// Mock empty result
-		$this->set_fn_return( [ DB::class, 'get_col' ], [] );
-		
-		// Track DB queries
-		$queries = [];
-		$this->set_fn_return( [ DB::class, 'query' ], function ( $query ) use ( &$queries ) {
-			$queries[] = $query;
-			return true;
-		} );
+		$tasks_before = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE action_id = %d',
+				Tasks::table_name(),
+				$action_id
+			)
+		);
+		$this->assertEquals( 0, $tasks_before );
 		
 		$provider->delete_tasks_on_action_deletion( $action_id );
 		
-		// Should not have executed any DELETE queries
-		$this->assertCount( 0, $queries );
+		$tasks_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE action_id = %d',
+				Tasks::table_name(),
+				$action_id
+			)
+		);
+		$this->assertEquals( 0, $tasks_after );
 	}
 
 	/**
@@ -99,45 +140,71 @@ class Provider_Test extends WPTestCase {
 	 */
 	public function it_should_sanitize_task_ids_before_deletion(): void {
 		$provider = Config::get_container()->get( Provider::class );
-		$action_id = 789;
+		$shepherd = shepherd();
 		
-		// Mock task IDs with duplicates and mixed types
-		$mixed_task_ids = [ '1', '2', '2', '3', 1, 2 ];
-		$this->set_fn_return( [ DB::class, 'get_col' ], $mixed_task_ids );
+		// Create real tasks using Shepherd's API.
+		$test_task_1 = new Do_Action_Task();
+		$shepherd->dispatch( $test_task_1 );
+		$task_id_1 = $shepherd->get_last_scheduled_task_id();
 		
-		// Track DB queries
-		$queries = [];
-		$this->set_fn_return( [ DB::class, 'query' ], function ( $query ) use ( &$queries ) {
-			$queries[] = $query;
-			return true;
-		} );
+		$test_task_2 = new Do_Action_Task();
+		$shepherd->dispatch( $test_task_2 );
+		$task_id_2 = $shepherd->get_last_scheduled_task_id();
 		
-		$provider->delete_tasks_on_action_deletion( $action_id );
+		$test_task_3 = new Do_Action_Task();
+		$shepherd->dispatch( $test_task_3 );
+		$task_id_3 = $shepherd->get_last_scheduled_task_id();
 		
-		// Should have deduplicated the IDs
-		$this->assertStringContainsString( 'task_id IN (1,2,3)', $queries[0] );
-		$this->assertStringContainsString( 'IN (1,2,3)', $queries[1] );
+		// Get first task's action ID to use for all.
+		$common_action_id = $this->get_task_action_id( $task_id_1 );
+		
+		// Update all tasks to have the same action_id to test deduplication.
+		DB::query(
+			DB::prepare(
+				'UPDATE %i SET action_id = %d WHERE %i IN (%d, %d, %d)',
+				Tasks::table_name(),
+				$common_action_id,
+				Tasks::uid_column(),
+				$task_id_1,
+				$task_id_2,
+				$task_id_3
+			)
+		);
+		
+		$provider->delete_tasks_on_action_deletion( $common_action_id );
+		
+		$tasks_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE action_id = %d',
+				Tasks::table_name(),
+				$common_action_id
+			)
+		);
+		$this->assertEquals( 0, $tasks_after );
+		
+		$logs_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE task_id IN (%d, %d, %d)',
+				Task_Logs::table_name(),
+				$task_id_1,
+				$task_id_2,
+				$task_id_3
+			)
+		);
+		$this->assertEquals( 0, $logs_after );
 	}
 
 	/**
-	 * @test
+	 * Helper method to get action_id for a task.
 	 */
-	public function it_should_query_for_tasks_with_correct_action_id(): void {
-		$provider = Config::get_container()->get( Provider::class );
-		$action_id = 999;
-		
-		// Track DB queries
-		$queries = [];
-		$this->set_fn_return( [ DB::class, 'get_col' ], function ( $query ) use ( &$queries ) {
-			$queries[] = $query;
-			return [];
-		} );
-		
-		$provider->delete_tasks_on_action_deletion( $action_id );
-		
-		// Should have queried for the correct action ID
-		$this->assertCount( 1, $queries );
-		$this->assertStringContainsString( 'action_id = 999', $queries[0] );
-		$this->assertStringContainsString( Tasks::table_name(), $queries[0] );
+	private function get_task_action_id( int $task_id ): int {
+		return (int) DB::get_var(
+			DB::prepare(
+				'SELECT action_id FROM %i WHERE %i = %d',
+				Tasks::table_name(),
+				Tasks::uid_column(),
+				$task_id
+			)
+		);
 	}
 }
