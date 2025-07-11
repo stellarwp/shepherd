@@ -74,6 +74,37 @@ class Authenticated_HTTP_Request extends HTTP_Request {
 }
 ```
 
+### [Herding Task](./tasks/herding.md)
+
+Maintains database integrity by automatically cleaning up orphaned task data.
+
+**Key Features:**
+
+- Automatic scheduling (every 6 hours)
+- Removes orphaned task records and logs
+- Safe database operations with prepared statements
+- Completion hooks for extensibility
+- No-op when no cleanup needed
+
+**Automatic Usage:**
+
+```php
+// Runs automatically every 6 hours - no manual intervention needed
+// Attached to WordPress 'init' hook with priority 20
+```
+
+**Manual Usage:**
+
+```php
+use StellarWP\Shepherd\Tasks\Herding;
+
+// Dispatch immediately for manual cleanup
+shepherd()->dispatch( new Herding() );
+
+// Or schedule for later
+shepherd()->dispatch( new Herding(), HOUR_IN_SECONDS );
+```
+
 ## Creating Your Own Tasks
 
 To create custom tasks, extend the `Task_Abstract` class:

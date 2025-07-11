@@ -223,16 +223,76 @@ protected function validate_args( ...$args ): void {
 }
 ```
 
+## Database Cleanup
+
+Shepherd includes automatic database cleanup to maintain data integrity and prevent orphaned records.
+
+### Automatic Cleanup on Action Deletion
+
+When Action Scheduler deletes actions (through cleanup, manual deletion, or other processes), Shepherd automatically removes the corresponding task data to prevent orphaned records.
+
+**How it works:**
+
+1. **Hook Registration**: The `action_scheduler_deleted_action` hook is registered during Shepherd initialization
+2. **Automatic Cleanup**: When an action is deleted, Shepherd queries for associated tasks
+3. **Cascade Deletion**: Both task records and their logs are removed from Shepherd's tables
+4. **Data Integrity**: Prevents accumulation of orphaned data
+
+**Example behavior:**
+
+```php
+// When Action Scheduler deletes an action with ID 123
+do_action( 'action_scheduler_deleted_action', 123 );
+
+// Shepherd automatically:
+// 1. Finds tasks with action_id = 123
+// 2. Deletes associated logs from shepherd_task_logs
+// 3. Deletes task records from shepherd_tasks
+// No manual intervention required
+```
+
+### Periodic Cleanup with Herding Task
+
+The [Herding task](tasks/herding.md) runs every 6 hours to clean up any orphaned data that might exist due to:
+
+- Database corruption
+- External modifications to Action Scheduler tables
+- Race conditions during cleanup
+
+**Combined Strategy:**
+
+- **Immediate cleanup**: Action deletion hook removes data when actions are deleted
+- **Periodic cleanup**: Herding task catches any missed orphaned data
+- **Database integrity**: Ensures consistent state between Shepherd and Action Scheduler
+
+### Manual Cleanup
+
+If you need to manually clean up orphaned data:
+
+```php
+// Run the Herding task immediately
+shepherd()->dispatch( new \StellarWP\Shepherd\Tasks\Herding() );
+
+// Or trigger Action Scheduler cleanup
+as_unschedule_all_actions( 'shepherd_task_prefix' );
+```
+
 ## Performance Considerations
 
 ### Database Optimization
 
 The task tables include indexes on:
 
-- `action_id`: For Action Scheduler integration
+- `action_id`: For Action Scheduler integration and cleanup operations
 - `args_hash`: For duplicate detection
 - `class_hash`: For task type queries
 - `task_id`: For log retrieval
+
+### Cleanup Performance
+
+- **Batch Operations**: Cleanup operations use batch deletions for efficiency
+- **Indexed Queries**: All cleanup queries use indexed columns for optimal performance
+- **Minimal Overhead**: Action deletion hooks add minimal overhead to Action Scheduler operations
 
 ## Advanced Integration
 

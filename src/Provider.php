@@ -128,7 +128,9 @@ class Provider extends Provider_Abstract {
 				Tasks::uid_column(),
 				Tasks::table_name(),
 				'action_id',
-		) );
+				$action_id
+			)
+		);
 
 		if ( empty( $task_ids ) ) {
 			return;
