@@ -2,13 +2,13 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tasks;
+namespace StellarWP\Shepherd\Tasks;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use InvalidArgumentException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
 use TypeError;
-use StellarWP\Pigeon\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 
 class Email_Test extends WPTestCase {
 	use With_Uopz;
@@ -60,12 +60,12 @@ class Email_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_throw_pigeon_exception_if_wp_mail_fails() {
+	public function it_should_throw_shepherd_exception_if_wp_mail_fails() {
 		$email = new Email( 'test@test.com', 'Subject', 'Body' );
 
 		$this->set_fn_return( 'wp_mail', false );
 
-		$this->expectException( PigeonTaskException::class );
+		$this->expectException( ShepherdTaskException::class );
 		$email->process();
 	}
 }

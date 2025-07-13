@@ -8,5 +8,5 @@ codeception.*     export-ignore
 phpcs.xml         export-ignore
 phpstan.neon.dist export-ignore
 docs              export-ignore
-pigeon.php        export-ignore
 app/              export-ignore
+shepherd.php      export-ignore

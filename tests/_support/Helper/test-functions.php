@@ -1,12 +1,12 @@
 <?php
-use StellarWP\Pigeon\Tests\Container;
+use StellarWP\Shepherd\Tests\Container;
 use StellarWP\ContainerContract\ContainerInterface;
-use StellarWP\Pigeon\Tables\Tasks;
-use StellarWP\Pigeon\Tables\Task_Logs;
+use StellarWP\Shepherd\Tables\Tasks;
+use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Provider;
-use StellarWP\Pigeon\Tables;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Provider;
+use StellarWP\Shepherd\Tables;
 use StellarWP\Schema\Register;
 
 /**
@@ -14,8 +14,8 @@ use StellarWP\Schema\Register;
  *
  * @return void
  */
-function tests_pigeon_drop_tables() {
-	$container           = tests_pigeon_get_container();
+function tests_shepherd_drop_tables() {
+	$container           = tests_shepherd_get_container();
 	$safe_dynamic_prefix = $container->get( Tables\Utility\Safe_Dynamic_Prefix::class );
 
 	$tables        = [];
@@ -49,7 +49,7 @@ function tests_pigeon_drop_tables() {
  *
  * @return void
  */
-function tests_pigeon_raise_auto_increment(): void {
+function tests_shepherd_raise_auto_increment(): void {
 	DB::query( DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = 86740', DB::prefix( 'actionscheduler_actions' ) ) );
 	DB::query( DB::prepare( 'ALTER TABLE %i AUTO_INCREMENT = 94540', DB::prefix( 'actionscheduler_logs' ) ) );
 
@@ -70,10 +70,10 @@ function tests_pigeon_raise_auto_increment(): void {
  *
  * @return void
  */
-function tests_pigeon_reset_config(): void {
+function tests_shepherd_reset_config(): void {
 	Config::reset();
-	Config::set_hook_prefix( tests_pigeon_get_hook_prefix() );
-	Config::set_container( tests_pigeon_get_container() );
+	Config::set_hook_prefix( tests_shepherd_get_hook_prefix() );
+	Config::set_container( tests_shepherd_get_container() );
 	Config::set_max_table_name_length( 25 );
 }
 
@@ -82,7 +82,7 @@ function tests_pigeon_reset_config(): void {
  *
  * @return string
  */
-function tests_pigeon_get_hook_prefix(): string {
+function tests_shepherd_get_hook_prefix(): string {
 	return 'foobar';
 }
 
@@ -91,7 +91,7 @@ function tests_pigeon_get_hook_prefix(): string {
  *
  * @return ContainerInterface
  */
-function tests_pigeon_get_container(): ContainerInterface {
+function tests_shepherd_get_container(): ContainerInterface {
 	static $container = null;
 
 	if ( null === $container ) {
@@ -107,7 +107,7 @@ function tests_pigeon_get_container(): ContainerInterface {
  *
  * @return DateTimeInterface
  */
-function tests_pigeon_get_dt(): DateTimeInterface {
+function tests_shepherd_get_dt(): DateTimeInterface {
 	return new DateTime( '2025-06-13 17:25:00', new DateTimeZone( 'UTC' ) );
 }
 
@@ -116,24 +116,24 @@ function tests_pigeon_get_dt(): DateTimeInterface {
  *
  * @return void
  */
-function tests_pigeon_common_bootstrap(): void {
-	tests_pigeon_reset_config();
-	tests_pigeon_drop_tables();
+function tests_shepherd_common_bootstrap(): void {
+	tests_shepherd_reset_config();
+	tests_shepherd_drop_tables();
 
 	$container = Config::get_container();
 
-	// Bootstrap Pigeon.
+	// Bootstrap Shepherd.
 	$container->singleton( Provider::class );
 	$container->get( Provider::class )->register();
 
 	// For tests we forcefully register the task logs table for it to exist.
 	Register::table( Task_Logs::class );
 
-	tests_pigeon_raise_auto_increment();
+	tests_shepherd_raise_auto_increment();
 
 	// Drop the tables after the tests are done.
 	tests_add_filter(
 		'shutdown',
-		'tests_pigeon_drop_tables'
+		'tests_shepherd_drop_tables'
 	);
 }

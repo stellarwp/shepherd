@@ -1,26 +1,26 @@
 <?php
 /**
- * The Pigeon log model abstract.
+ * The Shepherd log model abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Contracts\Log_Model;
-use StellarWP\Pigeon\Tables\Task_Logs as Task_Logs_Table;
-use StellarWP\Pigeon\Tables\AS_Logs as AS_Logs_Table;
-use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Abstracts\Model_Abstract;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Contracts\Log_Model;
+use StellarWP\Shepherd\Tables\Task_Logs as Task_Logs_Table;
+use StellarWP\Shepherd\Tables\AS_Logs as AS_Logs_Table;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Abstracts\Model_Abstract;
 use DateTimeInterface;
-use StellarWP\Pigeon\Abstracts\Table_Abstract;
+use StellarWP\Shepherd\Abstracts\Table_Abstract;
 use Psr\Log\LogLevel;
 use InvalidArgumentException;
 use DateTime;
@@ -28,11 +28,11 @@ use RuntimeException;
 use StellarWP\DB\DB;
 
 /**
- * The Pigeon log model abstract.
+ * The Shepherd log model abstract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 class Log extends Model_Abstract implements Log_Model {
 	/**
@@ -362,7 +362,7 @@ class Log extends Model_Abstract implements Log_Model {
 			$table = Task_Logs_Table::class;
 		}
 
-		$table = apply_filters( 'pigeon_' . Config::get_hook_prefix() . '_log_table_interface', $table, $logger );
+		$table = apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_log_table_interface', $table, $logger );
 
 		if ( ! is_string( $table ) || ! class_exists( $table ) ) {
 			throw new RuntimeException( 'Invalid log table interface.' );
@@ -422,7 +422,7 @@ class Log extends Model_Abstract implements Log_Model {
 			unset( $model['id'] );
 		}
 
-		$model['message'] = 'pigeon_' . Config::get_hook_prefix() . '||' . $model['task_id'] . '||' . $model['type'] . '||' . $model['level'] . '||' . $model['entry'];
+		$model['message'] = 'shepherd_' . Config::get_hook_prefix() . '||' . $model['task_id'] . '||' . $model['type'] . '||' . $model['level'] . '||' . $model['entry'];
 		unset( $model['entry'], $model['task_id'], $model['type'], $model['level'] );
 
 		return $model;

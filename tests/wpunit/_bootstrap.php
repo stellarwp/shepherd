@@ -1,3 +1,3 @@
 <?php
 
-tests_pigeon_common_bootstrap();
+tests_shepherd_common_bootstrap();

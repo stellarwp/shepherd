@@ -1,18 +1,16 @@
-# Getting Started with Pigeon
+# Getting Started with Shepherd
 
-This guide will walk you through the basics of installing and using Pigeon to run your first background task.
+Install and use Shepherd to run your first background task.
 
 ## Installation
 
-Pigeon is a Composer package that provides a robust background task processing system for WordPress applications. To install it, you'll need to have Composer in your project. If you don't have it already, you can follow the instructions on the [Composer website](https://getcomposer.org/).
-
-Once you have Composer set up, you can add Pigeon to your project by running the following command in your project's root directory:
+Shepherd provides robust background task processing for WordPress. Install via Composer:
 
 ```bash
-composer require stellarwp/pigeon
+composer require stellarwp/shepherd
 ```
 
-After installing Pigeon, you need to make sure you're including the Composer autoloader in your plugin or theme. This is typically done by adding the following line to your main plugin file or `functions.php`:
+Include the Composer autoloader in your plugin or theme:
 
 ```php
 require_once __DIR__ . '/vendor/autoload.php';
@@ -20,11 +18,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 ## Configuration and Registration
 
-Pigeon requires a DI container that implements `StellarWP\ContainerContract\ContainerInterface`. You need to configure and register Pigeon before using it. This is typically done in your plugin's main file:
+Shepherd requires a DI container implementing `StellarWP\ContainerContract\ContainerInterface`. Register Shepherd in your plugin:
 
 ```php
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Provider;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Provider;
 
 // Example function to get your container instance
 function get_my_container(): \StellarWP\ContainerContract\ContainerInterface {
@@ -32,7 +30,7 @@ function get_my_container(): \StellarWP\ContainerContract\ContainerInterface {
     return $container;
 }
 
-// Register Pigeon (at the latest on plugins_loaded)
+// Register Shepherd (at the latest on plugins_loaded)
 add_action( 'plugins_loaded', function() {
     // IMPORTANT: Set the hook prefix first (required)
     Config::set_hook_prefix( 'my_app' ); // Use a unique prefix for your application
@@ -40,20 +38,20 @@ add_action( 'plugins_loaded', function() {
     // Get your container instance
     $container = get_my_container();
 
-    // Register Pigeon as a singleton
+    // Register Shepherd as a singleton
     $container->singleton( Provider::class );
 
-    // Set the container for Pigeon.
+    // Set the container for Shepherd.
     Config::set_container( $container );
 
-    // Initialize Pigeon
+    // Initialize Shepherd
     $container->get( Provider::class )->register();
 } );
 ```
 
 ### Configuration Options
 
-Before registering Pigeon, you can configure it using the `Config` class:
+Configure Shepherd before registration:
 
 ```php
 // Set a custom logger (optional - defaults to DB_Logger)
@@ -65,16 +63,14 @@ $prefix = Config::get_hook_prefix();
 
 ## Creating Your First Task
 
-Tasks in Pigeon are classes that extend the `StellarWP\Pigeon\Abstracts\Task_Abstract` class. At a minimum, you need to implement the `process()` method and `get_task_prefix()` method.
-
-Let's create a simple task that logs a message:
+Tasks extend `Task_Abstract` and implement `process()` and `get_task_prefix()` methods:
 
 ```php
 <?php
 
 namespace My\App\Tasks;
 
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
 
 class Log_Message_Task extends Task_Abstract {
     /**
@@ -97,7 +93,7 @@ class Log_Message_Task extends Task_Abstract {
         $code = $this->get_args()[1];
 
         // Your task logic here
-        error_log( 'Pigeon Task: ' . $message . ' with code ' . $code );
+        error_log( 'Shepherd Task: ' . $message . ' with code ' . $code );
 
         // If something goes wrong, throw an exception
         if ( $code >= 400 ) {
@@ -124,43 +120,43 @@ class Log_Message_Task extends Task_Abstract {
 
 ## Dispatching Your Task
 
-Once you've created your task, you can dispatch it using the `pigeon()` helper function:
+Dispatch tasks using the `shepherd()` helper:
 
 ```php
 use My\App\Tasks\Log_Message_Task;
-use function StellarWP\Pigeon\pigeon;
+use function StellarWP\Shepherd\shepherd;
 
 // Create a task instance
 $my_task = new Log_Message_Task( 'Hello, World!', 200 );
 
 // Dispatch immediately
-pigeon()->dispatch( $my_task );
+shepherd()->dispatch( $my_task );
 
 // Or dispatch with a delay (in seconds)
-pigeon()->dispatch( $my_task, 5 * MINUTE_IN_SECONDS ); // Execute after 5 minutes
+shepherd()->dispatch( $my_task, 5 * MINUTE_IN_SECONDS ); // Execute after 5 minutes
 ```
 
 ### What Happens Next?
 
-1. Pigeon schedules your task with Action Scheduler
-2. WordPress cron (or another Action Scheduler's runner, like CLI) picks up the task
-3. Your task's `process()` method is executed
-4. The task lifecycle is logged in the database
-5. If the task fails, it may be retried based on your configuration
+1. Shepherd schedules your task with Action Scheduler
+2. WordPress cron picks up the task
+3. Your task's `process()` method executes
+4. The lifecycle is logged in the database
+5. Failed tasks may be retried based on configuration
 
-Check your `debug.log` file, and you should see the message "Pigeon Task: Hello, World! with code 200".
+Check `debug.log` for the message "Shepherd Task: Hello, World! with code 200".
 
 ## Verifying Task Execution
 
-You can check if your task was scheduled successfully:
+Check if your task was scheduled successfully:
 
 ```php
 // Get the last scheduled task ID
-$task_id = pigeon()->get_last_scheduled_task_id();
+$task_id = shepherd()->get_last_scheduled_task_id();
 
 // Retrieve task logs
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Config;
 
 $logger = Config::get_container()->get( Logger::class );
 $logs = $logger->retrieve_logs( $task_id );
@@ -168,9 +164,9 @@ $logs = $logger->retrieve_logs( $task_id );
 
 ## Next Steps
 
-- Learn about [Advanced Usage](./advanced-usage.md) including retries, debouncing, and custom configuration
-- Explore the [Built-in Tasks](./tasks.md) that come with Pigeon
-- Read the [API Reference](./api-reference.md) for detailed information about all classes and methods
+- [Advanced Usage](./advanced-usage.md) - retries, debouncing, custom configuration
+- [Built-in Tasks](./tasks.md) - tasks included with Shepherd
+- [API Reference](./api-reference.md) - detailed class and method documentation
 
 ## Troubleshooting
 
@@ -179,4 +175,4 @@ If your tasks aren't running:
 1. **Check Action Scheduler**: Visit Tools → Scheduled Actions in WordPress admin
 2. **Verify WP-Cron**: Ensure WordPress cron is running or set up a real cron job
 3. **Check Logs**: Look for errors in your WordPress debug log
-4. **Database Tables**: Ensure Pigeon's tables were created during registration
+4. **Database Tables**: Ensure Shepherd's tables were created during registration

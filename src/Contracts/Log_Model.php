@@ -1,24 +1,24 @@
 <?php
 /**
- * The Pigeon log model contract.
+ * The Shepherd log model contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts
+ * @package StellarWP\Shepherd\Contracts
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Contracts;
+namespace StellarWP\Shepherd\Contracts;
 
 use DateTimeInterface;
 
 /**
- * The Pigeon log model contract.
+ * The Shepherd log model contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts
+ * @package StellarWP\Shepherd\Contracts
  */
 interface Log_Model extends Model {
 	/**

@@ -1,17 +1,17 @@
 <?php
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tasks;
+namespace StellarWP\Shepherd\Tasks;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Tests\Traits\With_AS_Assertions;
-use StellarWP\Pigeon\Tests\Traits\With_Clock_Mock;
-use StellarWP\Pigeon\Tests\Traits\With_Log_Snapshot;
-use StellarWP\Pigeon\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
+use StellarWP\Shepherd\Tests\Traits\With_Clock_Mock;
+use StellarWP\Shepherd\Tests\Traits\With_Log_Snapshot;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 
-use function StellarWP\Pigeon\pigeon;
+use function StellarWP\Shepherd\shepherd;
 
 class Email_Test extends WPTestCase {
 	use With_AS_Assertions;
@@ -25,8 +25,8 @@ class Email_Test extends WPTestCase {
 	 * @before
 	 */
 	public function setup(): void {
-		$this->freeze_time( tests_pigeon_get_dt() );
-		pigeon()->bust_runtime_cached_tasks();
+		$this->freeze_time( tests_shepherd_get_dt() );
+		shepherd()->bust_runtime_cached_tasks();
 		global $wp_actions;
 
 		self::$backup['wp_actions'] = $wp_actions;
@@ -54,13 +54,13 @@ class Email_Test extends WPTestCase {
 			return true;
 		}, true );
 
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Email( 'test@test.com', 'subject', 'body', [ 'Reply-To: test@test.com' ], [ 'attachment.txt' ] );
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 
@@ -92,13 +92,13 @@ class Email_Test extends WPTestCase {
 			return false;
 		}, true );
 
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Email( 'test@test.com', 'subject', 'body', [ 'Reply-To: dimi@test.com' ], [ 'attachment.jpg' ] );
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 
@@ -151,13 +151,13 @@ class Email_Test extends WPTestCase {
 			return false;
 		}, true );
 
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Email( 'test@test.com', 'subject', 'body' );
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertIsInt( $last_scheduled_task_id );
 
@@ -200,27 +200,27 @@ class Email_Test extends WPTestCase {
 			return true;
 		}, true );
 
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$dummy_task = new Email( 'test@test.com', 'subject', 'body' );
 
-		$hook_name = 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled';
+		$hook_name = 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_already_scheduled';
 
 		$this->assertSame( 0, did_action( $hook_name ) );
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 		$this->assertSame( 0, did_action( $hook_name ) );
 
-		$last_scheduled_task_id = $pigeon->get_last_scheduled_task_id();
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
 		$this->assertIsInt( $last_scheduled_task_id );
 
-		$pigeon->dispatch( $dummy_task );
+		$shepherd->dispatch( $dummy_task );
 		$this->assertSame( 1, did_action( $hook_name ) );
-		$this->assertEquals( $pigeon->get_last_scheduled_task_id(), $last_scheduled_task_id );
+		$this->assertEquals( $shepherd->get_last_scheduled_task_id(), $last_scheduled_task_id );
 
-		$pigeon->dispatch( new Email( 'test@test.com', 'subject', 'body' ) );
+		$shepherd->dispatch( new Email( 'test@test.com', 'subject', 'body' ) );
 		$this->assertSame( 2, did_action( $hook_name ) );
-		$this->assertEquals( $pigeon->get_last_scheduled_task_id(), $last_scheduled_task_id );
+		$this->assertEquals( $shepherd->get_last_scheduled_task_id(), $last_scheduled_task_id );
 
 		$this->assertTaskExecutesWithoutErrors( $last_scheduled_task_id );
 
@@ -238,22 +238,22 @@ class Email_Test extends WPTestCase {
 			return true;
 		}, true );
 
-		$pigeon = pigeon();
-		$this->assertNull( $pigeon->get_last_scheduled_task_id() );
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
 
 		$task1 = new Email( 'test1@test.com', 'subject1', 'body1' );
-		$pigeon->dispatch( $task1 );
-		$task1_id = $pigeon->get_last_scheduled_task_id();
+		$shepherd->dispatch( $task1 );
+		$task1_id = $shepherd->get_last_scheduled_task_id();
 		$this->assertIsInt( $task1_id );
 
 		$task2 = new Email( 'test2@test.com', 'subject2', 'body2' );
-		$pigeon->dispatch( $task2 );
-		$task2_id = $pigeon->get_last_scheduled_task_id();
+		$shepherd->dispatch( $task2 );
+		$task2_id = $shepherd->get_last_scheduled_task_id();
 		$this->assertIsInt( $task2_id );
 
 		$this->assertNotEquals( $task1_id, $task2_id );
 
-		$hook_name = 'pigeon_' . tests_pigeon_get_hook_prefix() . '_task_already_scheduled';
+		$hook_name = 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_already_scheduled';
 		$this->assertSame( 0, did_action( $hook_name ) );
 
 		$this->assertTaskExecutesWithoutErrors( $task1_id );

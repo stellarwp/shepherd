@@ -4,20 +4,20 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables\Utility;
+ * @package StellarWP\Shepherd\Tables\Utility;
  */
 
-namespace StellarWP\Pigeon\Tables\Utility;
+namespace StellarWP\Shepherd\Tables\Utility;
 
 use RuntimeException;
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Config;
 
 /**
  * Safe dynamic table prefix utility class.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables\Utility;
+ * @package StellarWP\Shepherd\Tables\Utility;
  */
 class Safe_Dynamic_Prefix {
 	/**

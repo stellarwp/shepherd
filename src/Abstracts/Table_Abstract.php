@@ -4,18 +4,18 @@
  *
  * @since TDB
  *
- * @package StellarWP\Pigeon\Abstracts
+ * @package StellarWP\Shepherd\Abstracts
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
 use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
-use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
+use StellarWP\Shepherd\Traits\Custom_Table_Query_Methods;
 use DateTimeInterface;
 
 /**
@@ -23,7 +23,7 @@ use DateTimeInterface;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Abstracts
+ * @package StellarWP\Shepherd\Abstracts
  */
 abstract class Table_Abstract extends Table {
 	use Custom_Table_Query_Methods;

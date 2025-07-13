@@ -1,22 +1,22 @@
 <?php
 /**
- * Pigeon's task contract.
+ * Shepherd's task contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Contracts;
+namespace StellarWP\Shepherd\Contracts;
 
 /**
- * Pigeon's task contract.
+ * Shepherd's task contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 interface Task extends Task_Model {
 	/**

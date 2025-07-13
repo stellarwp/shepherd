@@ -24,19 +24,19 @@ public function __construct(
 
 ## Configuration
 
-- **Task Prefix**: `pigeon_email_`
+- **Task Prefix**: `shepherd_email_`
 - **Max Retries**: 4 additional attempts (5 total attempts)
 - **Retry Delay**: 30 seconds between attempts
 - **Priority**: 10 (default)
-- **Group**: `pigeon_{prefix}_queue_default`
+- **Group**: `shepherd_{prefix}_queue_default`
 
 ## Usage Examples
 
 ### Basic Email
 
 ```php
-use StellarWP\Pigeon\Tasks\Email;
-use function StellarWP\Pigeon\pigeon;
+use StellarWP\Shepherd\Tasks\Email;
+use function StellarWP\Shepherd\shepherd;
 
 // Simple text email
 $email = new Email(
@@ -45,7 +45,7 @@ $email = new Email(
     'Thank you for signing up!'
 );
 
-pigeon()->dispatch( $email );
+shepherd()->dispatch( $email );
 ```
 
 ### HTML Email with Headers
@@ -62,7 +62,7 @@ $email = new Email(
     ]
 );
 
-pigeon()->dispatch( $email );
+shepherd()->dispatch( $email );
 ```
 
 ### Email with Attachments
@@ -79,7 +79,7 @@ $email = new Email(
     ]
 );
 
-pigeon()->dispatch( $email );
+shepherd()->dispatch( $email );
 ```
 
 ### Delayed Email
@@ -92,7 +92,7 @@ $email = new Email(
     'This is a friendly reminder about your appointment.'
 );
 
-pigeon()->dispatch( $email, HOUR_IN_SECONDS );
+shepherd()->dispatch( $email, HOUR_IN_SECONDS );
 ```
 
 ## Error Handling
@@ -122,7 +122,7 @@ The Email task automatically handles failures and retries. Common scenarios:
 The Email task fires a WordPress action after successfully sending:
 
 ```php
-add_action( 'pigeon_{prefix}_email_processed', function( $task ) {
+add_action( 'shepherd_{prefix}_email_processed', function( $task ) {
     // Track successful email sending
     error_log( "Email sent to: {$task->get_args()[0]} with subject: {$task->get_args()[1]}" );
 }, 10, 1 );
@@ -157,11 +157,11 @@ Email tasks are automatically logged with these events:
 ### Retrieving Logs
 
 ```php
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Config;
 
 // Get task ID after dispatching
-$task_id = pigeon()->get_last_scheduled_task_id();
+$task_id = shepherd()->get_last_scheduled_task_id();
 
 // Retrieve logs
 $logger = Config::get_container()->get( Logger::class );
@@ -212,7 +212,7 @@ You can extend the `Email` task to create your own tasks.
 1. Check WordPress email configuration
 2. Verify SMTP settings if using SMTP plugin
 3. Check email logs in Action Scheduler
-4. Review Pigeon task logs
+4. Review Shepherd task logs
 
 ### Attachments Not Working
 

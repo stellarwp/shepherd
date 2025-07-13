@@ -1,29 +1,31 @@
 <?php
 /**
- * Pigeon's main service provider.
+ * Shepherd's main service provider.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
-use StellarWP\Pigeon\Abstracts\Provider_Abstract;
-use StellarWP\Pigeon\Tables\Provider as Tables_Provider;
-use StellarWP\Pigeon\Admin\Provider as Admin_Provider;
+use StellarWP\Shepherd\Abstracts\Provider_Abstract;
+use StellarWP\Shepherd\Tables\Provider as Tables_Provider;
+use StellarWP\Shepherd\Admin\Provider as Admin_Provider;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Tables\Task_Logs;
+use StellarWP\Shepherd\Tables\Tasks;
 
 /**
  * Main Service Provider
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon;
+ * @package StellarWP\Shepherd;
  */
 class Provider extends Provider_Abstract {
 	/**
@@ -54,7 +56,7 @@ class Provider extends Provider_Abstract {
 	private static bool $has_registered = false;
 
 	/**
-	 * Registers Pigeon's specific providers and starts core functionality
+	 * Registers Shepherd's specific providers and starts core functionality
 	 *
 	 * @since TBD
 	 *
@@ -79,6 +81,7 @@ class Provider extends Provider_Abstract {
 		if ( is_admin() ) {
 			$this->container->get( Admin_Provider::class )->register();
 		}
+		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
 
 		self::$has_registered = true;
 	}
@@ -106,7 +109,7 @@ class Provider extends Provider_Abstract {
 	}
 
 	/**
-	 * Checks if Pigeon is registered.
+	 * Checks if Shepherd is registered.
 	 *
 	 * @since TBD
 	 *
@@ -114,5 +117,46 @@ class Provider extends Provider_Abstract {
 	 */
 	public static function is_registered(): bool {
 		return self::$has_registered;
+	}
+
+	/**
+	 * Deletes tasks on action deletion.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $action_id The action ID.
+	 */
+	public function delete_tasks_on_action_deletion( int $action_id ): void {
+		$task_ids = DB::get_col(
+			DB::prepare(
+				'SELECT DISTINCT(%i) FROM %i WHERE %i = %d',
+				Tasks::uid_column(),
+				Tasks::table_name(),
+				'action_id',
+				$action_id
+			)
+		);
+
+		if ( empty( $task_ids ) ) {
+			return;
+		}
+
+		$task_ids = implode( ',', array_unique( array_map( 'intval', $task_ids ) ) );
+
+		DB::query(
+			DB::prepare(
+				"DELETE FROM %i WHERE %i IN ({$task_ids})",
+				Task_Logs::table_name(),
+				'task_id',
+			)
+		);
+
+		DB::query(
+			DB::prepare(
+				"DELETE FROM %i WHERE %i IN ({$task_ids})",
+				Tasks::table_name(),
+				Tasks::uid_column(),
+			)
+		);
 	}
 }

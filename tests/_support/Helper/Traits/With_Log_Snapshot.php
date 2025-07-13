@@ -1,9 +1,9 @@
 <?php
 
-namespace StellarWP\Pigeon\Tests\Traits;
+namespace StellarWP\Shepherd\Tests\Traits;
 
 use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
-use StellarWP\Pigeon\Log;
+use StellarWP\Shepherd\Log;
 
 trait With_Log_Snapshot {
 	use SnapshotAssertions;

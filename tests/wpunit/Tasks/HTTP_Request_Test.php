@@ -2,14 +2,14 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tasks;
+namespace StellarWP\Shepherd\Tasks;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use InvalidArgumentException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use TypeError;
-use StellarWP\Pigeon\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use WP_Error;
 
 class HTTP_Request_Test extends WPTestCase {
@@ -156,7 +156,7 @@ class HTTP_Request_Test extends WPTestCase {
 
 		$this->set_fn_return( 'wp_remote_request', $error );
 
-		$this->expectException( PigeonTaskFailWithoutRetryException::class );
+		$this->expectException( ShepherdTaskFailWithoutRetryException::class );
 		$this->expectExceptionMessage( 'HTTP GET request to https://example.com failed with code: `http_request_failed` and message: `Connection timeout`' );
 
 		$request->process();
@@ -178,7 +178,7 @@ class HTTP_Request_Test extends WPTestCase {
 
 		$this->set_fn_return( 'wp_remote_request', $response );
 
-		$this->expectException( PigeonTaskFailWithoutRetryException::class );
+		$this->expectException( ShepherdTaskFailWithoutRetryException::class );
 		$this->expectExceptionMessage( 'HTTP GET request to https://example.com returned error 404: `Not Found`' );
 
 		$request->process();
@@ -200,7 +200,7 @@ class HTTP_Request_Test extends WPTestCase {
 
 		$this->set_fn_return( 'wp_remote_request', $response );
 
-		$this->expectException( PigeonTaskException::class );
+		$this->expectException( ShepherdTaskException::class );
 		$this->expectExceptionMessage( 'HTTP GET request to https://example.com returned error 500: `Internal Server Error`' );
 
 		$request->process();
@@ -221,7 +221,7 @@ class HTTP_Request_Test extends WPTestCase {
 	public function it_should_have_correct_task_prefix() {
 		$request = new HTTP_Request( 'https://example.com' );
 
-		$this->assertEquals( 'pigeon_http_', $request->get_task_prefix() );
+		$this->assertEquals( 'shepherd_http_', $request->get_task_prefix() );
 	}
 
 	/**
@@ -249,13 +249,13 @@ class HTTP_Request_Test extends WPTestCase {
 
 		$this->set_fn_return( 'wp_remote_request', $response );
 
-		$prefix = tests_pigeon_get_hook_prefix();
+		$prefix = tests_shepherd_get_hook_prefix();
 
-		$this->assertSame( 0, did_action( 'pigeon_' . $prefix . '_http_request_processed' ) );
+		$this->assertSame( 0, did_action( 'shepherd_' . $prefix . '_http_request_processed' ) );
 
 		$request->process();
 
-		$this->assertSame( 1, did_action( 'pigeon_' . $prefix . '_http_request_processed' ) );
+		$this->assertSame( 1, did_action( 'shepherd_' . $prefix . '_http_request_processed' ) );
 	}
 
 	/**

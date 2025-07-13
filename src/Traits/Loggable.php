@@ -1,27 +1,27 @@
 <?php
 /**
- * The Pigeon loggable trait.
+ * The Shepherd loggable trait.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Traits;
+ * @package StellarWP\Shepherd\Traits;
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Traits;
+namespace StellarWP\Shepherd\Traits;
 
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Contracts\Logger;
 use Psr\Log\LogLevel;
 use StellarWP\Pigeon\Log;
 
 /**
- * The Pigeon loggable trait.
+ * The Shepherd loggable trait.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Traits;
+ * @package StellarWP\Shepherd\Traits;
  */
 trait Loggable {
 	/**

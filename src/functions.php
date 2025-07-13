@@ -1,38 +1,38 @@
 <?php
 /**
- * Pigeon's functions.
+ * Shepherd's functions.
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use RuntimeException;
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Config;
 
 /**
- * Get the Pigeon's Regulator instance.
+ * Get the Shepherd's Regulator instance.
  *
  * @since TBD
  *
- * @return Regulator The Pigeon's regulator.
+ * @return Regulator The Shepherd's regulator.
  *
- * @throws RuntimeException If Pigeon is not registered.
+ * @throws RuntimeException If Shepherd is not registered.
  */
-function pigeon(): Regulator {
+function shepherd(): Regulator {
 	if ( ! Provider::is_registered() ) {
-		throw new RuntimeException( 'Pigeon is not registered.' );
+		throw new RuntimeException( 'Shepherd is not registered.' );
 	}
 
-	static $pigeon = null;
+	static $shepherd = null;
 
-	if ( null !== $pigeon ) {
-		return $pigeon;
+	if ( null !== $shepherd ) {
+		return $shepherd;
 	}
 
-	$pigeon = Config::get_container()->get( Regulator::class );
+	$shepherd = Config::get_container()->get( Regulator::class );
 
-	return $pigeon;
+	return $shepherd;
 }

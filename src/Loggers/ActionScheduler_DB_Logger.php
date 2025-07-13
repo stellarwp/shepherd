@@ -1,26 +1,26 @@
 <?php
 /**
- * Pigeon's Action Scheduler DB Logger
+ * Shepherd's Action Scheduler DB Logger
  *
- * @package StellarWP\Pigeon\Loggers
+ * @package StellarWP\Shepherd\Loggers
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Loggers;
+namespace StellarWP\Shepherd\Loggers;
 
-use StellarWP\Pigeon\Contracts\Logger as LoggerContract;
+use StellarWP\Shepherd\Contracts\Logger as LoggerContract;
 use Psr\Log\LoggerTrait;
 use Psr\Log\InvalidArgumentException;
-use StellarWP\Pigeon\Log;
-use StellarWP\Pigeon\Tables\AS_Logs;
+use StellarWP\Shepherd\Log;
+use StellarWP\Shepherd\Tables\AS_Logs;
 
 /**
- * Pigeon DB Logger
+ * Shepherd DB Logger
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Loggers
+ * @package StellarWP\Shepherd\Loggers
  */
 class ActionScheduler_DB_Logger implements LoggerContract {
 	use LoggerTrait;

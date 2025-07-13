@@ -1,9 +1,9 @@
 <?php
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tests\Tasks;
+namespace StellarWP\Shepherd\Tests\Tasks;
 
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
 
 class Do_Action_Task extends Task_Abstract {
 	public function get_task_prefix(): string {
@@ -11,7 +11,7 @@ class Do_Action_Task extends Task_Abstract {
 	}
 
 	public function get_task_name(): string {
-		return 'pigeon_test_do_action_task';
+		return 'shepherd_test_do_action_task';
 	}
 
 	public function process(): void {

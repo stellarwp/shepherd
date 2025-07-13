@@ -1,26 +1,26 @@
 <?php
 /**
- * Pigeon Config
+ * Shepherd Config
  *
- * @package StellarWP\Pigeon\Config
+ * @package StellarWP\Shepherd\Config
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use RuntimeException;
 use StellarWP\ContainerContract\ContainerInterface;
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
 use Closure;
 
 /**
- * Pigeon Config
+ * Shepherd Config
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Config
+ * @package StellarWP\Shepherd\Config
  */
 class Config {
 	/**
@@ -115,7 +115,7 @@ class Config {
 	 */
 	public static function get_container(): ContainerInterface {
 		if ( self::$container === null ) {
-			throw new RuntimeException( __( 'You must provide a container via StellarWP\Pigeon\Config::set_container() before attempting to fetch it.', 'stellarwp-pigeon' ) );
+			throw new RuntimeException( __( 'You must provide a container via StellarWP\Shepherd\Config::set_container() before attempting to fetch it.', 'stellarwp-shepherd' ) );
 		}
 
 		return self::$container;

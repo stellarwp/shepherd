@@ -1,35 +1,36 @@
 <?php
 /**
- * Pigeon's regulator.
+ * Shepherd's regulator.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
-use StellarWP\Pigeon\Abstracts\Provider_Abstract;
+use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\ContainerContract\ContainerInterface as Container;
-use StellarWP\Pigeon\Contracts\Task;
-use StellarWP\Pigeon\Tables\Tasks as Tasks_Table;
+use StellarWP\Shepherd\Contracts\Task;
+use StellarWP\Shepherd\Tables\Tasks as Tasks_Table;
 use RuntimeException;
 use Exception;
 use Throwable;
 use StellarWP\DB\DB;
-use StellarWP\Pigeon\Exceptions\PigeonTaskException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
-use StellarWP\Pigeon\Traits\Loggable;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
+use StellarWP\Shepherd\Traits\Loggable;
+use StellarWP\Shepherd\Tasks\Herding;
 
 /**
- * Pigeon's regulator.
+ * Shepherd's regulator.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon
+ * @package StellarWP\Shepherd
  */
 class Regulator extends Provider_Abstract {
 	use Loggable;
@@ -41,7 +42,7 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @var string
 	 */
-	protected string $process_task_hook = 'pigeon_%s_process_task';
+	protected string $process_task_hook = 'shepherd_%s_process_task';
 
 	/**
 	 * The action ID being processed.
@@ -96,6 +97,7 @@ class Regulator extends Provider_Abstract {
 		add_action( 'action_scheduler_execution_ignored', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_failed_execution', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_after_process_queue', [ $this, 'handle_reschedule_of_failed_task' ], 1, 0 );
+		add_action( 'init', [ $this, 'schedule_cleanup_task' ], 20, 0 );
 	}
 
 	/**
@@ -169,7 +171,7 @@ class Regulator extends Provider_Abstract {
 	 * @param int  $delay The delay in seconds before the task is processed.
 	 *
 	 * @throws RuntimeException                 If the task fails to be scheduled or inserted into the database.
-	 * @throws PigeonTaskAlreadyExistsException If the task is already scheduled.
+	 * @throws ShepherdTaskAlreadyExistsException If the task is already scheduled.
 	 */
 	protected function dispatch_callback( Task $task, int $delay ): void {
 		$group     = $task->get_group();
@@ -179,7 +181,7 @@ class Regulator extends Provider_Abstract {
 			DB::beginTransaction();
 
 			if ( Action_Scheduler_Methods::has_scheduled_action( $this->process_task_hook, [ $args_hash ], $group ) ) {
-				throw new PigeonTaskAlreadyExistsException( 'The task is already scheduled.' );
+				throw new ShepherdTaskAlreadyExistsException( 'The task is already scheduled.' );
 			}
 
 			$previous_action_id = $task->get_action_id();
@@ -214,7 +216,7 @@ class Regulator extends Provider_Abstract {
 				 *
 				 * @param Task $task The task that should be retried.
 				 */
-				do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_rescheduled', $task );
+				do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_rescheduled', $task );
 
 				$this->log_rescheduled(
 					$task->get_id(),
@@ -233,7 +235,7 @@ class Regulator extends Provider_Abstract {
 				 *
 				 * @param Task $task The task that should be retried.
 				 */
-				do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_created', $task );
+				do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_created', $task );
 
 				$this->log_created( $task->get_id(), $log_data );
 			}
@@ -249,8 +251,8 @@ class Regulator extends Provider_Abstract {
 			 * @param Task             $task The task that failed to be scheduled or inserted into the database.
 			 * @param RuntimeException $e    The exception that was thrown.
 			 */
-			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_scheduling_failed', $task, $e );
-		} catch ( PigeonTaskAlreadyExistsException $e ) {
+			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_scheduling_failed', $task, $e );
+		} catch ( ShepherdTaskAlreadyExistsException $e ) {
 			DB::rollback();
 			/**
 			 * Fires when a task is already scheduled.
@@ -259,7 +261,7 @@ class Regulator extends Provider_Abstract {
 			 *
 			 * @param Task $task The task that is already scheduled.
 			 */
-			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_already_scheduled', $task );
+			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_already_scheduled', $task );
 		}
 	}
 
@@ -301,9 +303,9 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @param string $args_hash The arguments hash.
 	 *
-	 * @throws RuntimeException                    If no action ID is found, no Pigeon task is found with the action ID, or the task arguments hash does not match the expected hash.
-	 * @throws PigeonTaskException                 If the task fails to be processed.
-	 * @throws PigeonTaskFailWithoutRetryException If the task fails to be processed without retry.
+	 * @throws RuntimeException                    If no action ID is found, no Shepherd task is found with the action ID, or the task arguments hash does not match the expected hash.
+	 * @throws ShepherdTaskException                 If the task fails to be processed.
+	 * @throws ShepherdTaskFailWithoutRetryException If the task fails to be processed without retry.
 	 * @throws Exception                           If the task fails to be processed.
 	 * @throws Throwable                           If the task fails to be processed.
 	 */
@@ -314,7 +316,7 @@ class Regulator extends Provider_Abstract {
 			$task = Tasks_Table::get_by_args_hash( $args_hash );
 
 			if ( ! $task ) {
-				throw new RuntimeException( 'No Pigeon task found with args hash ' . $args_hash . '.' );
+				throw new RuntimeException( 'No Shepherd task found with args hash ' . $args_hash . '.' );
 			}
 
 			$task = array_shift( $task );
@@ -323,7 +325,7 @@ class Regulator extends Provider_Abstract {
 		$task ??= Tasks_Table::get_by_action_id( $this->current_action_id );
 
 		if ( ! $task ) {
-			throw new RuntimeException( 'No Pigeon task found with action ID ' . $this->current_action_id . '.' );
+			throw new RuntimeException( 'No Shepherd task found with action ID ' . $this->current_action_id . '.' );
 		}
 
 		$log_data = [
@@ -339,7 +341,7 @@ class Regulator extends Provider_Abstract {
 		 * @param Task $task          The task that is being processed.
 		 * @param int  $action_id     The action ID that is being processed.
 		 */
-		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_started', $task, $this->current_action_id );
+		do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_started', $task, $this->current_action_id );
 
 		try {
 			try {
@@ -352,19 +354,19 @@ class Regulator extends Provider_Abstract {
 				$task->process();
 
 				$this->log_finished( $task->get_id(), $log_data );
-			} catch ( PigeonTaskException $e ) {
+			} catch ( ShepherdTaskException $e ) {
 				throw $e;
 			}
-		} catch ( PigeonTaskFailWithoutRetryException $e ) {
+		} catch ( ShepherdTaskFailWithoutRetryException $e ) {
 			/**
 			 * Fires when a task fails to be processed without retry.
 			 *
 			 * @since TBD
 			 *
 			 * @param Task                                $task The task that failed to be processed without retry.
-			 * @param PigeonTaskFailWithoutRetryException $e    The exception that was thrown.
+			 * @param ShepherdTaskFailWithoutRetryException $e    The exception that was thrown.
 			 */
-			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
+			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
 
 			/**
 			 * Fires when a task fails to be processed without retry.
@@ -372,9 +374,9 @@ class Regulator extends Provider_Abstract {
 			 * @since TBD
 			 *
 			 * @param Task                                $task The task that failed to be processed without retry.
-			 * @param PigeonTaskFailWithoutRetryException $e    The exception that was thrown.
+			 * @param ShepherdTaskFailWithoutRetryException $e    The exception that was thrown.
 			 */
-			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
+			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed_without_retry', $task, $e );
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 
@@ -388,10 +390,10 @@ class Regulator extends Provider_Abstract {
 			 * @param Task      $task The task that failed to be processed.
 			 * @param Exception $e    The exception that was thrown.
 			 */
-			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
+			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
 
 			if ( $this->should_retry( $task ) ) {
-				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
+				throw new ShepherdTaskException( __( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
@@ -405,10 +407,10 @@ class Regulator extends Provider_Abstract {
 			 * @param Task      $task The task that failed to be processed.
 			 * @param Throwable $e    The exception that was thrown.
 			 */
-			do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
+			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
 
 			if ( $this->should_retry( $task ) ) {
-				throw new PigeonTaskException( __( 'The task failed, but will be retried.', 'stellarwp-pigeon' ) );
+				throw new ShepherdTaskException( __( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
@@ -423,7 +425,7 @@ class Regulator extends Provider_Abstract {
 		 * @param Task $task          The task that is finished processing.
 		 * @param int  $action_id     The action ID that is finished processing.
 		 */
-		do_action( 'pigeon_' . Config::get_hook_prefix() . '_task_finished', $task, $this->current_action_id );
+		do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_finished', $task, $this->current_action_id );
 	}
 
 	/**
@@ -448,5 +450,14 @@ class Regulator extends Provider_Abstract {
 		$this->failed_tasks[] = $task;
 
 		return true;
+	}
+
+	/**
+	 * Schedules the cleanup task.
+	 *
+	 * @since TBD
+	 */
+	public function schedule_cleanup_task(): void {
+		$this->dispatch( new Herding(), 6 * HOUR_IN_SECONDS );
 	}
 }

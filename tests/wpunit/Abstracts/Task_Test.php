@@ -2,10 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Abstracts;
+namespace StellarWP\Shepherd\Abstracts;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Contracts\Task;
+use StellarWP\Shepherd\Contracts\Task;
 
 class Task_Test extends WPTestCase {
 	protected function get_task( ...$args ): Task {
@@ -27,10 +27,10 @@ class Task_Test extends WPTestCase {
 		$this->assertInstanceOf( Task::class, $task );
 		$this->assertInstanceOf( Task_Abstract::class, $task );
 
-		$prefix = tests_pigeon_get_hook_prefix();
+		$prefix = tests_shepherd_get_hook_prefix();
 
 		$this->assertSame( [ 'test1', 3, 'test2' ], $task->get_args() );
-		$this->assertSame( "pigeon_{$prefix}_queue_default", $task->get_group() );
+		$this->assertSame( "shepherd_{$prefix}_queue_default", $task->get_group() );
 		$this->assertSame( 10, $task->get_priority() );
 
 		$this->assertIsInt( $task->get_id() );

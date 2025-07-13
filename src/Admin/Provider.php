@@ -1,23 +1,23 @@
 <?php
 /**
- * Admin provider for Pigeon.
+ * Admin provider for Shepherd.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Admin
+ * @package StellarWP\Shepherd\Admin
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Admin;
+namespace StellarWP\Shepherd\Admin;
 
-use StellarWP\Pigeon\Abstracts\Provider_Abstract;
-use StellarWP\Pigeon\Action_Scheduler_Methods;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Tables\AS_Actions;
-use StellarWP\Pigeon\Tables\Tasks;
-use StellarWP\Pigeon\Contracts\Logger;
-use StellarWP\Pigeon\Log;
+use StellarWP\Shepherd\Abstracts\Provider_Abstract;
+use StellarWP\Shepherd\Action_Scheduler_Methods;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Tables\AS_Actions;
+use StellarWP\Shepherd\Tables\Tasks;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Log;
 use ActionScheduler_SimpleSchedule;
 
 /**
@@ -25,7 +25,7 @@ use ActionScheduler_SimpleSchedule;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Admin
+ * @package StellarWP\Shepherd\Admin
  */
 class Provider extends Provider_Abstract {
 	/**
@@ -83,7 +83,7 @@ class Provider extends Provider_Abstract {
 			Config::get_admin_page_title(),
 			Config::get_admin_menu_title(),
 			Config::get_admin_page_capability(),
-			'pigeon-' . Config::get_hook_prefix(),
+			'shepherd-' . Config::get_hook_prefix(),
 			[ $this, 'render_admin_page' ]
 		);
 
@@ -107,7 +107,7 @@ class Provider extends Provider_Abstract {
 	}
 
 	/**
-	 * Checks if Pigeon is registered.
+	 * Checks if Shepherd's Admin Provider is registered.
 	 *
 	 * @since TBD
 	 *
@@ -169,7 +169,7 @@ class Provider extends Provider_Abstract {
 		check_ajax_referer( 'shepherd_get_tasks', 'nonce' );
 
 		if ( ! current_user_can( Config::get_admin_page_capability() ) ) {
-			wp_send_json_error( __( 'You are not authorized to access this page.', 'stellarwp-pigeon' ) );
+			wp_send_json_error( __( 'You are not authorized to access this page.', 'stellarwp-shepherd' ) );
 			/** @phpstan-ignore deadCode.unreachable */
 			return;
 		}

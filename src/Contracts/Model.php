@@ -1,24 +1,24 @@
 <?php
 /**
- * The Pigeon model contract.
+ * The Shepherd model contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts;
+ * @package StellarWP\Shepherd\Contracts;
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Contracts;
+namespace StellarWP\Shepherd\Contracts;
 
-use StellarWP\Pigeon\Abstracts\Table_Abstract;
+use StellarWP\Shepherd\Abstracts\Table_Abstract;
 
 /**
- * The Pigeon model contract.
+ * The Shepherd model contract.
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Contracts;
+ * @package StellarWP\Shepherd\Contracts;
  */
 interface Model {
 	/**

@@ -1,6 +1,6 @@
-# Contributing to Pigeon
+# Contributing to Shepherd
 
-Thank you for contributing to Pigeon! This guide outlines the standards and processes for commits and pull requests.
+Thank you for contributing to Shepherd! This guide outlines the standards and processes for commits and pull requests.
 
 ## Table of Contents
 
@@ -250,8 +250,8 @@ Related to #789
  * @param Task $task  The task to schedule.
  * @param int  $delay Delay in seconds before execution. Default 0.
  *
- * @throws PigeonTaskException If task scheduling fails.
- * @throws PigeonTaskAlreadyExistsException If duplicate task exists.
+ * @throws ShepherdTaskException If task scheduling fails.
+ * @throws ShepherdTaskAlreadyExistsException If duplicate task exists.
  *
  * @return void
  */

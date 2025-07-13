@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Pigeon Coding Standards">
+<ruleset name="Shepherd Coding Standards">
 	<rule ref="StellarWP">
 		<exclude name="StellarWP.Classes.ValidClassName.NotSnakeCase"/>
 	</rule>
@@ -16,7 +16,7 @@
 	<!-- Enforce our specific plugin's text domain. -->
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="stellarwp-pigeon" />
+			<property name="text_domain" type="array" value="stellarwp-shepherd" />
 		</properties>
 	</rule>
 

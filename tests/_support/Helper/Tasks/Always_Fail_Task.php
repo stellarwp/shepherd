@@ -1,9 +1,9 @@
 <?php
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tests\Tasks;
+namespace StellarWP\Shepherd\Tests\Tasks;
 
-use StellarWP\Pigeon\Abstracts\Task_Abstract;
+use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use Exception;
 
 class Always_Fail_Task extends Task_Abstract {
