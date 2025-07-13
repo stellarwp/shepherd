@@ -123,12 +123,12 @@ By default, Action Scheduler processes one task at a time. To increase concurren
 
 ## Admin UI Configuration
 
-Pigeon includes an optional admin interface for managing tasks. By default, the admin UI is enabled and appears under the WordPress Tools menu.
+Shepherd includes an optional admin interface for managing tasks. By default, the admin UI is enabled and appears under the WordPress Tools menu.
 
 ### Enable/Disable Admin UI
 
 ```php
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Config;
 
 // Disable the admin UI
 Config::set_render_admin_ui( false );
@@ -172,9 +172,9 @@ Config::set_admin_page_in_page_title_callback( function() {
 
 **Default titles:**
 
-- Page Title: `Pigeon ({hook_prefix})`
-- Menu Title: `Pigeon ({hook_prefix})`
-- In-Page Title: `Pigeon Task Manager (via {hook_prefix})`
+- Page Title: `Shepherd ({hook_prefix})`
+- Menu Title: `Shepherd ({hook_prefix})`
+- In-Page Title: `Shepherd Task Manager (via {hook_prefix})`
 
 ## Complete Configuration Example
 

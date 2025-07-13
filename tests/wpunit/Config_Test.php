@@ -82,7 +82,7 @@ class Config_Test extends WPTestCase {
 	 */
 	public function it_should_get_default_admin_page_title(): void {
 		Config::set_hook_prefix( 'test_foo' );
-		$expected = sprintf( __( 'Pigeon (%s)', 'stellarwp-pigeon' ), 'test_foo' );
+		$expected = sprintf( __( 'Shepherd (%s)', 'stellarwp-shepherd' ), 'test_foo' );
 		$this->assertEquals( $expected, Config::get_admin_page_title() );
 	}
 
@@ -105,7 +105,7 @@ class Config_Test extends WPTestCase {
 		Config::set_admin_page_title_callback( fn() => 123 );
 		Config::set_hook_prefix( 'test_foo' );
 
-		$expected = sprintf( __( 'Pigeon (%s)', 'stellarwp-pigeon' ), 'test_foo' );
+		$expected = sprintf( __( 'Shepherd (%s)', 'stellarwp-shepherd' ), 'test_foo' );
 		$this->assertEquals( $expected, Config::get_admin_page_title() );
 
 		// Clean up.
@@ -117,7 +117,7 @@ class Config_Test extends WPTestCase {
 	 */
 	public function it_should_get_default_admin_menu_title(): void {
 		Config::set_hook_prefix( 'bar_foo' );
-		$expected = sprintf( __( 'Pigeon (%s)', 'stellarwp-pigeon' ), 'bar_foo' );
+		$expected = sprintf( __( 'Shepherd (%s)', 'stellarwp-shepherd' ), 'bar_foo' );
 		$this->assertEquals( $expected, Config::get_admin_menu_title() );
 	}
 
@@ -138,7 +138,7 @@ class Config_Test extends WPTestCase {
 	 */
 	public function it_should_get_default_admin_page_in_page_title(): void {
 		Config::set_hook_prefix( 'baz_foo' );
-		$expected = sprintf( __( 'Pigeon Task Manager (via %s)', 'stellarwp-pigeon' ), 'baz_foo' );
+		$expected = sprintf( __( 'Shepherd Task Manager (via %s)', 'stellarwp-shepherd' ), 'baz_foo' );
 		$this->assertEquals( $expected, Config::get_admin_page_in_page_title() );
 	}
 

@@ -17,13 +17,13 @@ For a guide on how to install Shepherd and get started with creating and dispatc
 
 ### Development Setup
 
-If you're contributing to Pigeon or building the admin UI:
+If you're contributing to Shepherd or building the admin UI:
 
 1. **Use the correct Node version**:
    ```bash
    nvm use
    ```
-   This will switch to Node 18.17.0 as specified in `.nvmrc`
+   This will switch to Node as specified in `.nvmrc`
 
 2. **Install dependencies**:
    ```bash

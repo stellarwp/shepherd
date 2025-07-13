@@ -1,6 +1,6 @@
 # Admin UI Guide
 
-Pigeon includes a powerful React-based admin interface for managing and monitoring background tasks. This guide covers how to enable, customize, and extend the admin UI.
+Shepherd includes a powerful React-based admin interface for managing and monitoring background tasks. This guide covers how to enable, customize, and extend the admin UI.
 
 ## Quick Start
 
@@ -9,7 +9,7 @@ Pigeon includes a powerful React-based admin interface for managing and monitori
 The admin UI is disabled by default. Enable it during configuration:
 
 ```php
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Config;
 
 // Enable admin UI
 Config::set_render_admin_ui( true );
@@ -21,7 +21,7 @@ Config::set_admin_page_capability( 'edit_posts' );
 ### Accessing the Interface
 
 Once enabled, the admin interface is available at:
-- **WordPress Admin** → **Tools** → **Pigeon ({your_hook_prefix})**
+- **WordPress Admin** → **Tools** → **Shepherd ({your_hook_prefix})**
 
 ## Interface Overview
 
@@ -31,7 +31,7 @@ The admin UI provides a comprehensive table view of all background tasks with th
 
 The main interface displays tasks in a sortable, filterable table with these columns:
 
-- **Task ID**: Unique Pigeon task identifier
+- **Task ID**: Unique Shepherd task identifier
 - **Action ID**: Action Scheduler action identifier
 - **Task Type**: The PHP class name of the task
 - **Arguments**: JSON representation of task arguments (scrollable, formatted)
@@ -82,7 +82,7 @@ Each task has contextual actions:
 You can customize all admin page titles:
 
 ```php
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Config;
 
 // Custom page title (browser tab, admin page list)
 Config::set_admin_page_title_callback( function() {
@@ -102,11 +102,11 @@ Config::set_admin_page_in_page_title_callback( function() {
 
 ### Default Titles
 
-If no custom callbacks are set, Pigeon uses these defaults:
+If no custom callbacks are set, Shepherd uses these defaults:
 
-- **Page Title**: `Pigeon ({hook_prefix})`
-- **Menu Title**: `Pigeon ({hook_prefix})`
-- **In-Page Title**: `Pigeon Task Manager (via {hook_prefix})`
+- **Page Title**: `Shepherd ({hook_prefix})`
+- **Menu Title**: `Shepherd ({hook_prefix})`
+- **In-Page Title**: `Shepherd Task Manager (via {hook_prefix})`
 
 ### Access Control
 
@@ -133,7 +133,7 @@ You can modify the data sent to the JavaScript interface:
 $prefix = Config::get_hook_prefix();
 
 // Filter individual task data
-add_filter( "pigeon_{$prefix}_admin_task_data", function( $task_data, $task ) {
+add_filter( "shepherd_{$prefix}_admin_task_data", function( $task_data, $task ) {
     // Add custom fields to each task
     $task_data['custom_priority'] = get_task_priority( $task->id );
     $task_data['estimated_duration'] = calculate_duration( $task );
@@ -142,7 +142,7 @@ add_filter( "pigeon_{$prefix}_admin_task_data", function( $task_data, $task ) {
 }, 10, 2 );
 
 // Filter the entire data payload
-add_filter( "pigeon_{$prefix}_admin_localized_data", function( $data ) {
+add_filter( "shepherd_{$prefix}_admin_localized_data", function( $data ) {
     // Add global configuration
     $data['settings'] = [
         'auto_refresh' => true,
@@ -344,7 +344,7 @@ The admin UI integrates with WordPress through:
 2. **Check localized data**: View page source for `window.shepherdData`
 3. **Check AJAX endpoint**: Test AJAX requests in browser network tab
 4. **Check nonce validity**: Ensure nonce is being passed correctly
-5. **Check database**: Verify tasks exist in Pigeon tables
+5. **Check database**: Verify tasks exist in Shepherd tables
 6. **Check Action Scheduler**: Ensure Action Scheduler is active
 7. **Check JOIN queries**: Verify Action Scheduler tables exist
 
@@ -375,8 +375,8 @@ add_action( 'admin_menu', function() {
 } );
 
 function render_custom_task_interface() {
-    // Use Pigeon's data APIs to build custom interface
-    $tasks = \StellarWP\Pigeon\Tables\Tasks::get_all();
+    // Use Shepherd's data APIs to build custom interface
+    $tasks = \StellarWP\Shepherd\Tables\Tasks::get_all();
     
     // Render your custom interface
     include 'custom-task-interface.php';

@@ -5,16 +5,16 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Admin
+ * @package StellarWP\Shepherd\Admin
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Admin\Provider;
-use StellarWP\Pigeon\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Admin\Provider;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
 
 class Admin_Provider_Test extends WPTestCase {
@@ -40,7 +40,7 @@ class Admin_Provider_Test extends WPTestCase {
 	 */
 	public function cleanup_environment(): void {
 		$_POST = [];
-		tests_pigeon_reset_config();
+		tests_shepherd_reset_config();
 	}
 
 	/**

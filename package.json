@@ -1,7 +1,7 @@
 {
-  "name": "stellarwp-pigeon",
-  "version": "1.0.0",
-  "description": "Background processing library for WordPress with React admin UI",
+  "name": "stellarwp/shepherd",
+  "version": "0.0.1",
+  "description": "Background processing library for WordPress",
   "private": true,
   "engines": {
     "node": ">=18.17.0",

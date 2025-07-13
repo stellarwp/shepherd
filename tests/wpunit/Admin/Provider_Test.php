@@ -5,16 +5,16 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Admin
+ * @package StellarWP\Shepherd\Admin
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Admin;
+namespace StellarWP\Shepherd\Admin;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
 
 class Provider_Test extends WPTestCase {

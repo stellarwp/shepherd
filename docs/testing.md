@@ -1,10 +1,10 @@
 # Testing Guide
 
-Pigeon includes a comprehensive testing framework with 46+ PHP tests and JavaScript component tests. This guide covers how to run tests, write new tests, and understand the testing patterns.
+Shepherd includes a comprehensive testing framework with 46+ PHP tests and JavaScript component tests. This guide covers how to run tests, write new tests, and understand the testing patterns.
 
 ## Test Structure Overview
 
-Pigeon uses multiple testing approaches for complete coverage:
+Shepherd uses multiple testing approaches for complete coverage:
 
 ```
 tests/
@@ -21,7 +21,7 @@ tests/
 
 ### Test Frameworks
 
-Pigeon uses [Codeception](https://codeception.com/) for PHP testing with two main suites:
+Shepherd uses [Codeception](https://codeception.com/) for PHP testing with two main suites:
 
 - **WPUnit**: WordPress unit tests with database access
 - **Integration**: Full WordPress integration tests
@@ -121,7 +121,7 @@ vendor/bin/codecept run integration
 ```php
 <?php
 
-namespace StellarWP\Pigeon;
+namespace StellarWP\Shepherd;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 
@@ -134,7 +134,7 @@ class My_Feature_Test extends WPTestCase {
         $task = new My_Task( 'test-arg' );
         
         // Act  
-        $result = pigeon()->dispatch( $task );
+        $result = shepherd()->dispatch( $task );
         
         // Assert
         $this->assertNotNull( $result );
@@ -144,11 +144,11 @@ class My_Feature_Test extends WPTestCase {
 
 #### Using Test Helpers
 
-Pigeon provides extensive test utilities:
+Shepherd provides extensive test utilities:
 
 ```php
-use StellarWP\Pigeon\Tests\Traits\With_Uopz;
-use StellarWP\Pigeon\Tests\Traits\With_Clock_Mock;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Tests\Traits\With_Clock_Mock;
 
 class Advanced_Test extends WPTestCase {
     use With_Uopz;
@@ -166,7 +166,7 @@ class Advanced_Test extends WPTestCase {
         
         // Test time-dependent functionality
         $task = new Scheduled_Task();
-        $result = pigeon()->dispatch( $task, 3600 ); // 1 hour delay
+        $result = shepherd()->dispatch( $task, 3600 ); // 1 hour delay
         
         $this->assertNotNull( $result );
     }
@@ -178,9 +178,9 @@ class Advanced_Test extends WPTestCase {
 Use provided mock tasks for consistent testing:
 
 ```php
-use StellarWP\Pigeon\Tests\Helper\Tasks\Always_Fail_Task;
-use StellarWP\Pigeon\Tests\Helper\Tasks\Internal_Counting_Task;
-use StellarWP\Pigeon\Tests\Helper\Tasks\Retryable_Do_Action_Task;
+use StellarWP\Shepherd\Tests\Helper\Tasks\Always_Fail_Task;
+use StellarWP\Shepherd\Tests\Helper\Tasks\Internal_Counting_Task;
+use StellarWP\Shepherd\Tests\Helper\Tasks\Retryable_Do_Action_Task;
 
 class Task_Behavior_Test extends WPTestCase {
     /**
@@ -189,7 +189,7 @@ class Task_Behavior_Test extends WPTestCase {
     public function it_should_retry_failed_tasks(): void {
         $task = new Always_Fail_Task();
         
-        pigeon()->dispatch( $task );
+        shepherd()->dispatch( $task );
         
         // Process the task through Action Scheduler
         $this->process_scheduled_actions();
@@ -206,7 +206,7 @@ class Task_Behavior_Test extends WPTestCase {
 Use snapshots for complex output verification:
 
 ```php
-use StellarWP\Pigeon\Tests\Traits\With_Log_Snapshot;
+use StellarWP\Shepherd\Tests\Traits\With_Log_Snapshot;
 
 class Snapshot_Test extends WPTestCase {
     use With_Log_Snapshot;
@@ -217,7 +217,7 @@ class Snapshot_Test extends WPTestCase {
     public function it_should_produce_expected_logs(): void {
         $task = new Email_Task( 'test@example.com', 'Subject', 'Body' );
         
-        pigeon()->dispatch( $task );
+        shepherd()->dispatch( $task );
         $this->process_scheduled_actions();
         
         // Compare actual logs with stored snapshot
@@ -447,8 +447,8 @@ Key functions in `test-functions.php`:
 
 ```php
 // Container management
-tests_pigeon_get_container()
-tests_pigeon_reset_config()
+tests_shepherd_get_container()
+tests_shepherd_reset_config()
 
 // Task processing
 process_scheduled_actions()
@@ -537,7 +537,7 @@ jobs:
 
 ### Common PHP Test Issues
 
-1. **Container not set**: Ensure `tests_pigeon_reset_config()` is called
+1. **Container not set**: Ensure `tests_shepherd_reset_config()` is called
 2. **Action Scheduler not processing**: Call `process_scheduled_actions()`
 3. **Database state**: Use proper setup/teardown methods
 4. **Time-dependent tests**: Use clock mocking traits

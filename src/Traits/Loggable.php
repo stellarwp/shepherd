@@ -14,7 +14,7 @@ namespace StellarWP\Shepherd\Traits;
 use StellarWP\Shepherd\Config;
 use StellarWP\Shepherd\Contracts\Logger;
 use Psr\Log\LogLevel;
-use StellarWP\Pigeon\Log;
+use StellarWP\Shepherd\Log;
 
 /**
  * The Shepherd loggable trait.

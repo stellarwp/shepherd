@@ -4,14 +4,14 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Pigeon\Abstracts\Table_Abstract as Table;
-use StellarWP\Pigeon\Contracts\Model;
-use StellarWP\Pigeon\Log;
+use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Shepherd\Contracts\Model;
+use StellarWP\Shepherd\Log;
 
 /**
  * Action Scheduler actions table schema.
@@ -20,7 +20,7 @@ use StellarWP\Pigeon\Log;
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables;
+ * @package StellarWP\Shepherd\Tables;
  */
 class AS_Actions extends Table {
 	/**

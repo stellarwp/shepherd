@@ -335,12 +335,12 @@ add_action( "shepherd_{$prefix}_http_request_processed", function( $task, $respo
 
 ## Admin UI Configuration
 
-Pigeon includes a React-based admin interface for monitoring and managing tasks with real-time AJAX updates. The admin UI is disabled by default and must be explicitly enabled.
+Shepherd includes a React-based admin interface for monitoring and managing tasks with real-time AJAX updates. The admin UI is disabled by default and must be explicitly enabled.
 
 ### Enabling/Disabling Admin UI
 
 ```php
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Config;
 
 // Disable admin UI entirely
 Config::set_render_admin_ui( false );
@@ -369,7 +369,7 @@ Config::set_admin_page_capability( 'administrator' );
 You can customize the titles shown in the admin interface:
 
 ```php
-use StellarWP\Pigeon\Config;
+use StellarWP\Shepherd\Config;
 
 // Custom page title (shown in browser tab and admin page list)
 Config::set_admin_page_title_callback( function() {
@@ -389,13 +389,13 @@ Config::set_admin_page_in_page_title_callback( function() {
 
 ### Default Titles
 
-If you don't set custom callbacks, Pigeon uses these default patterns:
+If you don't set custom callbacks, Shepherd uses these default patterns:
 
-- **Page Title**: `Pigeon ({hook_prefix})`
-- **Menu Title**: `Pigeon ({hook_prefix})`
-- **In-Page Title**: `Pigeon Task Manager (via {hook_prefix})`
+- **Page Title**: `Shepherd ({hook_prefix})`
+- **Menu Title**: `Shepherd ({hook_prefix})`
+- **In-Page Title**: `Shepherd Task Manager (via {hook_prefix})`
 
-This allows multiple Pigeon instances (with different hook prefixes) to coexist in the same WordPress installation.
+This allows multiple Shepherd instances (with different hook prefixes) to coexist in the same WordPress installation.
 
 ### Admin UI Location
 
@@ -403,7 +403,7 @@ The admin page can be added under **Tools** in the WordPress admin menu, by sett
 
 ### Admin UI Features
 
-Pigeon includes a built-in React-powered admin interface that provides:
+Shepherd includes a built-in React-powered admin interface that provides:
 
 1. **Task List View**: A comprehensive table showing all background tasks with:
    - Task ID and Action ID
@@ -438,7 +438,7 @@ The admin UI is built with:
 
 The data is provided server-side through PHP and includes:
 
-- Task information from the Pigeon tasks table
+- Task information from the Shepherd tasks table
 - Action details from Action Scheduler
 - Comprehensive log entries for each task
 - Pagination metadata
@@ -466,26 +466,26 @@ The built files are output to the `build/` directory and automatically enqueued 
 
 ### Specialized Exceptions
 
-Pigeon provides specific exception types for different failure scenarios:
+Shepherd provides specific exception types for different failure scenarios:
 
 ```php
-use StellarWP\Pigeon\Exceptions\PigeonTaskException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskAlreadyExistsException;
-use StellarWP\Pigeon\Exceptions\PigeonTaskFailWithoutRetryException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 
 class My_Task extends Task_Abstract {
     public function process(): void {
         // General task failure (will retry based on configuration)
         if ( $some_condition ) {
-            throw new PigeonTaskException( 'Task failed due to temporary issue' );
+            throw new ShepherdTaskException( 'Task failed due to temporary issue' );
         }
 
         // Task should fail immediately without retry (e.g., invalid data)
         if ( $invalid_data ) {
-            throw new PigeonTaskFailWithoutRetryException( 'Invalid task arguments' );
+            throw new ShepherdTaskFailWithoutRetryException( 'Invalid task arguments' );
         }
 
-        // Note: PigeonTaskAlreadyExistsException is thrown automatically
+        // Note: ShepherdTaskAlreadyExistsException is thrown automatically
         // when attempting to schedule duplicate tasks
     }
 }
@@ -493,8 +493,8 @@ class My_Task extends Task_Abstract {
 
 ### Exception Handling Strategies
 
-- **PigeonTaskException**: Use for temporary failures that might succeed on retry
-- **PigeonTaskFailWithoutRetryException**: Use for permanent failures (bad data, 4xx HTTP errors)
+- **ShepherdTaskException**: Use for temporary failures that might succeed on retry
+- **ShepherdTaskFailWithoutRetryException**: Use for permanent failures (bad data, 4xx HTTP errors)
 - **Standard Exceptions**: Any other exception will be treated as a temporary failure
 
 ## Database Utilities
@@ -504,12 +504,12 @@ class My_Task extends Task_Abstract {
 The `Safe_Dynamic_Prefix` utility prevents MySQL table name length violations:
 
 ```php
-use StellarWP\Pigeon\Tables\Utility\Safe_Dynamic_Prefix;
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 
 // Automatically trims long prefixes to fit MySQL's 64-character limit
 $safe_prefix = Safe_Dynamic_Prefix::get( 'very_long_application_prefix_name' );
 
-// The utility considers the longest table name in Pigeon when calculating safe length
+// The utility considers the longest table name in Shepherd when calculating safe length
 echo $safe_prefix; // Will be trimmed to ensure table names don't exceed 64 chars
 ```
 
@@ -518,7 +518,7 @@ echo $safe_prefix; // Will be trimmed to ensure table names don't exceed 64 char
 Use the `Custom_Table_Query_Methods` trait for complex database operations:
 
 ```php
-use StellarWP\Pigeon\Traits\Custom_Table_Query_Methods;
+use StellarWP\Shepherd\Traits\Custom_Table_Query_Methods;
 
 class My_Custom_Table extends Table_Abstract {
     use Custom_Table_Query_Methods;
@@ -572,18 +572,18 @@ foreach ( $table->get_in_batches( 100 ) as $batch ) {
 
 ### Available Logger Types
 
-Pigeon supports three logger implementations:
+Shepherd supports three logger implementations:
 
 ```php
-use StellarWP\Pigeon\Config;
-use StellarWP\Pigeon\Loggers\ActionScheduler_DB_Logger;
-use StellarWP\Pigeon\Loggers\DB_Logger;
-use StellarWP\Pigeon\Loggers\Null_Logger;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
+use StellarWP\Shepherd\Loggers\Null_Logger;
 
 // Default: Use Action Scheduler's existing log table
 Config::set_logger( new ActionScheduler_DB_Logger() );
 
-// Alternative: Use dedicated Pigeon log tables
+// Alternative: Use dedicated Shepherd log tables
 Config::set_logger( new DB_Logger() );
 
 // For testing: Disable logging entirely
@@ -595,17 +595,17 @@ Config::set_logger( new Null_Logger() );
 When using `ActionScheduler_DB_Logger`, logs are stored with a special format in the Action Scheduler logs table:
 
 ```
-pigeon_{hook_prefix}||{task_id}||{type}||{level}||{json_entry}
+shepherd_{hook_prefix}||{task_id}||{type}||{level}||{json_entry}
 ```
 
-This allows Pigeon to store its metadata while maintaining compatibility with Action Scheduler's existing structure.
+This allows Shepherd to store its metadata while maintaining compatibility with Action Scheduler's existing structure.
 
 ### Custom Logger Implementation
 
 Create custom loggers by implementing the `Logger` interface:
 
 ```php
-use StellarWP\Pigeon\Contracts\Logger;
+use StellarWP\Shepherd\Contracts\Logger;
 
 class Custom_Logger implements Logger {
     public function log( int $task_id, int $action_id, string $type, string $level, string $entry ): bool {
@@ -630,7 +630,7 @@ Config::set_logger( new Custom_Logger() );
 The `Action_Scheduler_Methods` class provides additional functionality:
 
 ```php
-use StellarWP\Pigeon\Action_Scheduler_Methods;
+use StellarWP\Shepherd\Action_Scheduler_Methods;
 
 // Get action with enhanced error handling
 $action = Action_Scheduler_Methods::get_action_by_id( $action_id );
@@ -645,7 +645,7 @@ $actions = Action_Scheduler_Methods::get_actions_by_status( 'failed', 50 );
 
 ### Custom Action Scheduler Hooks
 
-Monitor Action Scheduler events related to Pigeon tasks:
+Monitor Action Scheduler events related to Shepherd tasks:
 
 ```php
 // Hook into Action Scheduler events
@@ -658,7 +658,7 @@ add_action( 'action_scheduler_canceled_action', function( $action_id ) {
     // Action was cancelled
     $task = get_task_by_action_id( $action_id );
     if ( $task ) {
-        error_log( "Pigeon task {$task->id} was cancelled" );
+        error_log( "Shepherd task {$task->id} was cancelled" );
     }
 } );
 ```
@@ -667,7 +667,7 @@ add_action( 'action_scheduler_canceled_action', function( $action_id ) {
 
 ### Database Indexing
 
-Pigeon tables include optimized indexes:
+Shepherd tables include optimized indexes:
 
 ```sql
 -- Tasks table indexes
@@ -699,15 +699,15 @@ Config::set_logger( new Null_Logger() );
 
 #### Task Deduplication
 
-Pigeon automatically prevents duplicate tasks:
+Shepherd automatically prevents duplicate tasks:
 
 ```php
 // These will only create one task
-pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) );
-pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) ); // Ignored
+shepherd()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) );
+shepherd()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) ); // Ignored
 
 // To force duplicates, vary the arguments
-pigeon()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body', [], [], time() ) );
+shepherd()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body', [], [], time() ) );
 ```
 
 ## Admin UI AJAX Integration
@@ -762,7 +762,7 @@ $args[] = [
 The `AS_Actions` class provides a read-only interface to Action Scheduler's actions table:
 
 ```php
-use StellarWP\Pigeon\Tables\AS_Actions;
+use StellarWP\Shepherd\Tables\AS_Actions;
 
 // Get table name
 $table_name = AS_Actions::table_name(); // wp_actionscheduler_actions

@@ -4,12 +4,12 @@
  *
  * @since TBD
  *
- * @package StellarWP\Pigeon\Tables
+ * @package StellarWP\Shepherd\Tables
  */
 
 declare( strict_types=1 );
 
-namespace StellarWP\Pigeon\Tables;
+namespace StellarWP\Shepherd\Tables;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 

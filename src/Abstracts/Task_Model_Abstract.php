@@ -260,7 +260,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 		$tasks = ( static::TABLE_INTERFACE )::get_by_args_hash( $this->get_args_hash() );
 
 		if ( ! $tasks ) {
-			throw new RuntimeException( __( 'We failed to find the task after saving it.', 'stellarwp-pigeon' ) );
+			throw new RuntimeException( __( 'We failed to find the task after saving it.', 'stellarwp-shepherd' ) );
 		}
 
 		if ( count( $tasks ) === 1 ) {

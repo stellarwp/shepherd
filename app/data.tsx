@@ -22,19 +22,19 @@ export const getFields = ( data: Task[] ): Field< any >[] => {
 	return [
 		{
 			id: 'id',
-			label: __( 'Task ID', 'stellarwp-pigeon' ),
+			label: __( 'Task ID', 'stellarwp-shepherd' ),
 			enableHiding: false,
 			enableSorting: true,
 		},
 		{
 			id: 'action_id',
-			label: __( 'Action ID', 'stellarwp-pigeon' ),
+			label: __( 'Action ID', 'stellarwp-shepherd' ),
 			enableHiding: false,
 			enableSorting: false,
 		},
 		{
 			id: 'task_type',
-			label: __( 'Task Type', 'stellarwp-pigeon' ),
+			label: __( 'Task Type', 'stellarwp-shepherd' ),
 			enableHiding: true,
 			enableSorting: true,
 			filterBy: {
@@ -48,7 +48,7 @@ export const getFields = ( data: Task[] ): Field< any >[] => {
 		},
 		{
 			id: 'task_args',
-			label: __( 'Arguments', 'stellarwp-pigeon' ),
+			label: __( 'Arguments', 'stellarwp-shepherd' ),
 			enableHiding: true,
 			enableSorting: false,
 			getValue: ( { item } ) => {
@@ -72,13 +72,13 @@ export const getFields = ( data: Task[] ): Field< any >[] => {
 		},
 		{
 			id: 'current_try',
-			label: __( 'Current Try', 'stellarwp-pigeon' ),
+			label: __( 'Current Try', 'stellarwp-shepherd' ),
 			enableHiding: false,
 			enableSorting: true,
 		},
 		{
 			id: 'status',
-			label: __( 'Status', 'stellarwp-pigeon' ),
+			label: __( 'Status', 'stellarwp-shepherd' ),
 			enableHiding: false,
 			enableSorting: true,
 			filterBy: {
@@ -91,29 +91,29 @@ export const getFields = ( data: Task[] ): Field< any >[] => {
 			elements: [
 				{
 					value: 'pending',
-					label: __( 'Pending', 'stellarwp-pigeon' ),
+					label: __( 'Pending', 'stellarwp-shepherd' ),
 				},
 				{
 					value: 'in-progress',
-					label: __( 'In Progress', 'stellarwp-pigeon' ),
+					label: __( 'In Progress', 'stellarwp-shepherd' ),
 				},
 				{
 					value: 'complete',
-					label: __( 'Complete', 'stellarwp-pigeon' ),
+					label: __( 'Complete', 'stellarwp-shepherd' ),
 				},
 				{
 					value: 'failed',
-					label: __( 'Failed', 'stellarwp-pigeon' ),
+					label: __( 'Failed', 'stellarwp-shepherd' ),
 				},
 				{
 					value: 'cancelled',
-					label: __( 'Cancelled', 'stellarwp-pigeon' ),
+					label: __( 'Cancelled', 'stellarwp-shepherd' ),
 				},
 			],
 		},
 		{
 			id: 'scheduled_at',
-			label: __( 'Scheduled At', 'stellarwp-pigeon' ),
+			label: __( 'Scheduled At', 'stellarwp-shepherd' ),
 			enableHiding: true,
 			enableSorting: true,
 			getValue: ( { item } ) => {
@@ -121,7 +121,7 @@ export const getFields = ( data: Task[] ): Field< any >[] => {
 			},
 			render: ( { item } ) => {
 				if ( ! item.scheduled_at ) {
-					return <span>{ __( 'Never', 'stellarwp-pigeon' ) }</span>;
+					return <span>{ __( 'Never', 'stellarwp-shepherd' ) }</span>;
 				}
 
 				return (

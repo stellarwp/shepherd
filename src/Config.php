@@ -159,7 +159,7 @@ class Config {
 		}
 
 		/* translators: %s: The hook prefix for this instance */
-		return sprintf( __( 'Pigeon (%s)', 'stellarwp-pigeon' ), static::$hook_prefix );
+		return sprintf( __( 'Shepherd (%s)', 'stellarwp-shepherd' ), static::$hook_prefix );
 	}
 
 	/**
@@ -189,7 +189,7 @@ class Config {
 		}
 
 		/* translators: %s: The hook prefix for this instance */
-		return sprintf( __( 'Pigeon (%s)', 'stellarwp-pigeon' ), static::$hook_prefix );
+		return sprintf( __( 'Shepherd (%s)', 'stellarwp-shepherd' ), static::$hook_prefix );
 	}
 
 	/**
@@ -219,7 +219,7 @@ class Config {
 		}
 
 		/* translators: %s: The hook prefix for this instance */
-		return sprintf( __( 'Pigeon Task Manager (via %s)', 'stellarwp-pigeon' ), static::$hook_prefix );
+		return sprintf( __( 'Shepherd Task Manager (via %s)', 'stellarwp-shepherd' ), static::$hook_prefix );
 	}
 
 	/**
