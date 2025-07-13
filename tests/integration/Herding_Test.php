@@ -68,14 +68,8 @@ class Herding_Test extends WPTestCase {
 		);
 		$this->assertEquals( 1, $task_exists );
 
-		$logs_exist = DB::get_var(
-			DB::prepare(
-				'SELECT COUNT(*) FROM %i WHERE task_id = %d',
-				Task_Logs::table_name(),
-				$task_id
-			)
-		);
-		$this->assertGreaterThan( 0, $logs_exist );
+		$logs_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id );
+		$this->assertCount( 3, $logs_exist );
 
 		// Now manually remove the action from Action Scheduler to simulate orphaned data
 		DB::query(
@@ -162,13 +156,15 @@ class Herding_Test extends WPTestCase {
 		$shepherd = shepherd();
 
 		// Create multiple tasks
-		$task1 = new Do_Action_Task();
+		$task1 = new Do_Action_Task( 'arg1' );
 		$shepherd->dispatch( $task1 );
 		$task_id_1 = $shepherd->get_last_scheduled_task_id();
 
-		$task2 = new Do_Action_Task();
+		$task2 = new Do_Action_Task( 'arg2' );
 		$shepherd->dispatch( $task2 );
 		$task_id_2 = $shepherd->get_last_scheduled_task_id();
+
+		$this->assertNotEquals( $task_id_1, $task_id_2 );
 
 		// Execute first task
 		$this->assertTaskExecutesWithoutErrors( $task_id_1 );

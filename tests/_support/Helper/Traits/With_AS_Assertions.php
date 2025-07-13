@@ -5,10 +5,10 @@ namespace StellarWP\Shepherd\Tests\Traits;
 use StellarWP\Shepherd\Contracts\Task;
 use StellarWP\Shepherd\Abstracts\Task_Model_Abstract;
 use StellarWP\Shepherd\Action_Scheduler_Methods;
+use ActionScheduler;
 use ActionScheduler_Action;
 use ActionScheduler_QueueRunner as Runner;
 use StellarWP\Shepherd\Config;
-use StellarWP\Shepherd\Provider;
 use StellarWP\DB\DB;
 use PHPUnit\Framework\Assert;
 use function StellarWP\Shepherd\shepherd;
@@ -131,5 +131,9 @@ trait With_AS_Assertions {
 	protected function execute_as_runner(): void {
 		// Fresh instance to avoid re-running the same action multiple times in the context of the same request.
 		( new Runner() )->run();
+	}
+
+	protected function delete_tasks_action( Task $task ): void {
+		ActionScheduler::store()->delete_action( $task->get_action_id() );
 	}
 }

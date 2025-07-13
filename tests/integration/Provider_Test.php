@@ -6,7 +6,6 @@ namespace StellarWP\Shepherd;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
 use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
 use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
@@ -52,15 +51,15 @@ class Provider_Test extends WPTestCase {
 	public function it_should_delete_task_data_when_action_is_deleted(): void {
 		$shepherd = shepherd();
 		$provider = $this->get_provider();
-		
+
 		$task = new Do_Action_Task();
 		$shepherd->dispatch( $task );
 		$task_id = $shepherd->get_last_scheduled_task_id();
-		
+
 		$this->assertTaskExecutesWithoutErrors( $task_id );
-		
-		$task_exists = DB::get_var( 
-			DB::prepare( 
+
+		$task_exists = DB::get_var(
+			DB::prepare(
 				'SELECT COUNT(*) FROM %i WHERE %i = %d',
 				Tasks::table_name(),
 				Tasks::uid_column(),
@@ -68,22 +67,14 @@ class Provider_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 1, $task_exists );
-		
-		$logs_exist = DB::get_var(
+
+		$logs_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id );
+		$this->assertCount( 3, $logs_exist );
+
+		$this->delete_tasks_action( $task );
+
+		$task_exists_after = DB::get_var(
 			DB::prepare(
-				'SELECT COUNT(*) FROM %i WHERE task_id = %d',
-				Task_Logs::table_name(),
-				$task_id
-			)
-		);
-		$this->assertGreaterThan( 0, $logs_exist );
-		
-		$action_id = $this->get_task_action_id( $task_id );
-		
-		$provider->delete_tasks_on_action_deletion( $action_id );
-		
-		$task_exists_after = DB::get_var( 
-			DB::prepare( 
 				'SELECT COUNT(*) FROM %i WHERE %i = %d',
 				Tasks::table_name(),
 				Tasks::uid_column(),
@@ -91,15 +82,9 @@ class Provider_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 0, $task_exists_after );
-		
-		$logs_exist_after = DB::get_var(
-			DB::prepare(
-				'SELECT COUNT(*) FROM %i WHERE task_id = %d',
-				Task_Logs::table_name(),
-				$task_id
-			)
-		);
-		$this->assertEquals( 0, $logs_exist_after );
+
+		$logs_exist_after = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id );
+		$this->assertCount( 0, $logs_exist_after );
 	}
 
 	/**
@@ -107,21 +92,20 @@ class Provider_Test extends WPTestCase {
 	 */
 	public function it_should_delete_multiple_tasks_for_same_action(): void {
 		$shepherd = shepherd();
-		$provider = $this->get_provider();
-		
-		$task1 = new Do_Action_Task();
+
+		$task1 = new Do_Action_Task( 'arg1' );
 		$shepherd->dispatch( $task1 );
 		$task_id_1 = $shepherd->get_last_scheduled_task_id();
-		
-		$task2 = new Do_Action_Task();
+
+		$task2 = new Do_Action_Task( 'arg2' );
 		$shepherd->dispatch( $task2 );
 		$task_id_2 = $shepherd->get_last_scheduled_task_id();
-		
+
 		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
 		$this->assertTaskExecutesWithoutErrors( $task_id_2 );
-		
+
 		// Manually set both tasks to have the same action_id for testing.
-		$common_action_id = 12345;
+		$common_action_id = $task1->get_action_id();
 		DB::query(
 			DB::prepare(
 				'UPDATE %i SET action_id = %d WHERE %i IN (%d, %d)',
@@ -132,7 +116,7 @@ class Provider_Test extends WPTestCase {
 				$task_id_2
 			)
 		);
-		
+
 		$tasks_count_before = DB::get_var(
 			DB::prepare(
 				'SELECT COUNT(*) FROM %i WHERE %i IN (%d, %d)',
@@ -143,9 +127,9 @@ class Provider_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 2, $tasks_count_before );
-		
-		$provider->delete_tasks_on_action_deletion( $common_action_id );
-		
+
+		$this->delete_tasks_action( $task1 );
+
 		$tasks_count_after = DB::get_var(
 			DB::prepare(
 				'SELECT COUNT(*) FROM %i WHERE %i IN (%d, %d)',
@@ -156,16 +140,9 @@ class Provider_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 0, $tasks_count_after );
-		
-		$logs_count_after = DB::get_var(
-			DB::prepare(
-				'SELECT COUNT(*) FROM %i WHERE task_id IN (%d, %d)',
-				Task_Logs::table_name(),
-				$task_id_1,
-				$task_id_2
-			)
-		);
-		$this->assertEquals( 0, $logs_count_after );
+
+		$logs_count_after = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id_1 );
+		$this->assertCount( 0, $logs_count_after );
 	}
 
 	/**
@@ -173,9 +150,9 @@ class Provider_Test extends WPTestCase {
 	 */
 	public function it_should_handle_non_existent_action_id_gracefully(): void {
 		$provider = $this->get_provider();
-		
+
 		$non_existent_action_id = PHP_INT_MAX;
-		
+
 		$action_exists = DB::get_var(
 			DB::prepare(
 				'SELECT COUNT(*) FROM %i WHERE action_id = %d',
@@ -184,9 +161,9 @@ class Provider_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 0, $action_exists );
-		
+
 		$provider->delete_tasks_on_action_deletion( $non_existent_action_id );
-		
+
 		$this->assertTrue( true );
 	}
 
@@ -195,25 +172,22 @@ class Provider_Test extends WPTestCase {
 	 */
 	public function it_should_only_delete_tasks_for_specified_action(): void {
 		$shepherd = shepherd();
-		$provider = $this->get_provider();
-		
-		$task1 = new Do_Action_Task();
+
+		$task1 = new Do_Action_Task( 'arg1' );
 		$shepherd->dispatch( $task1 );
 		$task_id_1 = $shepherd->get_last_scheduled_task_id();
-		
-		$task2 = new Do_Action_Task();
+
+		$task2 = new Do_Action_Task( 'arg2' );
 		$shepherd->dispatch( $task2 );
 		$task_id_2 = $shepherd->get_last_scheduled_task_id();
-		
+
 		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
 		$this->assertTaskExecutesWithoutErrors( $task_id_2 );
-		
-		$action_id_1 = $this->get_task_action_id( $task_id_1 );
-		
-		$provider->delete_tasks_on_action_deletion( $action_id_1 );
-		
-		$task1_exists = DB::get_var( 
-			DB::prepare( 
+
+		$this->delete_tasks_action( $task1 );
+
+		$task1_exists = DB::get_var(
+			DB::prepare(
 				'SELECT COUNT(*) FROM %i WHERE %i = %d',
 				Tasks::table_name(),
 				Tasks::uid_column(),
@@ -221,9 +195,9 @@ class Provider_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 0, $task1_exists );
-		
-		$task2_exists = DB::get_var( 
-			DB::prepare( 
+
+		$task2_exists = DB::get_var(
+			DB::prepare(
 				'SELECT COUNT(*) FROM %i WHERE %i = %d',
 				Tasks::table_name(),
 				Tasks::uid_column(),
@@ -237,39 +211,21 @@ class Provider_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_trigger_on_action_scheduler_delete_hook(): void {
-		$provider = $this->get_provider();
-		
 		$shepherd = shepherd();
 		$task = new Do_Action_Task();
 		$shepherd->dispatch( $task );
 		$task_id = $shepherd->get_last_scheduled_task_id();
-		$action_id = $this->get_task_action_id( $task_id );
-		
-		$method_called = false;
-		$called_action_id = null;
-		
-		$this->set_fn_return( [ $provider, 'delete_tasks_on_action_deletion' ], function( $aid ) use ( &$method_called, &$called_action_id ) {
-			$method_called = true;
-			$called_action_id = $aid;
-		} );
-		
-		do_action( 'action_scheduler_deleted_action', $action_id );
-		
-		$this->assertTrue( $method_called );
-		$this->assertEquals( $action_id, $called_action_id );
-	}
 
-	/**
-	 * Helper method to get action_id for a task.
-	 */
-	private function get_task_action_id( int $task_id ): int {
-		return (int) DB::get_var(
+		$this->delete_tasks_action( $task );
+
+		$task_exists = DB::get_var(
 			DB::prepare(
-				'SELECT action_id FROM %i WHERE %i = %d',
+				'SELECT COUNT(*) FROM %i WHERE %i = %d',
 				Tasks::table_name(),
 				Tasks::uid_column(),
 				$task_id
 			)
 		);
+		$this->assertEquals( 0, $task_exists );
 	}
 }
