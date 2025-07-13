@@ -1,5 +1,5 @@
 {
-  "name": "shepherd",
+  "name": "@stellarwp/shepherd",
   "version": "0.0.1",
   "description": "Background processing library for WordPress",
   "private": true,
