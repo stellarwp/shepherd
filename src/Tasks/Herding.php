@@ -16,6 +16,7 @@ use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
 use StellarWP\DB\DB;
+use Generator;
 
 /**
  * Shepherd's herding task.
@@ -33,41 +34,8 @@ class Herding extends Task_Abstract {
 	public function process(): void {
 		DB::beginTransaction();
 
-		/**
-		* Filters the limit of tasks to herd in a single batch.
-		*
-		* @since TBD
-		*
-		* @param int $limit The limit of tasks to herd.
-		*/
-		$batch_size = max( 1, (int) apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_herding_batch_limit', 500 ) );
-
-		do {
-			$task_ids = DB::get_col(
-				DB::prepare(
-					'SELECT DISTINCT(%i) FROM %i WHERE %i NOT IN (SELECT %i FROM %i) LIMIT %d',
-					Tasks::uid_column(),
-					Tasks::table_name(),
-					'action_id',
-					'action_id',
-					DB::prefix( 'actionscheduler_actions' ),
-					$batch_size,
-				)
-			);
-
-			if ( empty( $task_ids ) ) {
-				/**
-				 * Fires when the herding task is processed.
-				 *
-				 * @since TBD
-				 *
-				 * @param Herding $task The herding task that was processed.
-				 */
-				do_action( 'shepherd_' . Config::get_hook_prefix() . '_herding_processed', $this );
-				return;
-			}
-
-			$task_ids = implode( ',', array_unique( array_map( 'intval', $task_ids ) ) );
+		foreach ( $this->get_task_ids() as $task_ids ) {
+			$task_ids = implode( ',', $task_ids );
 
 			DB::query(
 				DB::prepare(
@@ -83,7 +51,7 @@ class Herding extends Task_Abstract {
 					Tasks::uid_column(),
 				)
 			);
-		} while ( ! empty( $task_ids ) );
+		}
 
 		DB::commit();
 
@@ -106,5 +74,52 @@ class Herding extends Task_Abstract {
 	 */
 	public function get_task_prefix(): string {
 		return 'shepherd_tidy_';
+	}
+
+	/**
+	 * Gets the task IDs.
+	 *
+	 * @since TBD
+	 *
+	 * @return Generator<int[]> The task IDs.
+	 */
+	protected function get_task_ids(): Generator {
+		/**
+		* Filters the limit of tasks to herd in a single batch.
+		*
+		* @since TBD
+		*
+		* @param int $limit The limit of tasks to herd.
+		*/
+		$batch_size = max( 1, (int) apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_herding_batch_limit', 500 ) );
+
+		$counter = 0;
+
+		while ( 100 > $counter ) {
+			$results = array_unique(
+				array_map(
+					'intval',
+					(array) DB::get_col(
+						DB::prepare(
+							'SELECT DISTINCT(%i) FROM %i WHERE %i NOT IN (SELECT %i FROM %i) LIMIT %d',
+							Tasks::uid_column(),
+							Tasks::table_name(),
+							'action_id',
+							'action_id',
+							DB::prefix( 'actionscheduler_actions' ),
+							$batch_size,
+						)
+					)
+				)
+			);
+
+			++$counter;
+
+			if ( empty( $results ) ) {
+				break;
+			}
+
+			yield $results;
+		}
 	}
 }
