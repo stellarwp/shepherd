@@ -12,6 +12,9 @@ tests/_support/_generated
 # Third party dependencies
 vendor/
 
+# We DONT ignore build artifacts since they need to be part of the composer package.
+node_modules/
+
 # Tests
 codeception.yml
 tests/_output/*

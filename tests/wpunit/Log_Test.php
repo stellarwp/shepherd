@@ -94,4 +94,48 @@ class Log_Test extends WPTestCase {
 		$log = $this->get_log_instance();
 		$this->assertInstanceOf( AS_Logs::class, $log->get_table_interface() );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_have_all_type_constants_in_valid_types(): void {
+		$expected = [
+			Log::TYPE_CREATED,
+			Log::TYPE_STARTED,
+			Log::TYPE_FINISHED,
+			Log::TYPE_FAILED,
+			Log::TYPE_RESCHEDULED,
+			Log::TYPE_CANCELLED,
+			Log::TYPE_RETRYING,
+		];
+
+		$this->assertEquals( $expected, Log::VALID_TYPES );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_convert_to_array(): void {
+		$log  = $this->get_log_instance();
+		$date = new \DateTime( '2024-01-01 12:00:00' );
+
+		$log->set_id( 999 );
+		$log->set_task_id( 123 );
+		$log->set_action_id( 456 );
+		$log->set_date( $date );
+		$log->set_level( LogLevel::ERROR );
+		$log->set_type( Log::TYPE_FAILED );
+		$log->set_entry( 'Test error message' );
+
+		$array = $log->to_array();
+
+		$this->assertIsArray( $array );
+		$this->assertEquals( 999, $array['id'] );
+		$this->assertEquals( 123, $array['task_id'] );
+		$this->assertEquals( 456, $array['action_id'] );
+		$this->assertEquals( $date, $array['date'] );
+		$this->assertEquals( LogLevel::ERROR, $array['level'] );
+		$this->assertEquals( Log::TYPE_FAILED, $array['type'] );
+		$this->assertEquals( 'Test error message', $array['entry'] );
+	}
 }

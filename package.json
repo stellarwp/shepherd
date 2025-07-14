@@ -1,0 +1,33 @@
+{
+  "name": "@stellarwp/shepherd",
+  "version": "0.0.1",
+  "description": "Background processing library for WordPress",
+  "private": true,
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.6.7"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start --mode=development --devtool=source-map",
+    "dev": "WP_DEVTOOL=eval-source-map wp-scripts start",
+    "lint:js": "wp-scripts lint-js app/",
+    "lint:css": "wp-scripts lint-style",
+    "format:js": "wp-scripts lint-js app/ --fix",
+    "format:css": "wp-scripts lint-style --fix",
+    "test": "wp-scripts test-unit-js",
+    "test:watch": "wp-scripts test-unit-js --watch"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@wordpress/api-fetch": "^7.26.0",
+    "@wordpress/dataviews": "^4.22.0",
+    "@wordpress/scripts": "^30.14.1",
+    "postcss-import": "^16.1.1",
+    "postcss-inline-svg": "^6.0.0",
+    "postcss-mixins": "^12.0.0",
+    "postcss-nested": "^7.0.2",
+    "postcss-preset-env": "^10.2.4"
+  }
+}
