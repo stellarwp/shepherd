@@ -18,6 +18,7 @@ use StellarWP\DB\DB;
 use StellarWP\Shepherd\Contracts\Logger;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
+use RuntimeException;
 
 /**
  * Main Service Provider
@@ -85,11 +86,32 @@ class Provider extends Provider_Abstract {
 	 * Requires Action Scheduler.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.2
 	 *
 	 * @return void
+	 *
+	 * @throws RuntimeException If Action Scheduler is not found.
 	 */
 	private function require_action_scheduler(): void {
-		require_once __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php';
+		// This is true when we are not running as a Composer package.
+		if ( file_exists( __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php' ) ) {
+			require_once __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php';
+			return;
+		}
+
+		// This is true when we are running as a Composer package.
+		if ( file_exists( __DIR__ . '/../../../woocommerce/action-scheduler/action-scheduler.php' ) ) {
+			require_once __DIR__ . '/../../../woocommerce/action-scheduler/action-scheduler.php';
+			return;
+		}
+
+		// This is true when we are running as a Composer package but prefixed by Strauss or Mozart or similar.
+		if ( file_exists( __DIR__ . '/../../../../woocommerce/action-scheduler/action-scheduler.php' ) ) {
+			require_once __DIR__ . '/../../../../woocommerce/action-scheduler/action-scheduler.php';
+			return;
+		}
+
+		throw new RuntimeException( 'Action Scheduler not found' );
 	}
 
 	/**
