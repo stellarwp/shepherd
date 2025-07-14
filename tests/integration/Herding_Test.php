@@ -76,7 +76,7 @@ class Herding_Test extends WPTestCase {
 			DB::prepare(
 				'DELETE FROM %i WHERE action_id = %d',
 				DB::prefix( 'actionscheduler_actions' ),
-				$this->get_task_action_id( $task_id )
+				$dummy_task->get_action_id()
 			)
 		);
 
@@ -130,6 +130,114 @@ class Herding_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
+	public function it_should_process_herding_task_and_clean_orphaned_data_in_batches(): void {
+		$shepherd = shepherd();
+
+		$task_1 = new Do_Action_Task( 'arg1');
+		$shepherd->dispatch( $task_1 );
+		$task_id_1 = $shepherd->get_last_scheduled_task_id();
+
+		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
+
+		$task_2 = new Do_Action_Task( 'arg2');
+		$shepherd->dispatch( $task_2 );
+		$task_id_2 = $shepherd->get_last_scheduled_task_id();
+
+		$task_3 = new Do_Action_Task( 'arg3');
+		$shepherd->dispatch( $task_3 );
+		$task_id_3 = $shepherd->get_last_scheduled_task_id();
+
+		// Verify task and logs exist
+		$task_1_exists = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE %i = %d',
+				Tasks::table_name(),
+				Tasks::uid_column(),
+				$task_id_1
+			)
+		);
+		$this->assertEquals( 1, $task_1_exists );
+
+		$logs_1_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id_1 );
+		$this->assertCount( 3, $logs_1_exist );
+
+		$logs_2_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id_2 );
+		$this->assertCount( 1, $logs_2_exist );
+
+		$logs_3_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id_3 );
+		$this->assertCount( 1, $logs_3_exist );
+
+		DB::query(
+			DB::prepare(
+				'DELETE FROM %i WHERE action_id IN (%d, %d)',
+				DB::prefix( 'actionscheduler_actions' ),
+				$task_1->get_action_id(),
+				$task_2->get_action_id()
+			)
+		);
+
+		add_filter( 'shepherd_' . tests_shepherd_get_hook_prefix() . '_herding_batch_limit', function () {
+			return 1;
+		} );
+
+		// Dispatch herding task
+		$herding_task = new Herding();
+		$shepherd->dispatch( $herding_task );
+		$herding_task_id = $shepherd->get_last_scheduled_task_id();
+
+		$hook_name = 'shepherd_' . tests_shepherd_get_hook_prefix() . '_herding_processed';
+
+		$this->assertSame( 0 , did_action( $hook_name ) );
+
+		// Execute herding task
+		$this->assertTaskExecutesWithoutErrors( $herding_task_id );
+
+		$this->assertSame( 1 , did_action( $hook_name ) );
+
+		$task_1_exists_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE %i = %d',
+				Tasks::table_name(),
+				Tasks::uid_column(),
+				$task_id_1
+			)
+		);
+		$this->assertEquals( 0, $task_1_exists_after );
+
+		$task_2_exists_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE %i = %d',
+				Tasks::table_name(),
+				Tasks::uid_column(),
+				$task_id_2
+			)
+		);
+
+		$this->assertEquals( 0, $task_2_exists_after );
+
+		$task_3_exists_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE %i = %d',
+				Tasks::table_name(),
+				Tasks::uid_column(),
+				$task_id_3
+			)
+		);
+		$this->assertEquals( 1, $task_3_exists_after );
+
+		$logs_1_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id_1 );
+		$this->assertCount( 0, $logs_1_exist );
+
+		$logs_2_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id_2 );
+		$this->assertCount( 0, $logs_2_exist );
+
+		$logs_3_exist = Config::get_container()->get( Logger::class )->retrieve_logs( $task_id_3 );
+		$this->assertCount( 1, $logs_3_exist );
+	}
+
+	/**
+	 * @test
+	 */
 	public function it_should_handle_no_orphaned_data_gracefully(): void {
 		$shepherd = shepherd();
 
@@ -174,7 +282,7 @@ class Herding_Test extends WPTestCase {
 			DB::prepare(
 				'DELETE FROM %i WHERE action_id = %d',
 				DB::prefix( 'actionscheduler_actions' ),
-				$this->get_task_action_id( $task_id_1 )
+				$task1->get_action_id()
 			)
 		);
 
@@ -206,19 +314,5 @@ class Herding_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 1, $task2_exists, 'Active task should remain' );
-	}
-
-	/**
-	 * Helper method to get action_id for a task
-	 */
-	private function get_task_action_id( int $task_id ): int {
-		return (int) DB::get_var(
-			DB::prepare(
-				'SELECT action_id FROM %i WHERE %i = %d',
-				Tasks::table_name(),
-				Tasks::uid_column(),
-				$task_id
-			)
-		);
 	}
 }

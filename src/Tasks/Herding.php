@@ -14,6 +14,9 @@ namespace StellarWP\Shepherd\Tasks;
 use StellarWP\Shepherd\Config;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Tables\Task_Logs;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Tables\Tasks;
 use StellarWP\DB\DB;
 use Generator;
@@ -34,19 +37,46 @@ class Herding extends Task_Abstract {
 	public function process(): void {
 		DB::beginTransaction();
 
+		$logger = Config::get_container()->get( Logger::class );
+
+		$logs_at_as_table  = false;
+		$logs_at_own_table = false;
+
+		if ( $logger instanceof ActionScheduler_DB_Logger ) {
+			$logs_at_as_table = true;
+		}
+
+		if ( $logger instanceof DB_Logger ) {
+			$logs_at_own_table = true;
+		}
+
 		foreach ( $this->get_task_ids() as $task_ids ) {
-			$task_ids = implode( ',', $task_ids );
+			$imploded_task_ids = implode( ',', $task_ids );
+
+			if ( $logs_at_own_table ) {
+				DB::query(
+					DB::prepare(
+						"DELETE FROM %i WHERE task_id IN ({$imploded_task_ids})",
+						Task_Logs::table_name(),
+					)
+				);
+			}
+
+			if ( $logs_at_as_table ) {
+				foreach ( $task_ids as $task_id ) {
+					DB::query(
+						DB::prepare(
+							'DELETE FROM %i WHERE message LIKE %s',
+							DB::prefix( 'actionscheduler_logs' ),
+							'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%'
+						)
+					);
+				}
+			}
 
 			DB::query(
 				DB::prepare(
-					"DELETE FROM %i WHERE task_id IN ({$task_ids})",
-					Task_Logs::table_name(),
-				)
-			);
-
-			DB::query(
-				DB::prepare(
-					"DELETE FROM %i WHERE %i IN ({$task_ids})",
+					"DELETE FROM %i WHERE %i IN ({$imploded_task_ids})",
 					Tasks::table_name(),
 					Tasks::uid_column(),
 				)
