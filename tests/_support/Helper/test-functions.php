@@ -112,6 +112,28 @@ function tests_shepherd_get_dt(): DateTimeInterface {
 }
 
 /**
+ * Enables fake transactions.
+ *
+ * @return void
+ */
+function tests_shepherd_fake_transactions_enable() {
+	uopz_set_return( DB::class, 'beginTransaction', true, false );
+	uopz_set_return( DB::class, 'rollback', true, false );
+	uopz_set_return( DB::class, 'commit', true, false );
+}
+
+/**
+ * Disables fake transactions.
+ *
+ * @return void
+ */
+function tests_shepherd_fake_transactions_disable() {
+	uopz_unset_return( DB::class, 'beginTransaction' );
+	uopz_unset_return( DB::class, 'rollback' );
+	uopz_unset_return( DB::class, 'commit' );
+}
+
+/**
  * Bootstraps the common test environment.
  *
  * @return void
@@ -119,6 +141,7 @@ function tests_shepherd_get_dt(): DateTimeInterface {
 function tests_shepherd_common_bootstrap(): void {
 	tests_shepherd_reset_config();
 	tests_shepherd_drop_tables();
+	tests_shepherd_fake_transactions_enable();
 
 	$container = Config::get_container();
 
