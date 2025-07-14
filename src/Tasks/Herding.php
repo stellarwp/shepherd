@@ -33,12 +33,20 @@ class Herding extends Task_Abstract {
 	public function process(): void {
 		$task_ids = DB::get_col(
 			DB::prepare(
-				'SELECT DISTINCT(%i) FROM %i WHERE %i NOT IN (SELECT %i FROM %i)',
+				'SELECT DISTINCT(%i) FROM %i WHERE %i NOT IN (SELECT %i FROM %i) LIMIT %d',
 				Tasks::uid_column(),
 				Tasks::table_name(),
 				'action_id',
 				'action_id',
-				DB::prefix( 'actionscheduler_actions' )
+				DB::prefix( 'actionscheduler_actions' ),
+				/**
+				 * Filters the limit of tasks to herd in a single batch.
+				 *
+				 * @since TBD
+				 *
+				 * @param int $limit The limit of tasks to herd.
+				 */
+				apply_filters( 'shepherd_' . Config::get_hook_prefix() . '_herding_batch_limit', 500 )
 			)
 		);
 
