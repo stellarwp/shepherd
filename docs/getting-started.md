@@ -4,7 +4,7 @@ Install and use Shepherd to run your first background task.
 
 ## Installation
 
-Shepherd provides robust background task processing for WordPress. Install via Composer:
+Require Shepherd as a production dependency via Composer:
 
 ```bash
 composer require stellarwp/shepherd
