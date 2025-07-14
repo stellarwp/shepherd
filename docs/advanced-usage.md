@@ -1,16 +1,16 @@
 # Advanced Usage
 
-This guide covers the advanced features of Shepherd for more complex use cases.
+Advanced Shepherd features for complex use cases.
 
 ## Automatic Retries
 
-Shepherd can automatically retry failed tasks. A task is considered failed when it throws any exception during the `process()` method.
+Shepherd automatically retries failed tasks (tasks that throw exceptions during `process()`).
 
 ### Configuring Retries
 
-Override the `get_max_retries()` method on your task class. The default is `0` (no retries).
+Override `get_max_retries()` in your task class. Default is `0` (no retries).
 
-**Important**: This method returns the number of _additional_ attempts, not the total attempts. A task with 2 retries will execute up to 3 times total.
+**Important**: Returns additional attempts, not total. A task with 2 retries executes up to 3 times total.
 
 ```php
 <?php
@@ -40,7 +40,7 @@ class My_Retryable_Task extends Task_Abstract {
 
 ### Retry Delays
 
-By default, Shepherd uses exponential backoff for retries. You can customize this by overriding `get_retry_delay()`:
+Default uses exponential backoff. Customize by overriding `get_retry_delay()`:
 
 ```php
 public function get_retry_delay(): int {
@@ -88,23 +88,22 @@ Groups help with:
 
 ## Unique Tasks
 
-Shepherd prevents duplicate tasks from being scheduled. A task is considered a duplicate if it has the same class and arguments as an existing scheduled task.
+Shepherd prevents duplicate tasks (same class and arguments) from being scheduled.
 
-When you try to dispatch a duplicate task, Shepherd will:
+When dispatching a duplicate task:
 
-- Check if an identical task already exists (same class + arguments)
-- If it exists, silently ignore the dispatch request. You can listen to an action to be notified when this happens. See [API Reference](api-reference.md) for more information.
-- If it doesn't exist, schedule the task normally
+- Identical task exists: Silently ignored (listen to action for notification - see [API Reference](api-reference.md))
+- No identical task: Scheduled normally
 
-This behavior prevents accidental task duplication and is enabled by default for all tasks.
+Prevents accidental duplication and is enabled by default.
 
 ## Logging
 
-Shepherd includes comprehensive logging that tracks the complete lifecycle of each task.
+Comprehensive logging tracks the complete task lifecycle.
 
 ### Built-in Logging
 
-By default, logs are stored in Action Scheduler's `actionscheduler_logs` table using the `ActionScheduler_DB_Logger`. This reduces database overhead by reusing existing infrastructure. The following events are automatically logged:
+Default logs are stored in Action Scheduler's `actionscheduler_logs` table using `ActionScheduler_DB_Logger`. Reduces database overhead by reusing existing infrastructure. Automatically logged events:
 
 - `created`: Task scheduled (triggers `shepherd_{prefix}_task_created` action)
 - `started`: Task execution begins (triggers `shepherd_{prefix}_task_started` action)
@@ -223,16 +222,76 @@ protected function validate_args( ...$args ): void {
 }
 ```
 
+## Database Cleanup
+
+Shepherd includes automatic database cleanup to maintain data integrity and prevent orphaned records.
+
+### Automatic Cleanup on Action Deletion
+
+When Action Scheduler deletes actions (through cleanup, manual deletion, or other processes), Shepherd automatically removes the corresponding task data to prevent orphaned records.
+
+**How it works:**
+
+1. **Hook Registration**: The `action_scheduler_deleted_action` hook is registered during Shepherd initialization
+2. **Automatic Cleanup**: When an action is deleted, Shepherd queries for associated tasks
+3. **Cascade Deletion**: Both task records and their logs are removed from Shepherd's tables
+4. **Data Integrity**: Prevents accumulation of orphaned data
+
+**Example behavior:**
+
+```php
+// When Action Scheduler deletes an action with ID 123
+do_action( 'action_scheduler_deleted_action', 123 );
+
+// Shepherd automatically:
+// 1. Finds tasks with action_id = 123
+// 2. Deletes associated logs from shepherd_task_logs
+// 3. Deletes task records from shepherd_tasks
+// No manual intervention required
+```
+
+### Periodic Cleanup with Herding Task
+
+The [Herding task](tasks/herding.md) runs every 6 hours to clean up any orphaned data that might exist due to:
+
+- Database corruption
+- External modifications to Action Scheduler tables
+- Race conditions during cleanup
+
+**Combined Strategy:**
+
+- **Immediate cleanup**: Action deletion hook removes data when actions are deleted
+- **Periodic cleanup**: Herding task catches any missed orphaned data
+- **Database integrity**: Ensures consistent state between Shepherd and Action Scheduler
+
+### Manual Cleanup
+
+If you need to manually clean up orphaned data:
+
+```php
+// Run the Herding task immediately
+shepherd()->dispatch( new \StellarWP\Shepherd\Tasks\Herding() );
+
+// Or trigger Action Scheduler cleanup
+as_unschedule_all_actions( 'shepherd_task_prefix' );
+```
+
 ## Performance Considerations
 
 ### Database Optimization
 
 The task tables include indexes on:
 
-- `action_id`: For Action Scheduler integration
+- `action_id`: For Action Scheduler integration and cleanup operations
 - `args_hash`: For duplicate detection
 - `class_hash`: For task type queries
 - `task_id`: For log retrieval
+
+### Cleanup Performance
+
+- **Batch Operations**: Cleanup operations use batch deletions for efficiency
+- **Indexed Queries**: All cleanup queries use indexed columns for optimal performance
+- **Minimal Overhead**: Action deletion hooks add minimal overhead to Action Scheduler operations
 
 ## Advanced Integration
 

@@ -118,6 +118,19 @@ Returns the container instance.
 
 Checks if Shepherd has been registered.
 
+##### `delete_tasks_on_action_deletion( int $action_id ): void`
+
+Automatically removes task data when Action Scheduler deletes an action.
+
+- **Parameters:**
+  - `$action_id` - The Action Scheduler action ID being deleted
+- **Behavior:**
+  - Queries for tasks associated with the action ID
+  - Removes corresponding logs from `shepherd_task_logs`
+  - Removes task records from `shepherd_tasks`
+  - No-op if no tasks are associated with the action ID
+- **Hook:** Automatically called on `action_scheduler_deleted_action`
+
 ---
 
 ### `Email` Task
