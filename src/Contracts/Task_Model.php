@@ -2,7 +2,7 @@
 /**
  * The Shepherd task model contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Contracts;
  */
@@ -14,7 +14,7 @@ namespace StellarWP\Shepherd\Contracts;
 /**
  * The Shepherd task model contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Contracts;
  */
@@ -22,7 +22,7 @@ interface Task_Model extends Model {
 	/**
 	 * Sets the task's arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array $args The task's arguments.
 	 */
@@ -31,28 +31,28 @@ interface Task_Model extends Model {
 	/**
 	 * Sets the task's data.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function set_data(): void;
 
 	/**
 	 * Sets the task's arguments hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function set_args_hash(): void;
 
 	/**
 	 * Sets the task's class hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function set_class_hash(): void;
 
 	/**
 	 * Sets the task's action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $action_id The task's action ID.
 	 */
@@ -61,7 +61,7 @@ interface Task_Model extends Model {
 	/**
 	 * Sets the task's current try.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $current_try The task's current try.
 	 */
@@ -70,7 +70,7 @@ interface Task_Model extends Model {
 	/**
 	 * Gets the task's current try.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task's current try.
 	 */
@@ -79,7 +79,7 @@ interface Task_Model extends Model {
 	/**
 	 * Gets the task's action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task's action ID.
 	 */
@@ -88,7 +88,7 @@ interface Task_Model extends Model {
 	/**
 	 * Gets the task's arguments hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's arguments hash.
 	 */
@@ -97,7 +97,7 @@ interface Task_Model extends Model {
 	/**
 	 * Gets the task's class hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's class hash.
 	 */
@@ -106,7 +106,7 @@ interface Task_Model extends Model {
 	/**
 	 * Gets the task's data.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's data.
 	 */
@@ -115,7 +115,7 @@ interface Task_Model extends Model {
 	/**
 	 * Gets the task's arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The task's arguments.
 	 */
@@ -126,7 +126,7 @@ interface Task_Model extends Model {
 	 *
 	 * SHOULD BE a maximum of 15 characters.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's prefix.
 	 */

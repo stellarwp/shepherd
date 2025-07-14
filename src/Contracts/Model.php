@@ -2,7 +2,7 @@
 /**
  * The Shepherd model contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Contracts;
  */
@@ -16,7 +16,7 @@ use StellarWP\Shepherd\Abstracts\Table_Abstract;
 /**
  * The Shepherd model contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Contracts;
  */
@@ -24,7 +24,7 @@ interface Model {
 	/**
 	 * Gets the model's ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The model's ID.
 	 */
@@ -33,7 +33,7 @@ interface Model {
 	/**
 	 * Sets the model's ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $id The model's ID.
 	 */
@@ -42,7 +42,7 @@ interface Model {
 	/**
 	 * Saves the model.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The id of the saved model.
 	 */
@@ -51,7 +51,7 @@ interface Model {
 	/**
 	 * Deletes the model.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -60,7 +60,7 @@ interface Model {
 	/**
 	 * Gets the table interface for the model.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Table_Abstract The table interface.
 	 */
@@ -69,7 +69,7 @@ interface Model {
 	/**
 	 * Converts the model to an array.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The model as an array.
 	 */

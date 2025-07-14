@@ -2,7 +2,7 @@
 /**
  * Shepherd's task abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -19,7 +19,7 @@ use JsonSerializable;
 /**
  * Shepherd's task abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Abstracts;
  */
@@ -27,7 +27,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	/**
 	 * The task's constructor.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param mixed ...$args The task's constructor arguments.
 	 *
@@ -53,7 +53,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	/**
 	 * Gets the task's group.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's group.
 	 */
@@ -66,7 +66,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 *
 	 * Action scheduler will not accept anything less than 0 or greater than 255.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task's priority.
 	 */
@@ -77,7 +77,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	/**
 	 * Validates the task's arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	protected function validate_args(): void {}
 
@@ -86,7 +86,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	 *
 	 * 0 means the task is not retryable, while less than 0 means the task is retryable indefinitely.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The maximum number of retries.
 	 */
@@ -97,7 +97,7 @@ abstract class Task_Abstract extends Task_Model_Abstract implements Task {
 	/**
 	 * Gets the retry delay.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The retry delay in seconds.
 	 */

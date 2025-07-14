@@ -2,7 +2,7 @@
 /**
  * Shepherd's HTTP request task.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tasks;
  */
@@ -26,7 +26,7 @@ use WP_Error;
  * This task makes HTTP requests using WordPress's wp_remote_request() function
  * with built-in retry logic for failed requests.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tasks;
  */
@@ -34,7 +34,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Valid HTTP methods.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string[]
 	 */
@@ -43,7 +43,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Default request timeout in seconds.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array
 	 */
@@ -58,7 +58,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * The HTTP request task's constructor.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $url     The URL to send the request to.
 	 * @param array  $args    Optional. Request arguments (headers, body, timeout, etc.).
@@ -75,7 +75,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Processes the HTTP request task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @throws ShepherdTaskException                 If the HTTP request fails but should be retried.
 	 * @throws ShepherdTaskFailWithoutRetryException If the HTTP request fails without retry.
@@ -101,7 +101,7 @@ class HTTP_Request extends Task_Abstract {
 			/**
 			 * Filters whether to retry the HTTP request on WP_Error.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param bool         $should_retry Whether to retry the HTTP request on WP_Error.
 			 * @param WP_Error     $response     The WP_Error object.
@@ -127,7 +127,7 @@ class HTTP_Request extends Task_Abstract {
 			/**
 			 * Filters whether to retry the HTTP request on invalid response.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param bool         $should_retry Whether to retry the HTTP request on invalid response.
 			 * @param mixed        $response     The response.
@@ -150,7 +150,7 @@ class HTTP_Request extends Task_Abstract {
 			/**
 			 * Filters whether to retry the HTTP request on HTTP error status codes (4xx, 5xx).
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param bool         $should_retry Whether to retry the HTTP request on HTTP error status codes (4xx, 5xx).
 			 * @param array        $response     The response.
@@ -176,7 +176,7 @@ class HTTP_Request extends Task_Abstract {
 			/**
 			 * Filters whether to retry the HTTP request on non-2xx response codes.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param bool         $should_retry Whether to retry the HTTP request on non-2xx response codes.
 			 * @param array        $response     The response.
@@ -201,7 +201,7 @@ class HTTP_Request extends Task_Abstract {
 		/**
 		 * Fires when the HTTP request task is processed successfully.
 		 *
-		 * @since TBD
+		 * @since 0.0.1
 		 *
 		 * @param HTTP_Request $task     The HTTP request task that was processed.
 		 * @param array        $response The wp_remote_request response array.
@@ -214,7 +214,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Validates the HTTP request task's arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @throws InvalidArgumentException If the HTTP request arguments are invalid.
 	 */
@@ -243,7 +243,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Gets the HTTP request task's hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The HTTP request task's hook prefix.
 	 */
@@ -256,7 +256,7 @@ class HTTP_Request extends Task_Abstract {
 	 *
 	 * Network requests can be flaky, so allow retries.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The maximum number of retries.
 	 */
@@ -267,7 +267,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Gets the request URL.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The request URL.
 	 */
@@ -278,7 +278,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Gets the HTTP method.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The HTTP method.
 	 */
@@ -289,7 +289,7 @@ class HTTP_Request extends Task_Abstract {
 	/**
 	 * Gets the request arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The request arguments.
 	 */
@@ -302,7 +302,7 @@ class HTTP_Request extends Task_Abstract {
 	 *
 	 * Offers an alternative of having to store the auth credentials in the database.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The authentication headers.
 	 */

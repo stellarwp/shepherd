@@ -135,7 +135,7 @@ shepherd()->dispatch($email_task);
 
 ## Logging System
 
-### Default Logger Change (TBD)
+### Default Logger Change
 
 Shepherd now uses `ActionScheduler_DB_Logger` as the default logger instead of `DB_Logger`. This change:
 

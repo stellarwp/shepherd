@@ -17,7 +17,7 @@ use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
 /**
  * Shepherd Config
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Config
  */
@@ -25,7 +25,7 @@ class Config {
 	/**
 	 * Container object.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var ?ContainerInterface
 	 */
@@ -34,7 +34,7 @@ class Config {
 	/**
 	 * The hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -43,7 +43,7 @@ class Config {
 	/**
 	 * The logger.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var ?Logger
 	 */
@@ -52,7 +52,7 @@ class Config {
 	/**
 	 * The maximum table name length.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -61,7 +61,7 @@ class Config {
 	/**
 	 * Get the container.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @throws RuntimeException If the container is not set.
 	 *
@@ -78,7 +78,7 @@ class Config {
 	/**
 	 * Gets the hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @throws RuntimeException If the hook prefix is not set.
 	 *
@@ -96,7 +96,7 @@ class Config {
 	/**
 	 * Gets the logger.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Logger
 	 */
@@ -155,7 +155,7 @@ class Config {
 	/**
 	 * Sets the logger.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param ?Logger $logger The logger.
 	 *
@@ -168,7 +168,7 @@ class Config {
 	/**
 	 * Sets the maximum table name length.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $length The maximum table name length.
 	 *

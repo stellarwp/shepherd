@@ -2,7 +2,7 @@
 /**
  * The Shepherd loggable trait.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Traits;
  */
@@ -18,7 +18,7 @@ use Psr\Log\LogLevel;
 /**
  * The Shepherd loggable trait.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Traits;
  */
@@ -26,7 +26,7 @@ trait Loggable {
 	/**
 	 * The logger.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var Logger|null
 	 */
@@ -35,7 +35,7 @@ trait Loggable {
 	/**
 	 * Gets the logger.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Logger The logger.
 	 */
@@ -50,7 +50,7 @@ trait Loggable {
 	/**
 	 * Logs a message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $level   The log level.
 	 * @param string $type    The log type.
@@ -69,7 +69,7 @@ trait Loggable {
 	/**
 	 * Logs a created message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $task_id The task ID.
 	 * @param array  $data    The data to log.
@@ -85,7 +85,7 @@ trait Loggable {
 	/**
 	 * Logs a starting message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $task_id The task ID.
 	 * @param array  $data    The data to log.
@@ -101,7 +101,7 @@ trait Loggable {
 	/**
 	 * Logs a finished message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $task_id The task ID.
 	 * @param array  $data    The data to log.
@@ -117,7 +117,7 @@ trait Loggable {
 	/**
 	 * Logs a failed message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $task_id The task ID.
 	 * @param array  $data    The data to log.
@@ -133,7 +133,7 @@ trait Loggable {
 	/**
 	 * Logs a rescheduled message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $task_id The task ID.
 	 * @param array  $data    The data to log.
@@ -149,7 +149,7 @@ trait Loggable {
 	/**
 	 * Logs a cancelled message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $task_id The task ID.
 	 * @param array  $data    The data to log.
@@ -165,7 +165,7 @@ trait Loggable {
 	/**
 	 * Logs a retrying message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $task_id The task ID.
 	 * @param array  $data    The data to log.

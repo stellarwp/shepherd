@@ -2,7 +2,7 @@
 /**
  * The Shepherd log model contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Contracts
  */
@@ -16,7 +16,7 @@ use DateTimeInterface;
 /**
  * The Shepherd log model contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Contracts
  */
@@ -24,7 +24,7 @@ interface Log_Model extends Model {
 	/**
 	 * Sets the task ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $task_id The task ID.
 	 *
@@ -35,7 +35,7 @@ interface Log_Model extends Model {
 	/**
 	 * Sets the date.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param DateTimeInterface $date The date.
 	 *
@@ -46,7 +46,7 @@ interface Log_Model extends Model {
 	/**
 	 * Sets the level.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $level The level.
 	 *
@@ -57,7 +57,7 @@ interface Log_Model extends Model {
 	/**
 	 * Sets the type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $type The type.
 	 *
@@ -68,7 +68,7 @@ interface Log_Model extends Model {
 	/**
 	 * Sets the entry.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $entry The entry.
 	 *
@@ -79,7 +79,7 @@ interface Log_Model extends Model {
 	/**
 	 * Gets the task ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task ID.
 	 */
@@ -88,7 +88,7 @@ interface Log_Model extends Model {
 	/**
 	 * Gets the date.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return DateTimeInterface The date.
 	 */
@@ -97,7 +97,7 @@ interface Log_Model extends Model {
 	/**
 	 * Gets the level.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The level.
 	 */
@@ -106,7 +106,7 @@ interface Log_Model extends Model {
 	/**
 	 * Gets the type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The type.
 	 */
@@ -115,7 +115,7 @@ interface Log_Model extends Model {
 	/**
 	 * Gets the entry.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The entry.
 	 */

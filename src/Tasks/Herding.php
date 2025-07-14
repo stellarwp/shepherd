@@ -2,7 +2,7 @@
 /**
  * Shepherd's herding task.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tasks;
  */
@@ -24,7 +24,7 @@ use Generator;
 /**
  * Shepherd's herding task.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tasks;
  */
@@ -32,7 +32,7 @@ class Herding extends Task_Abstract {
 	/**
 	 * Processes the herding task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function process(): void {
 		DB::beginTransaction();
@@ -88,7 +88,7 @@ class Herding extends Task_Abstract {
 		/**
 		 * Fires when the herding task is processed.
 		 *
-		 * @since TBD
+		 * @since 0.0.1
 		 *
 		 * @param Herding $task The herding task that was processed.
 		 */
@@ -98,7 +98,7 @@ class Herding extends Task_Abstract {
 	/**
 	 * Gets the herding task's hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The herding task's hook prefix.
 	 */
@@ -109,7 +109,7 @@ class Herding extends Task_Abstract {
 	/**
 	 * Gets the task IDs.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Generator<int[]> The task IDs.
 	 */
@@ -117,7 +117,7 @@ class Herding extends Task_Abstract {
 		/**
 		* Filters the limit of tasks to herd in a single batch.
 		*
-		* @since TBD
+		* @since 0.0.1
 		*
 		* @param int $limit The limit of tasks to herd.
 		*/

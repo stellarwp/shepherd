@@ -18,7 +18,7 @@ use StellarWP\Shepherd\Tables\Task_Logs;
 /**
  * Shepherd DB Logger
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Loggers
  */
@@ -28,7 +28,7 @@ class DB_Logger implements LoggerContract {
 	/**
 	 * Retrieves the logs for a given task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $task_id The ID of the task.
 	 *

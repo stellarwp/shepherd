@@ -2,7 +2,7 @@
 /**
  * The base service provider class.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Abstracts
  */

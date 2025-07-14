@@ -2,7 +2,7 @@
 /**
  * Shepherd Tables Service Provider
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables;
  */
@@ -19,7 +19,7 @@ use StellarWP\Shepherd\Loggers\DB_Logger;
 /**
  * Shepherd Tables Service Provider
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables;
  */
@@ -37,7 +37,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Registers the service provider bindings.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void The method does not return any value.
 	 */

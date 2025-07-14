@@ -2,7 +2,7 @@
 /**
  * Shepherd's main service provider.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -22,7 +22,7 @@ use StellarWP\Shepherd\Tables\Tasks;
 /**
  * Main Service Provider
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd;
  */
@@ -30,7 +30,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * The version of the plugin.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -39,7 +39,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * The hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -48,7 +48,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Whether the provider has been registered.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var bool
 	 */
@@ -57,7 +57,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Registers Shepherd's specific providers and starts core functionality
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void The method does not return any value.
 	 */
@@ -84,7 +84,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Requires Action Scheduler.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -95,7 +95,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Resets the registered state.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -106,7 +106,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Checks if Shepherd is registered.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool
 	 */
@@ -117,7 +117,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Deletes tasks on action deletion.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $action_id The action ID.
 	 */

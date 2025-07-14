@@ -15,7 +15,7 @@ use StellarWP\Shepherd\Config;
 /**
  * Get the Shepherd's Regulator instance.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @return Regulator The Shepherd's regulator.
  *

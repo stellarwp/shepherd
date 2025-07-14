@@ -2,7 +2,7 @@
 /**
  * Shepherd's task contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -14,7 +14,7 @@ namespace StellarWP\Shepherd\Contracts;
 /**
  * Shepherd's task contract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -22,14 +22,14 @@ interface Task extends Task_Model {
 	/**
 	 * Processes the task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function process(): void;
 
 	/**
 	 * Gets the task's group.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's group.
 	 */
@@ -38,7 +38,7 @@ interface Task extends Task_Model {
 	/**
 	 * Gets the task's priority.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task's priority.
 	 */
@@ -49,7 +49,7 @@ interface Task extends Task_Model {
 	 *
 	 * 0 means the task is not retryable, while less than 0 means the task is retryable indefinitely.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The maximum number of retries.
 	 */
@@ -58,7 +58,7 @@ interface Task extends Task_Model {
 	/**
 	 * Gets the task's retry delay.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task's retry delay in seconds.
 	 */

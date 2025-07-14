@@ -2,7 +2,7 @@
 /**
  * The Shepherd model abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Abstracts;
  */
@@ -18,7 +18,7 @@ use RuntimeException;
 /**
  * The Shepherd model abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Abstracts;
  */
@@ -26,7 +26,7 @@ abstract class Model_Abstract implements Model {
 	/**
 	 * The model's ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -35,7 +35,7 @@ abstract class Model_Abstract implements Model {
 	/**
 	 * Gets the model's ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The model's ID.
 	 */
@@ -46,7 +46,7 @@ abstract class Model_Abstract implements Model {
 	/**
 	 * Sets the model's ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $id The model's ID.
 	 */
@@ -57,7 +57,7 @@ abstract class Model_Abstract implements Model {
 	/**
 	 * Saves the model.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The id of the saved model.
 	 *
@@ -84,7 +84,7 @@ abstract class Model_Abstract implements Model {
 	/**
 	 * Deletes the model.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 *
@@ -108,7 +108,7 @@ abstract class Model_Abstract implements Model {
 	/**
 	 * Converts the model to an array.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The model as an array.
 	 */

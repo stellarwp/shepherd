@@ -2,7 +2,7 @@
 /**
  * Provides query methods common to all custom tables.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Traits;
  */
@@ -19,7 +19,7 @@ use StellarWP\Shepherd\Contracts\Model;
 /**
  * Trait Custom_Table_Query_Methods.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Traits;
  */
@@ -27,7 +27,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Fetches all the rows from the table using a batched query.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $batch_size   The number of rows to fetch per batch.
 	 * @param string $output       The output type of the query, one of OBJECT, ARRAY_A, or ARRAY_N.
@@ -70,7 +70,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Inserts a single row into the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<mixed> $entry The entry to insert.
 	 *
@@ -83,7 +83,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Updates a single row in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<mixed> $entry The entry to update.
 	 *
@@ -96,7 +96,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Inserts or updates a single row in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<mixed> $entry The entry to upsert.
 	 *
@@ -112,7 +112,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Inserts multiple rows into the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<mixed> $entries The entries to insert.
 	 *
@@ -132,7 +132,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Updates multiple rows into the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<mixed> $entries The entries to update.
 	 *
@@ -183,7 +183,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Deletes a single row from the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $uid    The ID of the row to delete.
 	 * @param string $column The column to use for the delete query.
@@ -197,7 +197,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Deletes multiple rows from the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<int|string> $ids    The IDs of the rows to delete.
 	 * @param string            $column The column to use for the delete query.
@@ -230,7 +230,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Prepares the statements and values for the insert and update queries.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<mixed> $entries The entries to prepare.
 	 *
@@ -259,7 +259,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Fetches all the rows from the table using a batched query and a WHERE clause.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $where_clause The WHERE clause to use.
 	 * @param int    $batch_size   The number of rows to fetch per batch.
@@ -275,7 +275,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Fetches the first row from the table using a WHERE clause.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $where_clause The prepared WHERE clause to use.
 	 * @param string $output       The output type of the query, one of OBJECT, ARRAY_A, or ARRAY_N.
@@ -297,7 +297,7 @@ trait Custom_Table_Query_Methods {
 	 *
 	 * Also supports joining another table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array  $args                      The query arguments.
 	 * @param int    $per_page                  The number of items to display per page.
@@ -353,7 +353,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Gets the total number of items in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<string,mixed> $args The query arguments.
 	 *
@@ -373,7 +373,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Builds a WHERE clause from the provided arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<string,mixed> $args   The query arguments.
 	 *
@@ -459,7 +459,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Gets the JOIN parts of the query.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $join_table                The table to join.
 	 * @param string $join_condition            The condition to join on.
@@ -507,7 +507,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Gets all models by a column.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $column The column to get the models by.
 	 * @param mixed  $value  The value to get the models by.
@@ -535,7 +535,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Gets the first model by a column.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $column The column to get the model by.
 	 * @param mixed  $value  The value to get the model by.
@@ -559,7 +559,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Prepares a value for a query.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $column The column to prepare the value for.
 	 * @param mixed  $value  The value to prepare.
@@ -602,7 +602,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Gets a model by its ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $id The ID.
 	 *
@@ -619,7 +619,7 @@ trait Custom_Table_Query_Methods {
 	/**
 	 * Gets a model from an array.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<string, mixed> $model_array The model array.
 	 *

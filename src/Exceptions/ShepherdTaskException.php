@@ -2,7 +2,7 @@
 /**
  * Shepherd's task exception.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Exceptions;
  */
@@ -18,7 +18,7 @@ use Exception;
 /**
  * Shepherd's task exception.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Exceptions;
  */

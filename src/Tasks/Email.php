@@ -2,7 +2,7 @@
 /**
  * Shepherd's email task.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tasks;
  */
@@ -21,7 +21,7 @@ use InvalidArgumentException;
 /**
  * Shepherd's email task.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tasks;
  */
@@ -29,7 +29,7 @@ class Email extends Task_Abstract {
 	/**
 	 * The email task's constructor.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string   $to_email    The email address to send the email to.
 	 * @param string   $subject     The email subject.
@@ -46,7 +46,7 @@ class Email extends Task_Abstract {
 	/**
 	 * Processes the email task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @throws ShepherdTaskException If the email fails to send.
 	 */
@@ -61,7 +61,7 @@ class Email extends Task_Abstract {
 		/**
 		 * Fires when the email task is processed.
 		 *
-		 * @since TBD
+		 * @since 0.0.1
 		 *
 		 * @param Email $task The email task that was processed.
 		 */
@@ -71,7 +71,7 @@ class Email extends Task_Abstract {
 	/**
 	 * Validates the email task's arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @throws InvalidArgumentException If the email task's arguments are invalid.
 	 */
@@ -97,7 +97,7 @@ class Email extends Task_Abstract {
 	/**
 	 * Gets the email task's hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The email task's hook prefix.
 	 */
@@ -108,7 +108,7 @@ class Email extends Task_Abstract {
 	/**
 	 * Gets the maximum number of retries.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The maximum number of retries.
 	 */

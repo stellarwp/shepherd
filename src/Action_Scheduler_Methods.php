@@ -2,7 +2,7 @@
 /**
  * Shepherd's wrapper of Action Scheduler methods.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd;
  */
@@ -19,7 +19,7 @@ use RuntimeException;
 /**
  * Shepherd's wrapper of Action Scheduler methods.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd;
  */
@@ -27,7 +27,7 @@ class Action_Scheduler_Methods {
 	/**
 	 * Checks if an action is scheduled.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $hook The hook of the action.
 	 * @param array  $args The arguments of the action.
@@ -42,7 +42,7 @@ class Action_Scheduler_Methods {
 	/**
 	 * Schedules a single action.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int    $timestamp The timestamp of the action.
 	 * @param string $hook      The hook of the action.
@@ -60,7 +60,7 @@ class Action_Scheduler_Methods {
 	/**
 	 * Gets an action by its ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $action_id The action ID.
 	 *
@@ -83,7 +83,7 @@ class Action_Scheduler_Methods {
 	/**
 	 * Gets actions by their IDs.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array $action_ids The action IDs.
 	 *
@@ -111,7 +111,7 @@ class Action_Scheduler_Methods {
 	/**
 	 * Gets pending actions by their IDs.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array $action_ids The action IDs.
 	 *

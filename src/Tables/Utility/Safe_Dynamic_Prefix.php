@@ -2,7 +2,7 @@
 /**
  * The safe dynamic table prefix utility class.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables\Utility;
  */
@@ -15,7 +15,7 @@ use StellarWP\Shepherd\Config;
 /**
  * Safe dynamic table prefix utility class.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables\Utility;
  */
@@ -30,7 +30,7 @@ class Safe_Dynamic_Prefix {
 	/**
 	 * Calculates the longest table name.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<class-string> $tables The tables to calculate the longest table name for.
 	 *
@@ -43,7 +43,7 @@ class Safe_Dynamic_Prefix {
 	/**
 	 * Gets the longest table name.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<class-string> $tables The tables to calculate the longest table name for.
 	 *
@@ -69,7 +69,7 @@ class Safe_Dynamic_Prefix {
 	 * Calculates the maximum length a hook prefix can be while ensuring
 	 * table names don't exceed MySQL's 64-character limit.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string|null $longest_table_name The longest table name to calculate the maximum length for.
 	 *
@@ -91,7 +91,7 @@ class Safe_Dynamic_Prefix {
 	 * Returns the hook prefix trimmed to the maximum safe length
 	 * to ensure table names don't exceed MySQL's limit.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string|null $longest_table_name The longest table name to calculate the maximum length for.
 	 *

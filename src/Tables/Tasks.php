@@ -2,7 +2,7 @@
 /**
  * The Tasks table schema.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables;
  */
@@ -16,7 +16,7 @@ use InvalidArgumentException;
 /**
  * Tasks table schema.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables;
  */
@@ -24,7 +24,7 @@ class Tasks extends Table {
 	/**
 	 * The indexes for the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<array<string, string>>
 	 */
@@ -46,7 +46,7 @@ class Tasks extends Table {
 	/**
 	 * The schema version.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -55,7 +55,7 @@ class Tasks extends Table {
 	/**
 	 * The base table name, without the table prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -64,7 +64,7 @@ class Tasks extends Table {
 	/**
 	 * The table group.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -73,7 +73,7 @@ class Tasks extends Table {
 	/**
 	 * The slug used to identify the custom table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -82,7 +82,7 @@ class Tasks extends Table {
 	/**
 	 * The field that uniquely identifies a row in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -91,7 +91,7 @@ class Tasks extends Table {
 	/**
 	 * An array of all the columns in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string, array<string, bool|int|string>>
 	 */
@@ -143,7 +143,7 @@ class Tasks extends Table {
 	/**
 	 * Gets a task by its action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $action_id  The action ID.
 	 *
@@ -159,7 +159,7 @@ class Tasks extends Table {
 	/**
 	 * Gets a task by its arguments hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $args_hash The arguments hash.
 	 *
@@ -173,7 +173,7 @@ class Tasks extends Table {
 	/**
 	 * Gets a task from an array.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<string, mixed> $task_array The task array.
 	 *

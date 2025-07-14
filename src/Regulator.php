@@ -2,7 +2,7 @@
 /**
  * Shepherd's regulator.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -28,7 +28,7 @@ use StellarWP\Shepherd\Tasks\Herding;
 /**
  * Shepherd's regulator.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -38,7 +38,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * The process task hook.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -47,7 +47,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * The action ID being processed.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -56,7 +56,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * The scheduled tasks.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array
 	 */
@@ -67,7 +67,7 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * This is used to track tasks that failed to be processed so that they can be retried.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var Task[]
 	 */
@@ -76,7 +76,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * The regulator's constructor.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Container $container The container.
 	 */
@@ -88,7 +88,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Registers the regulator.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function register(): void {
 		add_action( $this->process_task_hook, [ $this, 'process_task' ] );
@@ -103,7 +103,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Handles the rescheduling of a failed task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function handle_reschedule_of_failed_task(): void {
 		if ( empty( $this->failed_tasks ) ) {
@@ -118,7 +118,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Track specified action.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $action_id Action ID to track.
 	 */
@@ -129,7 +129,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Un-track action.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function untrack_action(): void {
 		$this->current_action_id = 0;
@@ -138,7 +138,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Dispatches a task to be processed later.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
@@ -165,7 +165,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Dispatches a task to be processed later.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
@@ -212,7 +212,7 @@ class Regulator extends Provider_Abstract {
 				/**
 				 * Fires when a task should be retried.
 				 *
-				 * @since TBD
+				 * @since 0.0.1
 				 *
 				 * @param Task $task The task that should be retried.
 				 */
@@ -231,7 +231,7 @@ class Regulator extends Provider_Abstract {
 				/**
 				 * Fires when a task should be retried.
 				 *
-				 * @since TBD
+				 * @since 0.0.1
 				 *
 				 * @param Task $task The task that should be retried.
 				 */
@@ -246,7 +246,7 @@ class Regulator extends Provider_Abstract {
 			/**
 			 * Fires when a task fails to be scheduled or inserted into the database.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param Task             $task The task that failed to be scheduled or inserted into the database.
 			 * @param RuntimeException $e    The exception that was thrown.
@@ -257,7 +257,7 @@ class Regulator extends Provider_Abstract {
 			/**
 			 * Fires when a task is already scheduled.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param Task $task The task that is already scheduled.
 			 */
@@ -268,7 +268,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Gets the last scheduled task ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return ?int The last scheduled task ID.
 	 */
@@ -279,7 +279,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Gets the process task hook.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The process task hook.
 	 */
@@ -290,7 +290,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Busts the runtime cached tasks.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function bust_runtime_cached_tasks(): void {
 		$this->scheduled_tasks = [];
@@ -299,7 +299,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Processes a task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $args_hash The arguments hash.
 	 *
@@ -336,7 +336,7 @@ class Regulator extends Provider_Abstract {
 		/**
 		 * Fires when a task is being processed.
 		 *
-		 * @since TBD
+		 * @since 0.0.1
 		 *
 		 * @param Task $task          The task that is being processed.
 		 * @param int  $action_id     The action ID that is being processed.
@@ -361,7 +361,7 @@ class Regulator extends Provider_Abstract {
 			/**
 			 * Fires when a task fails to be processed without retry.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param Task                                $task The task that failed to be processed without retry.
 			 * @param ShepherdTaskFailWithoutRetryException $e    The exception that was thrown.
@@ -371,7 +371,7 @@ class Regulator extends Provider_Abstract {
 			/**
 			 * Fires when a task fails to be processed without retry.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param Task                                $task The task that failed to be processed without retry.
 			 * @param ShepherdTaskFailWithoutRetryException $e    The exception that was thrown.
@@ -385,7 +385,7 @@ class Regulator extends Provider_Abstract {
 			/**
 			 * Fires when a task fails to be processed.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param Task      $task The task that failed to be processed.
 			 * @param Exception $e    The exception that was thrown.
@@ -402,7 +402,7 @@ class Regulator extends Provider_Abstract {
 			/**
 			 * Fires when a task fails to be processed.
 			 *
-			 * @since TBD
+			 * @since 0.0.1
 			 *
 			 * @param Task      $task The task that failed to be processed.
 			 * @param Throwable $e    The exception that was thrown.
@@ -420,7 +420,7 @@ class Regulator extends Provider_Abstract {
 		/**
 		 * Fires when a task is finished processing.
 		 *
-		 * @since TBD
+		 * @since 0.0.1
 		 *
 		 * @param Task $task          The task that is finished processing.
 		 * @param int  $action_id     The action ID that is finished processing.
@@ -431,7 +431,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Determines if the task should be retried.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Task $task The task.
 	 * @return bool Whether the task should be retried.
@@ -455,7 +455,7 @@ class Regulator extends Provider_Abstract {
 	/**
 	 * Schedules the cleanup task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function schedule_cleanup_task(): void {
 		$this->dispatch( new Herding(), 6 * HOUR_IN_SECONDS );

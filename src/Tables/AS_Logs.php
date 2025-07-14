@@ -2,7 +2,7 @@
 /**
  * The Action Scheduler logs table schema.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables;
  */
@@ -20,7 +20,7 @@ use DateTime;
  *
  * This is used only as an interface and should not be registered as a table for schema to handle.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Tables;
  */
@@ -28,7 +28,7 @@ class AS_Logs extends Table {
 	/**
 	 * The base table name, without the table prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -37,7 +37,7 @@ class AS_Logs extends Table {
 	/**
 	 * The field that uniquely identifies a row in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -46,7 +46,7 @@ class AS_Logs extends Table {
 	/**
 	 * An array of all the columns in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string, array<string, bool|int|string>>
 	 */
@@ -90,7 +90,7 @@ class AS_Logs extends Table {
 	/**
 	 * Gets the logs by task ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $task_id The task ID.
 	 * @return Log[] The logs for the task.
@@ -108,7 +108,7 @@ class AS_Logs extends Table {
 	/**
 	 * Gets a log from an array.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<string, mixed> $model_array The model array.
 	 *

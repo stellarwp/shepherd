@@ -2,7 +2,7 @@
 /**
  * The Shepherd log model abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -30,7 +30,7 @@ use StellarWP\DB\DB;
 /**
  * The Shepherd log model abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd
  */
@@ -38,7 +38,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The table interface for the log.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -47,7 +47,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The valid log levels.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<string>
 	 */
@@ -65,7 +65,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The valid log types.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<string>
 	 */
@@ -82,7 +82,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The task ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -91,7 +91,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -100,7 +100,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The date.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var DateTimeInterface
 	 */
@@ -109,7 +109,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The level.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -118,7 +118,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -127,7 +127,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * The entry.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -136,7 +136,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Sets the task ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $task_id The task ID.
 	 */
@@ -147,7 +147,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Sets the action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $action_id The action ID.
 	 */
@@ -158,7 +158,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Sets the date.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param DateTimeInterface $date The date.
 	 */
@@ -169,7 +169,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Sets the level.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $level The level.
 	 *
@@ -186,7 +186,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Sets the type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $type The type.
 	 *
@@ -203,7 +203,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Sets the entry.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $entry The entry.
 	 */
@@ -214,7 +214,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Gets the task ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task ID.
 	 */
@@ -225,7 +225,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Gets the action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The action ID.
 	 */
@@ -236,7 +236,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Gets the date.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return DateTimeInterface The date.
 	 */
@@ -247,7 +247,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Gets the level.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The level.
 	 */
@@ -258,7 +258,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Gets the type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The type.
 	 */
@@ -269,7 +269,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Gets the entry.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The entry.
 	 */
@@ -280,7 +280,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Gets the table interface for the log.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Table_Abstract The table interface.
 	 *
@@ -311,7 +311,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Converts the model to an array.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The model as an array.
 	 */
@@ -338,7 +338,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Converts the model to an array for saving.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The model as an array for saving.
 	 */
@@ -368,7 +368,7 @@ class Log extends Model_Abstract implements Log_Model {
 	/**
 	 * Saves the model.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The id of the saved model.
 	 *

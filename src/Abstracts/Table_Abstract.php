@@ -21,7 +21,7 @@ use DateTimeInterface;
 /**
  * Class Table_Abstract
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Abstracts
  */
@@ -31,7 +31,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The PHP type for an integer.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -40,7 +40,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The PHP type for a string.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -49,7 +49,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The PHP type for a float.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -58,7 +58,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The PHP type for a boolean.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -67,7 +67,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The PHP type for a datetime.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -76,7 +76,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The column type for a bigint.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -85,7 +85,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The column type for a varchar.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -94,7 +94,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The column type for a text.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -103,7 +103,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The column type for a longtext.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -112,7 +112,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The column type for a timestamp.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -127,7 +127,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * The indexes for the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<array<string, string>>
 	 */
@@ -136,7 +136,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * Constructor.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function __construct() {
 		$this->db        = DB::class;
@@ -148,7 +148,7 @@ abstract class Table_Abstract extends Table {
 	 *
 	 * This method is overridden to use the hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The base table name.
 	 */
@@ -166,7 +166,7 @@ abstract class Table_Abstract extends Table {
 	 *
 	 * This method is overridden to use the hook prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The schema slug.
 	 */
@@ -177,7 +177,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * An array of all the columns in the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string, array<string, string>>
 	 */
@@ -186,7 +186,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * An array of all the columns that are searchable.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string[]
 	 */
@@ -197,7 +197,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * Helper method to check and add an index to a table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array  $results    The results array to track changes.
 	 * @param string $index_name The name of the index.
@@ -226,7 +226,7 @@ abstract class Table_Abstract extends Table {
 	 * Returns the table creation SQL in the format supported
 	 * by the `dbDelta` function.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The table creation SQL, in the format supported
 	 *                by the `dbDelta` function.
@@ -277,7 +277,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * Add indexes after table creation.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<string,string> $results A map of results in the format
 	 *                                      returned by the `dbDelta` function.
@@ -300,7 +300,7 @@ abstract class Table_Abstract extends Table {
 	/**
 	 * Returns the base table name without the dynamic prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The base table name without the dynamic prefix.
 	 */

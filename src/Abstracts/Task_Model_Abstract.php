@@ -2,7 +2,7 @@
 /**
  * The Shepherd task model abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Abstracts;
  */
@@ -22,7 +22,7 @@ use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
 /**
  * The Shepherd task model abstract.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Shepherd\Abstracts;
  */
@@ -30,7 +30,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * The table interface for the task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -39,7 +39,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * The task's action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -48,7 +48,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * The task's class hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -57,7 +57,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * The task's arguments hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -66,7 +66,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * The task's data.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -77,7 +77,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	 *
 	 * We start at 1 because the first try is the initial try.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -86,7 +86,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * The task's constructor arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<mixed>
 	 */
@@ -95,7 +95,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Sets the task's action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $action_id The task's action ID.
 	 */
@@ -106,7 +106,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Sets the task's class hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function set_class_hash(): void {
 		$this->class_hash = md5( static::class );
@@ -115,7 +115,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Sets the task's arguments hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @throws RuntimeException If the task prefix is longer than 15 characters.
 	 */
@@ -132,7 +132,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Sets the task's data.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	public function set_data(): void {
 		$this->data = wp_json_encode(
@@ -146,7 +146,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Sets the task's current try.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $current_try The task's current try.
 	 */
@@ -157,7 +157,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Sets the task's arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array $args The task's arguments.
 	 */
@@ -169,7 +169,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Gets the task's action ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task's action ID.
 	 */
@@ -180,7 +180,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Gets the task's class hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's class hash.
 	 */
@@ -191,7 +191,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Gets the task's arguments hash.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's arguments hash.
 	 */
@@ -202,7 +202,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Gets the task's data.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The task's data.
 	 */
@@ -213,7 +213,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Gets the task's current try.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The task's current try.
 	 */
@@ -224,7 +224,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Gets the task's arguments.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array The task's arguments.
 	 */
@@ -235,7 +235,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Gets the table interface for the task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Table_Abstract The table interface.
 	 */
@@ -246,7 +246,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	/**
 	 * Saves the task.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The id of the saved task.
 	 *
