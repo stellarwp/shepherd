@@ -2,12 +2,8 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
-## [1.0.0] TBD
+## [0.0.1] 2025-07-14
 
-### Added
+* Feature - Initial release of Shepherd.
 
-* Feature - Initial version
-* Docs - Documentation
-* Tests - Automated tests
-
-[1.0.0]: https://github.com/stellarwp/shepherd/releases/tag/1.0.0
+[0.0.1]: https://github.com/stellarwp/shepherd/releases/tag/0.0.1
