@@ -9,9 +9,29 @@ use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
 use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use StellarWP\DB\DB;
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
 
 class Herding_Test extends WPTestCase {
 	use With_Uopz;
+
+	/**
+	 * @before
+	 */
+	public function set_logger(): void {
+		Config::set_logger( new DB_Logger() );
+		Config::get_container()->singleton( Logger::class, Config::get_logger() );
+	}
+
+	/**
+	 * @after
+	 */
+	public function reset_logger(): void {
+		Config::set_logger( new ActionScheduler_DB_Logger() );
+		Config::get_container()->singleton( Logger::class, Config::get_logger() );
+	}
 
 	/**
 	 * @test
