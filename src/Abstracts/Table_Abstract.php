@@ -264,11 +264,11 @@ abstract class Table_Abstract extends Table {
 			$columns_definitions[] = $column_sql;
 		}
 
-		$columns_sql = implode( ',' . PHP_EOL, $columns_definitions ) . ',' . PHP_EOL;
+		$columns_sql = implode( ',' . PHP_EOL, $columns_definitions );
 
 		return "
 			CREATE TABLE `{$table_name}` (
-				{$columns_sql}
+				{$columns_sql},
 				PRIMARY KEY (`{$uid_column}`)
 			) {$charset_collate};
 		";
