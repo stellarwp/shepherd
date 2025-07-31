@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file. This projec
 
 * Fix - Removed an empty line after the columns and before the primary key of the Table creation SQL.
 
+[0.0.3]: https://github.com/stellarwp/shepherd/releases/tag/0.0.3
+
 ## [0.0.2] 2025-07-14
 
 * Fix - Fix the path to the Action Scheduler file to take into consideration the different ways Composer can be installed.
