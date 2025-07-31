@@ -119,10 +119,10 @@ Note: Tasks that fail without retry (e.g., HTTP 4xx errors) trigger `shepherd_{p
 
 ```php
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Provider;
+use StellarWP\Shepherd\Config;
 
 // Get the logger instance
-$logger = Provider::get_container()->get( Logger::class );
+$logger = Config::get_container()->get( Logger::class );
 
 // Retrieve logs for a specific task
 $logs = $logger->retrieve_logs( $task_id );
@@ -332,3 +332,474 @@ add_action( "shepherd_{$prefix}_http_request_processed", function( $task, $respo
     // Handle successful HTTP response
 }, 10, 2 );
 ```
+
+## Admin UI Configuration
+
+Shepherd includes a React-based admin interface for monitoring and managing tasks with real-time AJAX updates. The admin UI is disabled by default and must be explicitly enabled.
+
+### Enabling/Disabling Admin UI
+
+```php
+use StellarWP\Shepherd\Config;
+
+// Disable admin UI entirely
+Config::set_render_admin_ui( false );
+
+// Re-enable admin UI
+Config::set_render_admin_ui( true );
+```
+
+### Customizing Admin Page Access
+
+Control who can access the admin page by setting the required capability:
+
+```php
+// Default capability is 'manage_options'
+Config::set_admin_page_capability( 'manage_options' );
+
+// Allow editors to access the admin page
+Config::set_admin_page_capability( 'edit_posts' );
+
+// Restrict to administrators only
+Config::set_admin_page_capability( 'administrator' );
+```
+
+### Customizing Admin Page Titles
+
+You can customize the titles shown in the admin interface:
+
+```php
+use StellarWP\Shepherd\Config;
+
+// Custom page title (shown in browser tab and admin page list)
+Config::set_admin_page_title_callback( function() {
+    return __( 'My Task Manager', 'domain' );
+} );
+
+// Custom menu title (shown in WordPress admin sidebar under Tools)
+Config::set_admin_menu_title_callback( function() {
+    return __( 'Tasks', 'domain' );
+} );
+
+// Custom in-page title (shown as H1 on the admin page itself)
+Config::set_admin_page_in_page_title_callback( function() {
+    return __( 'Background Task Dashboard', 'domain' );
+} );
+```
+
+### Default Titles
+
+If you don't set custom callbacks, Shepherd uses these default patterns:
+
+- **Page Title**: `Shepherd ({hook_prefix})`
+- **Menu Title**: `Shepherd ({hook_prefix})`
+- **In-Page Title**: `Shepherd Task Manager (via {hook_prefix})`
+
+This allows multiple Shepherd instances (with different hook prefixes) to coexist in the same WordPress installation.
+
+### Admin UI Location
+
+The admin page can be added under **Tools** in the WordPress admin menu, by setting the `render_admin_ui` config to `true`. The page includes a fully-featured React-based task management interface.
+
+### Admin UI Features
+
+Shepherd includes a built-in React-powered admin interface that provides:
+
+1. **Task List View**: A comprehensive table showing all background tasks with:
+   - Task ID and Action ID
+   - Task type (class name)
+   - Arguments passed to the task
+   - Current retry attempt number
+   - Task status (Pending, Running, Success, Failed, Cancelled)
+   - Scheduled execution time
+   - Sortable columns and pagination
+
+2. **Task Actions**: Interactive controls for managing tasks:
+   - **View**: See detailed task logs (available for tasks with log entries)
+   - **Reschedule**: Reschedule a task to a new date and time
+   - **Edit**: Modify task properties (bulk action supported)
+   - **Delete**: Remove tasks with confirmation dialog (bulk action supported)
+
+3. **Real-time Status Display**:
+   - Tasks show their current status with appropriate labels
+   - Scheduled times are displayed in human-readable format (e.g., "2 hours ago")
+   - Recent tasks show relative time, older tasks show absolute dates
+
+4. **Responsive Design**: The interface uses WordPress DataViews component for consistent admin experience
+
+### Technical Implementation
+
+The admin UI is built with:
+
+- **React**: For component architecture
+- **WordPress DataViews**: For the table interface
+- **WordPress i18n**: For internationalization support
+- **TypeScript**: For type safety
+
+The data is provided server-side through PHP and includes:
+
+- Task information from the Shepherd tasks table
+- Action details from Action Scheduler
+- Comprehensive log entries for each task
+- Pagination metadata
+
+### Admin UI Development
+
+The admin UI source code is located in the `app/` directory:
+
+- `app/index.tsx` - Main entry point
+- `app/components/ShepherdTable.tsx` - Task table component
+- `app/data.tsx` - Data processing and field definitions
+- `app/types.ts` - TypeScript type definitions
+
+To modify the admin UI:
+
+1. Install the appropriate Node.js version: `nvm use`
+2. Install Node.js dependencies: `npm ci`
+3. Run development build: `npm run dev`
+4. Make your changes to the React components
+5. Build for production: `npm run build`
+
+The built files are output to the `build/` directory and automatically enqueued by the PHP admin provider.
+
+## Exception Handling
+
+### Specialized Exceptions
+
+Shepherd provides specific exception types for different failure scenarios:
+
+```php
+use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
+use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
+
+class My_Task extends Task_Abstract {
+    public function process(): void {
+        // General task failure (will retry based on configuration)
+        if ( $some_condition ) {
+            throw new ShepherdTaskException( 'Task failed due to temporary issue' );
+        }
+
+        // Task should fail immediately without retry (e.g., invalid data)
+        if ( $invalid_data ) {
+            throw new ShepherdTaskFailWithoutRetryException( 'Invalid task arguments' );
+        }
+
+        // Note: ShepherdTaskAlreadyExistsException is thrown automatically
+        // when attempting to schedule duplicate tasks
+    }
+}
+```
+
+### Exception Handling Strategies
+
+- **ShepherdTaskException**: Use for temporary failures that might succeed on retry
+- **ShepherdTaskFailWithoutRetryException**: Use for permanent failures (bad data, 4xx HTTP errors)
+- **Standard Exceptions**: Any other exception will be treated as a temporary failure
+
+## Database Utilities
+
+### Safe Table Naming
+
+The `Safe_Dynamic_Prefix` utility prevents MySQL table name length violations:
+
+```php
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
+
+// Automatically trims long prefixes to fit MySQL's 64-character limit
+$safe_prefix = Safe_Dynamic_Prefix::get( 'very_long_application_prefix_name' );
+
+// The utility considers the longest table name in Shepherd when calculating safe length
+echo $safe_prefix; // Will be trimmed to ensure table names don't exceed 64 chars
+```
+
+### Advanced Query Operations
+
+Use the `Custom_Table_Query_Methods` trait for complex database operations:
+
+```php
+use StellarWP\Shepherd\Traits\Custom_Table_Query_Methods;
+
+class My_Custom_Table extends Table_Abstract {
+    use Custom_Table_Query_Methods;
+
+    public function get_high_priority_tasks() {
+        // Complex query with joins and filtering
+        return $this->query()
+            ->select( [ 'tasks.*', 'logs.latest_entry' ] )
+            ->join( 'task_logs as logs', 'tasks.id', 'logs.task_id' )
+            ->where( 'priority', '>', 5 )
+            ->order_by( 'created_at', 'DESC' )
+            ->limit( 50 )
+            ->get_results();
+    }
+
+    public function bulk_update_status( array $task_ids, string $status ) {
+        // Efficient bulk operations
+        return $this->update_many(
+            [ 'status' => $status, 'updated_at' => time() ],
+            [ 'id' => $task_ids ]
+        );
+    }
+
+    public function search_tasks( string $search_term ) {
+        // Search across multiple columns
+        return $this->search(
+            $search_term,
+            [ 'task_class', 'data', 'status' ]
+        );
+    }
+}
+```
+
+### Batch Processing
+
+Process large datasets efficiently with generators:
+
+```php
+// Process tasks in batches to avoid memory issues
+foreach ( $table->get_in_batches( 100 ) as $batch ) {
+    foreach ( $batch as $task ) {
+        // Process each task
+        process_task( $task );
+    }
+
+    // Memory is released after each batch
+}
+```
+
+## Logger Configuration
+
+### Available Logger Types
+
+Shepherd supports three logger implementations:
+
+```php
+use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
+use StellarWP\Shepherd\Loggers\Null_Logger;
+
+// Default: Use Action Scheduler's existing log table
+Config::set_logger( new ActionScheduler_DB_Logger() );
+
+// Alternative: Use dedicated Shepherd log tables
+Config::set_logger( new DB_Logger() );
+
+// For testing: Disable logging entirely
+Config::set_logger( new Null_Logger() );
+```
+
+### ActionScheduler_DB_Logger Format
+
+When using `ActionScheduler_DB_Logger`, logs are stored with a special format in the Action Scheduler logs table:
+
+```
+shepherd_{hook_prefix}||{task_id}||{type}||{level}||{json_entry}
+```
+
+This allows Shepherd to store its metadata while maintaining compatibility with Action Scheduler's existing structure.
+
+### Custom Logger Implementation
+
+Create custom loggers by implementing the `Logger` interface:
+
+```php
+use StellarWP\Shepherd\Contracts\Logger;
+
+class Custom_Logger implements Logger {
+    public function log( int $task_id, int $action_id, string $type, string $level, string $entry ): bool {
+        // Custom logging logic (e.g., external service, file system)
+        return $this->send_to_external_service( $task_id, $type, $level, $entry );
+    }
+
+    public function retrieve_logs( int $task_id ): array {
+        // Return array of Log objects
+        return $this->get_logs_from_external_service( $task_id );
+    }
+}
+
+// Set custom logger before registration
+Config::set_logger( new Custom_Logger() );
+```
+
+## Action Scheduler Integration
+
+### Enhanced Action Scheduler Methods
+
+The `Action_Scheduler_Methods` class provides additional functionality:
+
+```php
+use StellarWP\Shepherd\Action_Scheduler_Methods;
+
+// Get action with enhanced error handling
+$action = Action_Scheduler_Methods::get_action_by_id( $action_id );
+
+// Bulk operations
+$action_ids = Action_Scheduler_Methods::get_pending_actions_by_hook( 'my_hook' );
+Action_Scheduler_Methods::cancel_actions_by_ids( $action_ids );
+
+// Enhanced querying
+$actions = Action_Scheduler_Methods::get_actions_by_status( 'failed', 50 );
+```
+
+### Custom Action Scheduler Hooks
+
+Monitor Action Scheduler events related to Shepherd tasks:
+
+```php
+// Hook into Action Scheduler events
+add_action( 'action_scheduler_stored_action', function( $action_id ) {
+    // Action was stored in queue
+    error_log( "Action {$action_id} was queued" );
+} );
+
+add_action( 'action_scheduler_canceled_action', function( $action_id ) {
+    // Action was cancelled
+    $task = get_task_by_action_id( $action_id );
+    if ( $task ) {
+        error_log( "Shepherd task {$task->id} was cancelled" );
+    }
+} );
+```
+
+## Performance Optimization
+
+### Database Indexing
+
+Shepherd tables include optimized indexes:
+
+```sql
+-- Tasks table indexes
+INDEX `action_id` (action_id)
+INDEX `args_hash` (args_hash)  -- For duplicate detection
+INDEX `class_hash` (class_hash) -- For task type queries
+
+-- Logs table indexes
+INDEX `task_id` (task_id)       -- For log retrieval
+INDEX `action_id` (action_id)   -- For Action Scheduler integration
+```
+
+### Memory Management
+
+For high-volume task processing:
+
+```php
+// Use generators for large result sets
+foreach ( Tasks::get_in_batches( 500 ) as $batch ) {
+    process_batch( $batch );
+
+    // Clear object caches periodically
+    wp_cache_flush();
+}
+
+// Disable logging in high-volume scenarios
+Config::set_logger( new Null_Logger() );
+```
+
+#### Task Deduplication
+
+Shepherd automatically prevents duplicate tasks:
+
+```php
+// These will only create one task
+shepherd()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) );
+shepherd()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body' ) ); // Ignored
+
+// To force duplicates, vary the arguments
+shepherd()->dispatch( new Email_Task( 'user@example.com', 'Subject', 'Body', [], [], time() ) );
+```
+
+## Admin UI AJAX Integration
+
+The admin UI provides real-time data updates through AJAX:
+
+### AJAX Endpoint Configuration
+
+```php
+// The admin provider registers the AJAX endpoint
+add_action( 'wp_ajax_shepherd_get_tasks', [ $provider, 'ajax_get_tasks' ] );
+
+// Endpoint handles:
+// - Security with nonce verification
+// - Permission checks
+// - Dynamic filtering and sorting
+// - Pagination
+// - Search functionality
+```
+
+### Filter Processing
+
+The AJAX endpoint processes filter parameters:
+
+```php
+// task_type filters are mapped to class_hash for efficiency
+if ( $filter['field'] === 'task_type' ) {
+    $args[] = [
+        'column' => 'class_hash',
+        'value' => md5( $filter['value'] ),
+        'operator' => $filter['operator'] === 'isNot' ? '!=' : '='
+    ];
+}
+
+// Other filters are applied directly
+$args[] = [
+    'column' => $filter['field'],
+    'value' => $filter['value'],
+    'operator' => $filter['operator'] === 'isNot' ? '!=' : '='
+];
+```
+
+### Performance Optimization
+
+- **Hybrid Loading**: Initial page load includes default data, subsequent requests use AJAX
+- **Server-side Processing**: All filtering, sorting, and searching on the server
+- **Efficient Queries**: JOIN operations with Action Scheduler for status information
+- **Minimal Data Transfer**: Only necessary columns selected
+
+## AS_Actions Table Interface
+
+The `AS_Actions` class provides a read-only interface to Action Scheduler's actions table:
+
+```php
+use StellarWP\Shepherd\Tables\AS_Actions;
+
+// Get table name
+$table_name = AS_Actions::table_name(); // wp_actionscheduler_actions
+
+// Available columns for JOIN operations
+$columns = AS_Actions::get_columns();
+// Returns: action_id (BIGINT), status (VARCHAR)
+
+// Searchable columns
+$searchable = AS_Actions::get_searchable_columns();
+// Returns: ['status']
+```
+
+### Usage in JOIN Queries
+
+```php
+// Enable status filtering without data duplication
+$tasks_with_status = Tasks::paginate(
+    [
+        'orderby' => 'status',
+        [
+            'column' => 'status',
+            'value' => 'complete',
+            'operator' => '='
+        ]
+    ],
+    20,
+    1,
+    AS_Actions::class,     // Join table
+    'action_id=action_id', // JOIN condition
+    ['status']             // Additional columns
+);
+```
+
+### Benefits
+
+- **No Data Duplication**: Status stored only in Action Scheduler
+- **Real-time Accuracy**: Always current status information
+- **Performance**: Optimized JOIN queries
+- **Consistency**: Single source of truth for action status

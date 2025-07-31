@@ -14,6 +14,7 @@ namespace StellarWP\Shepherd\Traits;
 use StellarWP\Shepherd\Config;
 use StellarWP\Shepherd\Contracts\Logger;
 use Psr\Log\LogLevel;
+use StellarWP\Shepherd\Log;
 
 /**
  * The Shepherd loggable trait.
@@ -79,7 +80,7 @@ trait Loggable {
 	 */
 	public function log_created( int $task_id, array $data = [], string $message = '' ): void {
 		$message = $message ?: sprintf( 'Task %d created.', $task_id );
-		$this->log( LogLevel::INFO, 'created', $task_id, $message, $data );
+		$this->log( LogLevel::INFO, Log::TYPE_CREATED, $task_id, $message, $data );
 	}
 
 	/**
@@ -95,7 +96,7 @@ trait Loggable {
 	 */
 	public function log_starting( int $task_id, array $data = [], string $message = '' ): void {
 		$message = $message ?: sprintf( 'Task %d starting.', $task_id );
-		$this->log( LogLevel::INFO, 'started', $task_id, $message, $data );
+		$this->log( LogLevel::INFO, Log::TYPE_STARTED, $task_id, $message, $data );
 	}
 
 	/**
@@ -111,7 +112,7 @@ trait Loggable {
 	 */
 	public function log_finished( int $task_id, array $data = [], string $message = '' ): void {
 		$message = $message ?: sprintf( 'Task %d finished.', $task_id );
-		$this->log( LogLevel::INFO, 'finished', $task_id, $message, $data );
+		$this->log( LogLevel::INFO, Log::TYPE_FINISHED, $task_id, $message, $data );
 	}
 
 	/**
@@ -127,7 +128,7 @@ trait Loggable {
 	 */
 	public function log_failed( int $task_id, array $data = [], string $message = '' ): void {
 		$message = $message ?: sprintf( 'Task %d failed.', $task_id );
-		$this->log( LogLevel::ERROR, 'failed', $task_id, $message, $data );
+		$this->log( LogLevel::ERROR, Log::TYPE_FAILED, $task_id, $message, $data );
 	}
 
 	/**
@@ -143,7 +144,7 @@ trait Loggable {
 	 */
 	public function log_rescheduled( int $task_id, array $data = [], string $message = '' ): void {
 		$message = $message ?: sprintf( 'Task %d rescheduled.', $task_id );
-		$this->log( LogLevel::NOTICE, 'rescheduled', $task_id, $message, $data );
+		$this->log( LogLevel::NOTICE, Log::TYPE_RESCHEDULED, $task_id, $message, $data );
 	}
 
 	/**
@@ -159,7 +160,7 @@ trait Loggable {
 	 */
 	public function log_cancelled( int $task_id, array $data = [], string $message = '' ): void {
 		$message = $message ?: sprintf( 'Task %d cancelled.', $task_id );
-		$this->log( LogLevel::NOTICE, 'cancelled', $task_id, $message, $data );
+		$this->log( LogLevel::NOTICE, Log::TYPE_CANCELLED, $task_id, $message, $data );
 	}
 
 	/**
@@ -175,6 +176,6 @@ trait Loggable {
 	 */
 	public function log_retrying( int $task_id, array $data = [], string $message = '' ): void {
 		$message = $message ?: sprintf( 'Task %d retrying.', $task_id );
-		$this->log( LogLevel::INFO, 'retrying', $task_id, $message, $data );
+		$this->log( LogLevel::INFO, Log::TYPE_RETRYING, $task_id, $message, $data );
 	}
 }
