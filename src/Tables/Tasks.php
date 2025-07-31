@@ -51,7 +51,7 @@ class Tasks extends Table {
 	 *
 	 * @var string
 	 */
-	const SCHEMA_VERSION = '0.0.2';
+	const SCHEMA_VERSION = '0.0.2s';
 
 	/**
 	 * The base table name, without the table prefix.

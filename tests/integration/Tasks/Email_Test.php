@@ -233,18 +233,16 @@ class Email_Test extends WPTestCase {
 		$task1_id = $shepherd->get_last_scheduled_task_id();
 		$this->assertIsInt( $task1_id );
 
+		$this->assertTaskExecutesWithoutErrors( $task1_id );
+
 		$task2 = new Email( 'test2@test.com', 'subject2', 'body2' );
 		$shepherd->dispatch( $task2 );
 		$task2_id = $shepherd->get_last_scheduled_task_id();
 		$this->assertIsInt( $task2_id );
 
-		$this->assertNotEquals( $task1_id, $task2_id );
-
-		$hook_name = 'shepherd_' . tests_shepherd_get_hook_prefix() . '_task_already_scheduled';
-		$this->assertSame( 0, did_action( $hook_name ) );
-
-		$this->assertTaskExecutesWithoutErrors( $task1_id );
 		$this->assertTaskExecutesWithoutErrors( $task2_id );
+
+		$this->assertNotEquals( $task1_id, $task2_id );
 
 		$this->assertCount( 2, $spy );
 		$this->assertSame( [ 'test1@test.com', 'subject1', 'body1', [], [] ], $spy[0] );

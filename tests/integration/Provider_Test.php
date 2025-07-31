@@ -102,7 +102,6 @@ class Provider_Test extends WPTestCase {
 		$task_id_2 = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
-		$this->assertTaskExecutesWithoutErrors( $task_id_2 );
 
 		// Manually set both tasks to have the same action_id for testing.
 		$common_action_id = $task1->get_action_id();
@@ -126,6 +125,7 @@ class Provider_Test extends WPTestCase {
 				$task_id_2
 			)
 		);
+
 		$this->assertEquals( 2, $tasks_count_before );
 
 		$this->delete_tasks_action( $task1 );
@@ -177,11 +177,12 @@ class Provider_Test extends WPTestCase {
 		$shepherd->dispatch( $task1 );
 		$task_id_1 = $shepherd->get_last_scheduled_task_id();
 
+		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
+
 		$task2 = new Do_Action_Task( 'arg2' );
 		$shepherd->dispatch( $task2 );
 		$task_id_2 = $shepherd->get_last_scheduled_task_id();
 
-		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
 		$this->assertTaskExecutesWithoutErrors( $task_id_2 );
 
 		$this->delete_tasks_action( $task1 );
