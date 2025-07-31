@@ -268,14 +268,14 @@ class Herding_Test extends WPTestCase {
 		$shepherd->dispatch( $task1 );
 		$task_id_1 = $shepherd->get_last_scheduled_task_id();
 
+		// Execute first task
+		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
+
 		$task2 = new Do_Action_Task( 'arg2' );
 		$shepherd->dispatch( $task2 );
 		$task_id_2 = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertNotEquals( $task_id_1, $task_id_2 );
-
-		// Execute first task
-		$this->assertTaskExecutesWithoutErrors( $task_id_1 );
 
 		// Manually remove only the first task's action from Action Scheduler
 		DB::query(

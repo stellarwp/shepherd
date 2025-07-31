@@ -52,10 +52,11 @@ class Task_Logs extends Table {
 	 * The schema version.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.3 Updated to 0.0.3.
 	 *
 	 * @var string
 	 */
-	const SCHEMA_VERSION = '0.0.2-dev';
+	const SCHEMA_VERSION = '0.0.3';
 
 	/**
 	 * The base table name, without the table prefix.

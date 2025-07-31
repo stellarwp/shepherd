@@ -227,6 +227,7 @@ abstract class Table_Abstract extends Table {
 	 * by the `dbDelta` function.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.3 Updated to remove an empty line after the columns and before the primary key.
 	 *
 	 * @return string The table creation SQL, in the format supported
 	 *                by the `dbDelta` function.
@@ -264,11 +265,11 @@ abstract class Table_Abstract extends Table {
 			$columns_definitions[] = $column_sql;
 		}
 
-		$columns_sql = implode( ',' . PHP_EOL, $columns_definitions ) . ',' . PHP_EOL;
+		$columns_sql = implode( ',' . PHP_EOL, $columns_definitions );
 
 		return "
 			CREATE TABLE `{$table_name}` (
-				{$columns_sql}
+				{$columns_sql},
 				PRIMARY KEY (`{$uid_column}`)
 			) {$charset_collate};
 		";
