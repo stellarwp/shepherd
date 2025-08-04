@@ -79,6 +79,9 @@ class Provider extends Provider_Abstract {
 
 		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
 
+		// Manually require functions.php since it's not autoloaded for Strauss compatibility.
+		require_once __DIR__ . '/functions.php';
+
 		self::$has_registered = true;
 	}
 
