@@ -254,9 +254,9 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	 * @throws RuntimeException                 If multiple tasks are found with the same arguments hash.
 	 */
 	public function save(): int {
-		$task_id = parent::save();
-
-		$tasks = ( static::TABLE_INTERFACE )::get_by_args_hash( $this->get_args_hash() );
+		$task_id         = parent::save();
+		$table_interface = $this->get_table_interface();
+		$tasks           = $table_interface::get_by_args_hash( $this->get_args_hash() );
 
 		if ( count( $tasks ) === 1 ) {
 			return $task_id;
