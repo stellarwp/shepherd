@@ -156,9 +156,9 @@ $task_id = shepherd()->get_last_scheduled_task_id();
 
 // Retrieve task logs
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Provider;
+use StellarWP\Shepherd\Config;
 
-$logger = Provider::get_container()->get( Logger::class );
+$logger = Config::get_container()->get( Logger::class );
 $logs = $logger->retrieve_logs( $task_id );
 ```
 

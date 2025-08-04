@@ -90,6 +90,69 @@ Resets all configuration to defaults.
 
 - **Warning:** This should only be used in testing scenarios, not in production code.
 
+##### `set_container( ContainerInterface $container ): void`
+
+Sets the dependency injection container.
+
+##### `get_container(): ContainerInterface`
+
+Returns the container instance.
+
+##### `set_render_admin_ui( bool $render_admin_ui ): void`
+
+Controls whether the admin UI should be rendered.
+
+- **Parameters:**
+  - `$render_admin_ui` - Whether to render admin UI (default: true)
+
+##### `get_render_admin_ui(): bool`
+
+Returns whether the admin UI should be rendered.
+
+##### `set_admin_page_capability( string $capability ): void`
+
+Sets the capability required to access the admin page.
+
+- **Parameters:**
+  - `$capability` - WordPress capability (default: 'manage_options')
+
+##### `get_admin_page_capability(): string`
+
+Returns the capability required to access the admin page.
+
+##### `set_admin_page_title_callback( ?Closure $callback ): void`
+
+Sets a custom callback for generating the admin page title.
+
+- **Parameters:**
+  - `$callback` - Callback that returns a string, or null for default
+
+##### `get_admin_page_title(): string`
+
+Returns the admin page title (uses callback if set, otherwise default).
+
+##### `set_admin_menu_title_callback( ?Closure $callback ): void`
+
+Sets a custom callback for generating the admin menu title.
+
+- **Parameters:**
+  - `$callback` - Callback that returns a string, or null for default
+
+##### `get_admin_menu_title(): string`
+
+Returns the admin menu title (uses callback if set, otherwise default).
+
+##### `set_admin_page_in_page_title_callback( ?Closure $callback ): void`
+
+Sets a custom callback for generating the in-page title shown on the admin page.
+
+- **Parameters:**
+  - `$callback` - Callback that returns a string, or null for default
+
+##### `get_admin_page_in_page_title(): string`
+
+Returns the in-page title shown on the admin page (uses callback if set, otherwise default).
+
 ---
 
 ### `Provider`
@@ -105,14 +168,6 @@ Service provider for dependency injection and initialization.
 ##### `register(): void`
 
 Initializes Shepherd and registers all components.
-
-##### `set_container( ContainerInterface $container ): void`
-
-Sets the dependency injection container.
-
-##### `get_container(): ContainerInterface`
-
-Returns the container instance.
 
 ##### `is_registered(): bool`
 

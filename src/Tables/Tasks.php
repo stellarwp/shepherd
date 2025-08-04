@@ -90,6 +90,19 @@ class Tasks extends Table {
 	protected static $uid_column = 'id';
 
 	/**
+	 * An array of all the columns that are searchable.
+	 *
+	 * @since TBD
+	 *
+	 * @return string[]
+	 */
+	public static function get_searchable_columns(): array {
+		return [
+			'data',
+		];
+	}
+
+	/**
 	 * An array of all the columns in the table.
 	 *
 	 * @since 0.0.1
@@ -167,7 +180,7 @@ class Tasks extends Table {
 	 * @return Task[] The tasks, or an empty array if no tasks are found.
 	 */
 	public static function get_by_args_hash( string $args_hash ): array {
-		/** @var Task[]|null */
+		/** @var Task[] */
 		return self::get_all_by( 'args_hash', $args_hash );
 	}
 

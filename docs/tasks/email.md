@@ -158,13 +158,13 @@ Email tasks are automatically logged with these events:
 
 ```php
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Provider;
+use StellarWP\Shepherd\Config;
 
 // Get task ID after dispatching
 $task_id = shepherd()->get_last_scheduled_task_id();
 
 // Retrieve logs
-$logger = Provider::get_container()->get( Logger::class );
+$logger = Config::get_container()->get( Logger::class );
 $logs = $logger->retrieve_logs( $task_id );
 
 foreach ( $logs as $log ) {

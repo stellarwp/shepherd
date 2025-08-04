@@ -252,11 +252,16 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	 *
 	 * @throws ShepherdTaskAlreadyExistsException If multiple tasks are found with the same arguments hash.
 	 * @throws RuntimeException                 If multiple tasks are found with the same arguments hash.
+	 * @throws RuntimeException                 If we failed to find the task after saving it.
 	 */
 	public function save(): int {
 		$task_id         = parent::save();
 		$table_interface = Config::get_container()->get( static::TABLE_INTERFACE );
 		$tasks           = $table_interface::get_by_args_hash( $this->get_args_hash() );
+
+		if ( ! $tasks ) {
+			throw new RuntimeException( __( 'We failed to find the task after saving it.', 'stellarwp-shepherd' ) );
+		}
 
 		if ( count( $tasks ) === 1 ) {
 			return $task_id;

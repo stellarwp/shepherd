@@ -4,7 +4,6 @@ namespace StellarWP\Shepherd\Tests\Traits;
 
 use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
 use StellarWP\Shepherd\Log;
-use StellarWP\Shepherd\Tests\ShepherdJsonSnapshot;
 
 trait With_Log_Snapshot {
 	use SnapshotAssertions;
@@ -70,23 +69,5 @@ trait With_Log_Snapshot {
 		);
 
 		$this->assertMatchesJsonSnapshot( $json );
-	}
-
-	/**
-	 * Asserts the current JSON string matches the one stored in the snapshot file.
-	 *
-	 * If the snapshot file is not present the assertion will be skipped and the snapshot file will be generated.
-	 *
-	 * @param string        $current     The current JSON string.
-	 * @param callable|null $dataVisitor A callable to manipulate the file contents before the assertion. The arguments
-	 *                                   will be an the expected and the current values (strings).
-	 */
-	protected function assertMatchesJsonSnapshot($current, callable $dataVisitor = null)
-	{
-		$jsonSnapshot = new ShepherdJsonSnapshot($current);
-		if ($dataVisitor !== null) {
-			$jsonSnapshot->setDataVisitor($dataVisitor);
-		}
-		$jsonSnapshot->assert();
 	}
 }

@@ -13,6 +13,7 @@ namespace StellarWP\Shepherd;
 
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Shepherd\Tables\Provider as Tables_Provider;
+use StellarWP\Shepherd\Admin\Provider as Admin_Provider;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Contracts\Logger;
@@ -77,10 +78,14 @@ class Provider extends Provider_Abstract {
 
 		$this->container->singleton( Logger::class, Config::get_logger() );
 		$this->container->singleton( Tables_Provider::class );
+		$this->container->singleton( Admin_Provider::class );
 		$this->container->singleton( Regulator::class );
 		$this->container->get( Tables_Provider::class )->register();
 		$this->container->get( Regulator::class )->register();
 
+		if ( is_admin() ) {
+			$this->container->get( Admin_Provider::class )->register();
+		}
 		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
 
 		self::$has_registered = true;
