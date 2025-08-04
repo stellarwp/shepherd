@@ -71,6 +71,10 @@ class Provider extends Provider_Abstract {
 
 		Schema_Config::set_container( Config::get_container() );
 		Schema_Config::set_db( DB::class );
+
+		// Manually require functions.php since it's not autoloaded for Strauss compatibility.
+		require_once __DIR__ . '/functions.php';
+
 		$this->container->singleton( Logger::class, Config::get_logger() );
 		$this->container->singleton( Tables_Provider::class );
 		$this->container->singleton( Regulator::class );
@@ -78,9 +82,6 @@ class Provider extends Provider_Abstract {
 		$this->container->get( Regulator::class )->register();
 
 		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
-
-		// Manually require functions.php since it's not autoloaded for Strauss compatibility.
-		require_once __DIR__ . '/functions.php';
 
 		self::$has_registered = true;
 	}
