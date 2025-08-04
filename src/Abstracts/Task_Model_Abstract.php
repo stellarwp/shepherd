@@ -255,7 +255,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 	 */
 	public function save(): int {
 		$task_id         = parent::save();
-		$table_interface = $this->get_table_interface();
+		$table_interface = Config::get_container()->get( static::TABLE_INTERFACE );
 		$tasks           = $table_interface::get_by_args_hash( $this->get_args_hash() );
 
 		if ( count( $tasks ) === 1 ) {
