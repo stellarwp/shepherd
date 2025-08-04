@@ -14,10 +14,7 @@
   "autoload": {
     "psr-4": {
       "StellarWP\\Shepherd\\": "src/"
-    },
-    "files": [
-      "src/functions.php"
-    ]
+    }
   },
   "autoload-dev": {
     "psr-4": {
