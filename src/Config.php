@@ -13,6 +13,9 @@ use RuntimeException;
 use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Shepherd\Contracts\Logger;
 use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\Null_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
+use StellarWP\Shepherd\Tables\AS_Logs;
 
 /**
  * Shepherd Config
@@ -102,7 +105,18 @@ class Config {
 	 */
 	public static function get_logger(): Logger {
 		if ( ! static::$logger ) {
-			static::$logger = new ActionScheduler_DB_Logger();
+			/**
+			 * Filters whether to log anything.
+			 *
+			 * @since TBD
+			 *
+			 * @param bool $should_log Whether to log anything.
+			 *
+			 * @return bool Whether to log anything.
+			 */
+			$should_log = (bool) apply_filters( 'shepherd_' . static::get_hook_prefix() . '_should_log', true );
+
+			static::$logger = ! $should_log ? new Null_Logger() : ( self::get_container()->get( AS_Logs::class )->exists() ? new ActionScheduler_DB_Logger() : new DB_Logger() );
 		}
 
 		return static::$logger;
