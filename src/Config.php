@@ -100,6 +100,7 @@ class Config {
 	 * Gets the logger.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.5 Introduce a filter to disable logging. Ensures the AS logger table exists before using it.
 	 *
 	 * @return Logger
 	 */
@@ -108,7 +109,7 @@ class Config {
 			/**
 			 * Filters whether to log anything.
 			 *
-			 * @since TBD
+			 * @since 0.0.5
 			 *
 			 * @param bool $should_log Whether to log anything.
 			 *
