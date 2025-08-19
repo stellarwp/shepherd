@@ -25,4 +25,4 @@ Shepherd comes with a set of pre-packaged tasks to handle common background oper
 
 ## Contributing
 
-We welcome contributions! Please see our contributing guidelines for more information. (TODO: Add a CONTRIBUTING.md file)
+We welcome contributions! Please see our contributing guidelines for more information.

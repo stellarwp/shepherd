@@ -8,9 +8,14 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use RuntimeException;
 use StellarWP\ContainerContract\ContainerInterface;
 use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Loggers\Null_Logger;
+use StellarWP\Schema\Tables\Contracts\Table;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 
 class Config_Test extends WPTestCase {
+	use With_Uopz;
+
 	/**
 	 * @test
 	 */
@@ -50,7 +55,26 @@ class Config_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_get_default_db_logger_if_none_is_set(): void {
+		Config::set_hook_prefix( 'my_prefix' );
 		$this->assertInstanceOf( ActionScheduler_DB_Logger::class, Config::get_logger() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_get_db_logger_if_as_table_doesnt_exist(): void {
+		Config::set_hook_prefix( 'my_prefix' );
+		$this->set_class_fn_return( Table::class, 'exists', false );
+		$this->assertInstanceOf( DB_Logger::class, Config::get_logger() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_get_null_logger_if_should_log_is_false(): void {
+		Config::set_hook_prefix( 'my_prefix' );
+		add_filter( 'shepherd_my_prefix_should_log', '__return_false' );
+		$this->assertInstanceOf( Null_Logger::class, Config::get_logger() );
 	}
 
 	/**
