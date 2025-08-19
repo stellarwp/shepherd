@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
-## [0.0.5] 2025-08-20
+## [0.0.5] 2025-08-19
 
 * Fix - Ensure the AS logger table exists before using it. Introduce a filter `shepherd_<hook_prefix>_should_log` to disable logging.
 
