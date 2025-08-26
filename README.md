@@ -9,7 +9,7 @@ Shepherd is a lightweight and powerful background processing library for WordPre
 - **Automatic Retries**: Configurable automatic retries for failed tasks.
 - **Debouncing**: Prevent tasks from running too frequently.
 - **Logging**: Built-in database logging for task lifecycle events.
-- **Included Tasks**: Comes with a ready-to-use `Email` task.
+- **Included Tasks**: Comes with ready-to-use tasks including `Email` (with multi-recipient support), `HTTP_Request`, and `Herding` tasks.
 
 ## Getting Started
 

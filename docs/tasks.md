@@ -12,6 +12,7 @@ Sends emails asynchronously using WordPress's `wp_mail()` function.
 
 - Automatic retries (up to 4 additional attempts)
 - Support for HTML content and attachments
+- Support for multiple recipients (comma-separated)
 - Comprehensive error handling
 - WordPress action hooks for tracking
 
@@ -20,6 +21,7 @@ Sends emails asynchronously using WordPress's `wp_mail()` function.
 ```php
 use StellarWP\Shepherd\Tasks\Email;
 
+// Single recipient
 $email = new Email(
     'user@example.com',
     'Welcome!',
@@ -28,6 +30,15 @@ $email = new Email(
 );
 
 shepherd()->dispatch( $email );
+
+// Multiple recipients
+$team_email = new Email(
+    'user1@example.com, user2@example.com, admin@example.com',
+    'Team Update',
+    'Important announcement for the team'
+);
+
+shepherd()->dispatch( $team_email );
 ```
 
 ### [HTTP Request Task](./tasks/http-request.md)
