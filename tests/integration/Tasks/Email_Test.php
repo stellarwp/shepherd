@@ -248,4 +248,62 @@ class Email_Test extends WPTestCase {
 		$this->assertSame( [ 'test1@test.com', 'subject1', 'body1', [], [] ], $spy[0] );
 		$this->assertSame( [ 'test2@test.com', 'subject2', 'body2', [], [] ], $spy[1] );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_dispatch_and_process_email_with_multiple_recipients(): void {
+		$spy = [];
+		$this->set_fn_return( 'wp_mail', function ( ...$args ) use ( &$spy ) {
+			$spy[] = $args;
+			return true;
+		}, true );
+
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
+
+		$dummy_task = new Email( 'test1@test.com, test2@test.com, test3@test.com', 'subject', 'body', [ 'Reply-To: sender@test.com' ] );
+		$shepherd->dispatch( $dummy_task );
+
+		$last_scheduled_task_id = $shepherd->get_last_scheduled_task_id();
+
+		$this->assertIsInt( $last_scheduled_task_id );
+
+		$this->assertTaskHasActionPending( $last_scheduled_task_id );
+		$this->assertTaskIsScheduledForExecutionAt( $last_scheduled_task_id, time() );
+		$this->assertTaskExecutesWithoutErrors( $last_scheduled_task_id );
+
+		$this->assertCount( 1, $spy );
+		$this->assertSame( [ 'test1@test.com, test2@test.com, test3@test.com', 'subject', 'body', [ 'Reply-To: sender@test.com' ], [] ], $spy[0] );
+
+		$logs = $this->get_logger()->retrieve_logs( $last_scheduled_task_id );
+		$this->assertCount( 3, $logs );
+		$this->assertSame( 'created', $logs[0]->get_type() );
+		$this->assertSame( 'started', $logs[1]->get_type() );
+		$this->assertSame( 'finished', $logs[2]->get_type() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_handle_multiple_recipients_with_varying_whitespace(): void {
+		$spy = [];
+		$this->set_fn_return( 'wp_mail', function ( ...$args ) use ( &$spy ) {
+			$spy[] = $args;
+			return true;
+		}, true );
+
+		$shepherd = shepherd();
+
+		// Test with various whitespace patterns
+		$task = new Email( 'user1@test.com,  user2@test.com  ,user3@test.com', 'Test', 'Body' );
+		$shepherd->dispatch( $task );
+		$task_id = $shepherd->get_last_scheduled_task_id();
+
+		$this->assertTaskExecutesWithoutErrors( $task_id );
+
+		$this->assertCount( 1, $spy );
+		// wp_mail receives the exact string we pass, WordPress handles the parsing
+		$this->assertSame( 'user1@test.com,  user2@test.com  ,user3@test.com', $spy[0][0] );
+	}
 }
