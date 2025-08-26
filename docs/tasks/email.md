@@ -16,7 +16,7 @@ public function __construct(
 
 ### Parameters
 
-- **`$to_email`** (string, required): Recipient's email address
+- **`$to_email`** (string, required): Recipient's email address(es). Can be a single email or multiple comma-separated emails.
 - **`$subject`** (string, required): Email subject line
 - **`$body`** (string, required): Email body content (HTML or plain text)
 - **`$headers`** (array, optional): Email headers (e.g., content type, reply-to)
@@ -60,6 +60,29 @@ $email = new Email(
         'From: noreply@example.com',
         'Reply-To: support@example.com'
     ]
+);
+
+shepherd()->dispatch( $email );
+```
+
+### Email to Multiple Recipients
+
+```php
+// Send to multiple recipients
+$email = new Email(
+    'user1@example.com, user2@example.com, admin@example.com',
+    'Team Update',
+    'Important update for all team members.'
+);
+
+shepherd()->dispatch( $email );
+
+// With proper spacing (whitespace is automatically handled)
+$email = new Email(
+    'user1@example.com,user2@example.com, user3@example.com',
+    'Newsletter',
+    '<h1>Weekly Newsletter</h1><p>Here are this week\'s updates...</p>',
+    [ 'Content-Type: text/html; charset=UTF-8' ]
 );
 
 shepherd()->dispatch( $email );

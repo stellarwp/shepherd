@@ -17,6 +17,7 @@ class Email_Test extends WPTestCase {
 	 */
 	public function it_should_throw_exception_for_invalid_email() {
 		$this->expectException( InvalidArgumentException::class );
+		$this->expectExceptionMessage( 'Invalid email address(es): not-an-email' );
 		new Email( 'not-an-email', 'Subject', 'Body' );
 	}
 
@@ -67,5 +68,83 @@ class Email_Test extends WPTestCase {
 
 		$this->expectException( ShepherdTaskException::class );
 		$email->process();
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_accept_multiple_recipients_separated_by_comma() {
+		$email = new Email( 'test1@test.com, test2@test.com, test3@test.com', 'Subject', 'Body' );
+
+		$spy = [];
+		$this->set_fn_return( 'wp_mail', function ( $to, $subject, $body, $headers = [], $attachments = [] ) use ( &$spy ) {
+			$spy = [ $to, $subject, $body, $headers, $attachments ];
+			return true;
+		}, true );
+
+		$email->process();
+
+		$this->assertEquals( [ 'test1@test.com, test2@test.com, test3@test.com', 'Subject', 'Body', [], [] ], $spy );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_accept_multiple_recipients_with_spaces() {
+		$email = new Email( 'test1@test.com,   test2@test.com  ,test3@test.com', 'Subject', 'Body' );
+
+		$spy = [];
+		$this->set_fn_return( 'wp_mail', function ( $to, $subject, $body, $headers = [], $attachments = [] ) use ( &$spy ) {
+			$spy = [ $to, $subject, $body, $headers, $attachments ];
+			return true;
+		}, true );
+
+		$email->process();
+
+		$this->assertEquals( [ 'test1@test.com,   test2@test.com  ,test3@test.com', 'Subject', 'Body', [], [] ], $spy );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_throw_exception_for_invalid_email_in_multiple_recipients() {
+		$this->expectException( InvalidArgumentException::class );
+		$this->expectExceptionMessage( 'Invalid email address(es): not-an-email, another-invalid' );
+		new Email( 'test@test.com, not-an-email, valid@email.com, another-invalid', 'Subject', 'Body' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_throw_exception_for_empty_string_recipients() {
+		$this->expectException( InvalidArgumentException::class );
+		$this->expectExceptionMessage( 'Email recipients must be a non-empty string' );
+		new Email( '', 'Subject', 'Body' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_throw_exception_for_whitespace_only_recipients() {
+		$this->expectException( InvalidArgumentException::class );
+		$this->expectExceptionMessage( 'Email recipients must be a non-empty string' );
+		new Email( '   ', 'Subject', 'Body' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_accept_single_recipient() {
+		$email = new Email( 'test@test.com', 'Subject', 'Body' );
+
+		$spy = [];
+		$this->set_fn_return( 'wp_mail', function ( $to, $subject, $body, $headers = [], $attachments = [] ) use ( &$spy ) {
+			$spy = [ $to, $subject, $body, $headers, $attachments ];
+			return true;
+		}, true );
+
+		$email->process();
+
+		$this->assertEquals( [ 'test@test.com', 'Subject', 'Body', [], [] ], $spy );
 	}
 }
