@@ -9,7 +9,7 @@
  * @wordpress-plugin
  * Plugin Name: Shepherd
  * Description: A library for offloading tasks to background processes.
- * Version:     0.0.5
+ * Version:     0.0.6
  * Author:      StellarWP
  * Author URI:  https://stellarwp.com
  * License:     GPL-2.0-or-later

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
+## [0.0.6] 2025-08-26
+
+* Fix - Update Email task to properly handle multiple email recipients separated by commas.
+
+[0.0.6]: https://github.com/stellarwp/shepherd/releases/tag/0.0.6
+
 ## [0.0.5] 2025-08-19
 
 * Fix - Ensure the AS logger table exists before using it. Introduce a filter `shepherd_<hook_prefix>_should_log` to disable logging.
