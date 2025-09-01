@@ -62,8 +62,6 @@ class Provider extends Provider_Abstract {
 			 * Fires an action when the Shepherd tables are registered.
 			 *
 			 * @since 0.0.7
-			 *
-			 * @param string $prefix The hook prefix.
 			 */
 			do_action( "shepherd_{$prefix}_tables_registered" );
 		} catch ( DatabaseQueryException $e ) {
