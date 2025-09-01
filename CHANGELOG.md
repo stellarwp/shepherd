@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
+## [0.0.7] 2025-09-03
+
+* Fix - Ensure the regulator is registered when the tables are created/updated successfully.
+* Fix - When scheduling an action, return 0 if the action ID is not an integer.
+* Tweak - Update the schema version of the Tasks table to 0.0.3 to fix a typo in the version string.
+
+[0.0.7]: https://github.com/stellarwp/shepherd/releases/tag/0.0.7
+
 ## [0.0.6] 2025-08-26
 
 * Fix - Update Email task to properly handle multiple email recipients separated by commas.
