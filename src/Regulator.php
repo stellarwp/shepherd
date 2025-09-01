@@ -150,7 +150,7 @@ class Regulator extends Provider_Abstract {
 		$prefix = Config::get_hook_prefix();
 
 		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
-			_doing_it_wrong( __METHOD__, __( 'Shepherd tables are not yet registered.', 'stellarwp-shepherd' ), '0.0.7' );
+			_doing_it_wrong( __METHOD__, esc_html__( 'Shepherd tables are not yet registered.', 'stellarwp-shepherd' ), '0.0.7' );
 			return $this;
 		}
 
