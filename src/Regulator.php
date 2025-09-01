@@ -139,6 +139,7 @@ class Regulator extends Provider_Abstract {
 	 * Dispatches a task to be processed later.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Updated to check if the Shepherd tables have been registered already.
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
@@ -146,6 +147,13 @@ class Regulator extends Provider_Abstract {
 	 * @return self The regulator instance.
 	 */
 	public function dispatch( Task $task, int $delay = 0 ): self {
+		$prefix = Config::get_hook_prefix();
+
+		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
+			_doing_it_wrong( __METHOD__, __( 'Shepherd tables are not yet registered.', 'stellarwp-shepherd' ), '0.0.7' );
+			return $this;
+		}
+
 		if ( did_action( 'init' ) || doing_action( 'init' ) ) {
 			$this->dispatch_callback( $task, $delay );
 			return $this;
