@@ -89,6 +89,7 @@ class Regulator extends Provider_Abstract {
 	 * Registers the regulator.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Updated to use the `wp_loaded` hook instead of the `init` hook to schedule the cleanup task.
 	 */
 	public function register(): void {
 		add_action( $this->process_task_hook, [ $this, 'process_task' ] );
@@ -140,6 +141,7 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @since 0.0.1
 	 * @since 0.0.7 Updated to check if the Shepherd tables have been registered already.
+	 * @since 0.0.7 Updated to use the `action_scheduler_init` hook instead of the `init` hook to check if Action Scheduler is initialized.
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
