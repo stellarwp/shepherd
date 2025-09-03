@@ -97,7 +97,7 @@ class Regulator extends Provider_Abstract {
 		add_action( 'action_scheduler_execution_ignored', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_failed_execution', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_after_process_queue', [ $this, 'handle_reschedule_of_failed_task' ], 1, 0 );
-		add_action( 'init', [ $this, 'schedule_cleanup_task' ], 20, 0 );
+		add_action( 'wp_loaded', [ $this, 'schedule_cleanup_task' ], 20, 0 );
 	}
 
 	/**
@@ -154,13 +154,13 @@ class Regulator extends Provider_Abstract {
 			return $this;
 		}
 
-		if ( did_action( 'init' ) || doing_action( 'init' ) ) {
+		if ( did_action( 'action_scheduler_init' ) || doing_action( 'action_scheduler_init' ) ) {
 			$this->dispatch_callback( $task, $delay );
 			return $this;
 		}
 
 		add_action(
-			'init',
+			'action_scheduler_init',
 			function () use ( $task, $delay ): void {
 				$this->dispatch_callback( $task, $delay );
 			},
