@@ -78,12 +78,28 @@ class Provider extends Provider_Abstract {
 		$this->container->singleton( Logger::class, Config::get_logger() );
 		$this->container->singleton( Tables_Provider::class );
 		$this->container->singleton( Regulator::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		add_action( "shepherd_{$prefix}_tables_registered", [ $this, 'register_regulator' ] );
+
 		$this->container->get( Tables_Provider::class )->register();
-		$this->container->get( Regulator::class )->register();
 
 		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
 
 		self::$has_registered = true;
+	}
+
+	/**
+	 * Registers the regulator when its safe to do so
+	 * since the tables have been created/updated successfully.
+	 *
+	 * @since 0.0.7
+	 *
+	 * @return void
+	 */
+	private function register_regulator(): void {
+		$this->container->get( Regulator::class )->register();
 	}
 
 	/**

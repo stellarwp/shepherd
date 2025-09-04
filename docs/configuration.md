@@ -115,9 +115,21 @@ The tasks table is created automatically when you call `Provider::register()`.
 
 The logs table is only created if you're using the `DB_Logger`. When using the default `ActionScheduler_DB_Logger`, logs are stored in Action Scheduler's existing `actionscheduler_logs` table.
 
+**Since version 0.0.7:**
+
+- Tables are created/updated before the Regulator is initialized
+- The `shepherd_{prefix}_tables_registered` action is fired upon successful table registration
+- The `shepherd_{prefix}_tables_error` action is fired if table creation fails
+- The Regulator will only be registered after tables are successfully created
+
 ## Action Scheduler Configuration
 
 Shepherd uses Action Scheduler for task scheduling. You can configure Action Scheduler settings separately:
+
+**Since version 0.0.7:**
+
+- Shepherd now uses the `action_scheduler_init` hook to ensure Action Scheduler is ready before dispatching tasks
+- Tasks dispatched before Action Scheduler initialization are automatically queued and dispatched once it's ready
 
 ### Custom Action Scheduler Tables
 
@@ -161,6 +173,7 @@ $container->get( Provider::class )->register();
 2. **Use Consistent Prefixes**: Keep your hook prefix consistent across your application
 3. **Container Singleton**: Always register Provider as a singleton
 4. **Check Registration**: If you are not sure whether Shepherd is registered, you can check it using `Provider::is_registered()` before accessing Shepherd
+5. **Table Initialization** (since 0.0.7): Listen to `shepherd_{prefix}_tables_registered` if you need to perform actions after tables are ready
 
 ```php
 if ( ! Provider::is_registered() ) {
