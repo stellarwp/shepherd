@@ -97,6 +97,17 @@ When dispatching a duplicate task:
 
 Prevents accidental duplication and is enabled by default.
 
+## Task Dispatching Requirements (Since 0.0.7)
+
+When dispatching tasks, Shepherd performs several checks:
+
+1. **Table Registration**: Verifies that Shepherd's database tables are registered
+2. **Action Scheduler**: Ensures Action Scheduler is initialized
+
+If Action Scheduler is not yet initialized when you dispatch a task, Shepherd will automatically queue it and dispatch once Action Scheduler is ready via the `action_scheduler_init` hook.
+
+If tables are not registered, a `_doing_it_wrong` notice will be triggered. Listen for the `shepherd_{prefix}_tables_registered` action to ensure tables are ready before dispatching tasks.
+
 ## Logging
 
 Comprehensive logging tracks the complete task lifecycle.

@@ -18,15 +18,18 @@ The main orchestrator for task scheduling and processing.
 
 #### Methods
 
-##### `dispatch( Task $task, int $delay = 0 ): void`
+##### `dispatch( Task $task, int $delay = 0 ): self`
 
 Schedules a task for execution.
 
 - **Parameters:**
   - `$task` - The task instance to schedule
   - `$delay` - Delay in seconds before execution (default: 0)
+- **Returns:** The Regulator instance for method chaining
 - **Throws:** and **Catches:** `ShepherdTaskAlreadyExistsException` if duplicate task exists
 - **Throws:** and **Catches:** `RuntimeException` if task fails to be scheduled or inserted into the database.
+- **Validation:** As of version 0.0.7, checks if Shepherd tables are registered before dispatching. Will trigger `_doing_it_wrong` if tables are not registered.
+- **Hook Integration:** As of version 0.0.7, uses `action_scheduler_init` hook instead of `init` to ensure Action Scheduler is ready.
 - You can listen for those errors above, by listening to the following actions:
   - `shepherd_{prefix}_task_scheduling_failed`
   - `shepherd_{prefix}_task_already_exists`
@@ -106,6 +109,8 @@ Service provider for dependency injection and initialization.
 
 Initializes Shepherd and registers all components.
 
+- **Since version 0.0.7:** The Regulator is only registered after tables are successfully created/updated via the `shepherd_{prefix}_tables_registered` action.
+
 ##### `set_container( ContainerInterface $container ): void`
 
 Sets the dependency injection container.
@@ -130,6 +135,64 @@ Automatically removes task data when Action Scheduler deletes an action.
   - Removes task records from `shepherd_tasks`
   - No-op if no tasks are associated with the action ID
 - **Hook:** Automatically called on `action_scheduler_deleted_action`
+
+---
+
+### `Action_Scheduler_Methods`
+
+Wrapper class for Action Scheduler integration (since 0.0.1).
+
+#### Methods
+
+##### `has_scheduled_action( string $hook, array $args = [], string $group = '' ): bool`
+
+Checks if an action is scheduled.
+
+- **Parameters:**
+  - `$hook` - The hook of the action
+  - `$args` - The arguments of the action
+  - `$group` - The group of the action
+- **Returns:** Whether the action is scheduled
+
+##### `schedule_single_action( int $timestamp, string $hook, array $args = [], string $group = '', bool $unique = false, int $priority = 10 ): int`
+
+Schedules a single action.
+
+- **Parameters:**
+  - `$timestamp` - The timestamp when the action should run
+  - `$hook` - The hook of the action
+  - `$args` - The arguments of the action
+  - `$group` - The group of the action
+  - `$unique` - Whether the action should be unique
+  - `$priority` - The priority of the action (0-255)
+- **Returns:** The action ID, or 0 if scheduling failed (since 0.0.7)
+
+##### `get_action_by_id( int $action_id ): ActionScheduler_Action`
+
+Gets an action by its ID.
+
+- **Parameters:**
+  - `$action_id` - The action ID
+- **Returns:** The action object
+- **Throws:** `RuntimeException` if the action is not found
+
+##### `get_actions_by_ids( array $action_ids ): array`
+
+Gets multiple actions by their IDs.
+
+- **Parameters:**
+  - `$action_ids` - Array of action IDs
+- **Returns:** Array of ActionScheduler_Action objects keyed by ID
+- **Throws:** `RuntimeException` if any action is not found
+
+##### `get_pending_actions_by_ids( array $action_ids ): array`
+
+Gets pending actions by their IDs, excluding finished and null actions.
+
+- **Parameters:**
+  - `$action_ids` - Array of action IDs
+- **Returns:** Array of pending ActionScheduler_Action objects
+- **Since 0.0.7:** Also excludes `ActionScheduler_NullAction` instances
 
 ---
 
@@ -416,6 +479,13 @@ Table name: `shepherd_{prefix}_task_logs`
 
 ### Actions
 
+- `shepherd_{prefix}_tables_registered` - Fired when Shepherd tables are successfully registered (since 0.0.7)
+  - No parameters
+  - Used internally to ensure safe initialization of the Regulator
+
+- `shepherd_{prefix}_tables_error` - Fired when database table creation/update fails (since 0.0.7)
+  - Parameters: `$exception` (DatabaseQueryException)
+
 - `shepherd_{prefix}_task_scheduling_failed` - Fired when a task fails to be scheduled
   - Parameters: `$task`, `$exception`
 
@@ -442,4 +512,6 @@ Table name: `shepherd_{prefix}_task_logs`
 
 ### Filters
 
-Currently, Shepherd does not provide any filters.
+- `shepherd_{prefix}_should_log` - Filter to control whether logging should occur (since 0.0.5)
+  - Parameters: `$should_log` (bool, default: true)
+  - Return false to disable logging

@@ -138,11 +138,12 @@ shepherd()->dispatch( $my_task, 5 * MINUTE_IN_SECONDS ); // Execute after 5 minu
 
 ### What Happens Next?
 
-1. Shepherd schedules your task with Action Scheduler
-2. WordPress cron picks up the task
-3. Your task's `process()` method executes
-4. The lifecycle is logged in the database
-5. Failed tasks may be retried based on configuration
+1. Shepherd validates that its tables are registered (since 0.0.7)
+2. Shepherd schedules your task with Action Scheduler
+3. WordPress cron picks up the task
+4. Your task's `process()` method executes
+5. The lifecycle is logged in the database
+6. Failed tasks may be retried based on configuration
 
 Check `debug.log` for the message "Shepherd Task: Hello, World! with code 200".
 
@@ -176,3 +177,5 @@ If your tasks aren't running:
 2. **Verify WP-Cron**: Ensure WordPress cron is running or set up a real cron job
 3. **Check Logs**: Look for errors in your WordPress debug log
 4. **Database Tables**: Ensure Shepherd's tables were created during registration
+5. **Table Registration** (since 0.0.7): Check for `shepherd_{prefix}_tables_error` action if tables fail to create
+6. **Initialization Order** (since 0.0.7): Ensure Action Scheduler is loaded before dispatching tasks
