@@ -14,6 +14,7 @@ namespace StellarWP\Shepherd;
 use ActionScheduler;
 use ActionScheduler_Action;
 use ActionScheduler_FinishedAction;
+use ActionScheduler_NullAction;
 use RuntimeException;
 
 /**
@@ -43,6 +44,7 @@ class Action_Scheduler_Methods {
 	 * Schedules a single action.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Updated to return 0 if the action ID is not an integer.
 	 *
 	 * @param int    $timestamp The timestamp of the action.
 	 * @param string $hook      The hook of the action.
@@ -54,7 +56,9 @@ class Action_Scheduler_Methods {
 	 * @return int The action ID.
 	 */
 	public static function schedule_single_action( int $timestamp, string $hook, array $args = [], string $group = '', bool $unique = false, int $priority = 10 ): int {
-		return as_schedule_single_action( $timestamp, $hook, $args, $group, $unique, $priority );
+		$action_id = as_schedule_single_action( $timestamp, $hook, $args, $group, $unique, $priority );
+
+		return is_int( $action_id ) ? $action_id : 0;
 	}
 
 	/**
@@ -120,6 +124,6 @@ class Action_Scheduler_Methods {
 	public static function get_pending_actions_by_ids( array $action_ids ): array {
 		$actions = self::get_actions_by_ids( $action_ids );
 
-		return array_filter( $actions, fn( ActionScheduler_Action $action ) => ! $action instanceof ActionScheduler_FinishedAction );
+		return array_filter( $actions, fn( ActionScheduler_Action $action ) => ! $action instanceof ActionScheduler_FinishedAction && ! $action instanceof ActionScheduler_NullAction );
 	}
 }

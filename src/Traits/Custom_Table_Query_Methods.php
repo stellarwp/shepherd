@@ -53,8 +53,8 @@ trait Custom_Table_Query_Methods {
 				DB::prepare(
 					"SELECT {$sql_calc_found_rows} * FROM %i {$where_clause} ORDER BY {$order_by} LIMIT %d, %d",
 					static::table_name( true ),
-					$offset,
-					$batch_size
+					$batch_size,
+					$offset
 				),
 				$output
 			);
@@ -62,6 +62,8 @@ trait Custom_Table_Query_Methods {
 			// We need to get the total number of rows, only after the first batch.
 			$total  ??= DB::get_var( 'SELECT FOUND_ROWS()' );
 			$fetched += count( $batch );
+
+			$offset += $batch_size;
 
 			yield from $batch;
 		} while ( $fetched < $total );

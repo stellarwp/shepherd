@@ -48,10 +48,11 @@ class Tasks extends Table {
 	 *
 	 * @since 0.0.1
 	 * @since 0.0.3 Updated to 0.0.2.
+	 * @since 0.0.7 Updated to 0.0.3 to fix typo in the version string.
 	 *
 	 * @var string
 	 */
-	const SCHEMA_VERSION = '0.0.2s';
+	const SCHEMA_VERSION = '0.0.3';
 
 	/**
 	 * The base table name, without the table prefix.
