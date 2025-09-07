@@ -83,7 +83,7 @@ class Provider extends Provider_Abstract {
 
 		add_action(
 			"shepherd_{$prefix}_tables_registered",
-			function() {
+			function () {
 				$this->container->get( Regulator::class )->register();
 			}
 		);
