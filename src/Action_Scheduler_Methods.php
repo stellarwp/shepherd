@@ -116,6 +116,7 @@ class Action_Scheduler_Methods {
 	 * Gets pending actions by their IDs.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Updated to filter out null actions.
 	 *
 	 * @param array $action_ids The action IDs.
 	 *

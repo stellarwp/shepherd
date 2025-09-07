@@ -28,6 +28,7 @@ trait Custom_Table_Query_Methods {
 	 * Fetches all the rows from the table using a batched query.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Increment the $offset variable.
 	 *
 	 * @param int    $batch_size   The number of rows to fetch per batch.
 	 * @param string $output       The output type of the query, one of OBJECT, ARRAY_A, or ARRAY_N.

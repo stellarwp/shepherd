@@ -59,6 +59,7 @@ class Provider extends Provider_Abstract {
 	 * Registers Shepherd's specific providers and starts core functionality
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Updated to register the regulator after the tables are registered successfully.
 	 *
 	 * @return void The method does not return any value.
 	 */
