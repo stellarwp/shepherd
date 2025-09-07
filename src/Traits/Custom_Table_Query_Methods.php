@@ -50,13 +50,15 @@ trait Custom_Table_Query_Methods {
 
 			$order_by = $order_by ?: $uid_column . ' ASC';
 
+			$query = DB::prepare(
+				"SELECT {$sql_calc_found_rows} * FROM %i {$where_clause} ORDER BY {$order_by} LIMIT %d, %d",
+				static::table_name( true ),
+				$offset,
+				$batch_size
+			);
+
 			$batch = DB::get_results(
-				DB::prepare(
-					"SELECT {$sql_calc_found_rows} * FROM %i {$where_clause} ORDER BY {$order_by} LIMIT %d, %d",
-					static::table_name( true ),
-					$batch_size,
-					$offset
-				),
+				$query,
 				$output
 			);
 
