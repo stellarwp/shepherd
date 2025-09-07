@@ -99,7 +99,7 @@ class Provider extends Provider_Abstract {
 	 * Requires Action Scheduler.
 	 *
 	 * @since 0.0.1
-	 * @since 0.0.2
+	 * @since 0.0.2 Look into multiple places for the action scheduler main file.
 	 *
 	 * @return void
 	 *
