@@ -7,9 +7,12 @@ namespace StellarWP\Shepherd;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Tasks\Herding;
 use StellarWP\Shepherd\Tests\Traits\With_Uopz;
+use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
+use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
 
 class Regulator_Test extends WPTestCase {
 	use With_Uopz;
+	use With_AS_Assertions;
 
 	/**
 	 * @test
@@ -57,22 +60,22 @@ class Regulator_Test extends WPTestCase {
 	public function it_should_dispatch_immediately_when_action_scheduler_initialized(): void {
 		$regulator = Config::get_container()->get( Regulator::class );
 
-		$dispatch_callback_called = false;
+		$task = new Do_Action_Task();
 
-		$this->set_class_fn_return(
-			Regulator::class,
-			'dispatch_callback',
-			function() use ( &$dispatch_callback_called ) {
-				$dispatch_callback_called = true;
-			},
-			true
-		);
+		$this->assertSame( 0, did_action( $task->get_task_name() ) );
 
-		$test_task = new Tasks\Herding();
+		$regulator->dispatch( $task );
 
-		$regulator->dispatch( $test_task );
+		$last_scheduled_task_id = $regulator->get_last_scheduled_task_id();
+		$this->assertNotNull( $last_scheduled_task_id );
 
-		$this->assertTrue( $dispatch_callback_called, 'dispatch_callback should be called immediately when AS is initialized' );
+		$this->assertTaskHasActionPending( $last_scheduled_task_id );
+
+		$this->assertTaskIsScheduledForExecutionAt( $last_scheduled_task_id, time() );
+
+		$this->assertTaskExecutesWithoutErrors( $last_scheduled_task_id );
+
+		$this->assertSame( 1, did_action( $task->get_task_name() ) );
 	}
 
 	/**
@@ -91,19 +94,10 @@ class Regulator_Test extends WPTestCase {
 
 		$regulator = Config::get_container()->get( Regulator::class );
 
-		$test_task = new Tasks\Herding();
-		$process_called = false;
-		$process_call_count = 0;
+		$test_task = new Do_Action_Task();
 
-		$this->set_class_fn_return(
-			Tasks\Herding::class,
-			'process',
-			function() use ( &$process_called, &$process_call_count ) {
-				$process_called = true;
-				$process_call_count++;
-			},
-			true
-		);
+		$this->assertSame( 0, did_action( $test_task->get_task_name() ) );
+		$this->assertSame( 0, did_action( "shepherd_{$prefix}_dispatched_sync" ) );
 
 		$sync_dispatch_fired = false;
 		$dispatched_task = null;
@@ -114,8 +108,8 @@ class Regulator_Test extends WPTestCase {
 
 		$regulator->dispatch( $test_task );
 
-		$this->assertTrue( $process_called, 'Task should be processed synchronously when tables are not registered' );
-		$this->assertEquals( 1, $process_call_count, 'Task process method should be called exactly once' );
+		$this->assertSame( 1, did_action( $test_task->get_task_name() ) );
+		$this->assertSame( 1, did_action( "shepherd_{$prefix}_dispatched_sync" ) );
 		$this->assertTrue( $sync_dispatch_fired, 'Synchronous dispatch action should be fired' );
 		$this->assertSame( $test_task, $dispatched_task, 'The dispatched task should be the same instance' );
 	}
@@ -138,19 +132,10 @@ class Regulator_Test extends WPTestCase {
 
 		add_filter( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", '__return_false' );
 
-		$test_task = new Tasks\Herding();
-		$process_called = false;
-		$process_call_count = 0;
+		$test_task = new Do_Action_Task();
 
-		$this->set_class_fn_return(
-			Tasks\Herding::class,
-			'process',
-			function() use ( &$process_called, &$process_call_count ) {
-				$process_called = true;
-				$process_call_count++;
-			},
-			true
-		);
+		$this->assertSame( 0, did_action( $test_task->get_task_name() ) );
+		$this->assertSame( 0, did_action( "shepherd_{$prefix}_dispatched_sync" ) );
 
 		$sync_dispatch_fired = false;
 		add_action( "shepherd_{$prefix}_dispatched_sync", function() use ( &$sync_dispatch_fired ) {
@@ -159,8 +144,8 @@ class Regulator_Test extends WPTestCase {
 
 		$regulator->dispatch( $test_task );
 
-		$this->assertFalse( $process_called, 'Task process method should not be called when sync dispatch is disabled' );
-		$this->assertEquals( 0, $process_call_count, 'Task process method should not be called at all' );
+		$this->assertSame( 0, did_action( $test_task->get_task_name() ) );
+		$this->assertSame( 0, did_action( "shepherd_{$prefix}_dispatched_sync" ) );
 		$this->assertFalse( $sync_dispatch_fired, 'Synchronous dispatch should not occur when disabled by filter' );
 	}
 }
