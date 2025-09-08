@@ -50,4 +50,28 @@ class Regulator_Test extends WPTestCase {
 
 		$this->assertSame( 20, has_action( 'wp_loaded', [ $regulator, 'schedule_cleanup_task' ] ) );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_dispatch_immediately_when_action_scheduler_initialized(): void {
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$dispatch_callback_called = false;
+
+		$this->set_class_fn_return(
+			Regulator::class,
+			'dispatch_callback',
+			function() use ( &$dispatch_callback_called ) {
+				$dispatch_callback_called = true;
+			},
+			true
+		);
+
+		$test_task = new Tasks\Herding();
+
+		$regulator->dispatch( $test_task );
+
+		$this->assertTrue( $dispatch_callback_called, 'dispatch_callback should be called immediately when AS is initialized' );
+	}
 }
