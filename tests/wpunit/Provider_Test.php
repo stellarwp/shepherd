@@ -207,4 +207,69 @@ class Provider_Test extends WPTestCase {
 			'Regulator registration should be hooked to tables_registered action'
 		);
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_hook_register_regulator_method_to_tables_registered_action(): void {
+		$provider = Config::get_container()->get( Provider::class );
+		$prefix = Config::get_hook_prefix();
+
+		$this->assertNotFalse(
+			has_action( "shepherd_{$prefix}_tables_registered", [ $provider, 'register_regulator' ] ),
+			'register_regulator method should be hooked to tables_registered action'
+		);
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_trigger_doing_it_wrong_if_tables_error_hook_not_handled(): void {
+		$prefix = Config::get_hook_prefix();
+		$action_name = "shepherd_{$prefix}_tables_error";
+
+		// Reset Provider registration state.
+		Provider::reset();
+
+		// Remove any existing error handler to simulate unhandled state.
+		remove_all_actions( $action_name );
+
+		// Mock _doing_it_wrong to verify it gets called.
+		$doing_it_wrong_called = false;
+		$this->set_fn_return( '_doing_it_wrong', function() use ( &$doing_it_wrong_called ) {
+			$doing_it_wrong_called = true;
+		}, true );
+
+		// Create a new Provider instance to trigger the check.
+		$provider = new Provider( Config::get_container() );
+		$provider->register();
+
+		$this->assertTrue( $doing_it_wrong_called, '_doing_it_wrong should be called when tables_error hook is not handled' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_trigger_doing_it_wrong_if_tables_error_hook_is_handled(): void {
+		$prefix = Config::get_hook_prefix();
+		$action_name = "shepherd_{$prefix}_tables_error";
+
+		// Reset Provider registration state.
+		Provider::reset();
+
+		// Add a handler to simulate handled state.
+		add_action( $action_name, '__return_true' );
+
+		// Mock _doing_it_wrong to verify it doesn't get called.
+		$doing_it_wrong_called = false;
+		$this->set_fn_return( '_doing_it_wrong', function() use ( &$doing_it_wrong_called ) {
+			$doing_it_wrong_called = true;
+		}, true );
+
+		// Create a new Provider instance to trigger the check.
+		$provider = new Provider( Config::get_container() );
+		$provider->register();
+
+		$this->assertFalse( $doing_it_wrong_called, '_doing_it_wrong should not be called when tables_error hook is handled' );
+	}
 }
