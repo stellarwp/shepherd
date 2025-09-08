@@ -66,6 +66,8 @@ class Regulator_Test extends WPTestCase {
 
 		$regulator->dispatch( $task );
 
+		$this->assertSame( 0, did_action( $task->get_task_name() ) );
+
 		$last_scheduled_task_id = $regulator->get_last_scheduled_task_id();
 		$this->assertNotNull( $last_scheduled_task_id );
 
