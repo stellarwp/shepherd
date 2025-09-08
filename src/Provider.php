@@ -84,6 +84,10 @@ class Provider extends Provider_Abstract {
 
 		add_action( "shepherd_{$prefix}_tables_registered", [ $this, 'register_regulator' ] );
 
+		if ( ! has_action( "shepherd_{$prefix}_tables_error" ) ) {
+			_doing_it_wrong( __METHOD__, esc_html__( 'Your software should be handling the case where Shepherd tables are not registered successfully and notify your end users about it.', 'stellarwp-shepherd' ), '0.0.7' );
+		}
+
 		$this->container->get( Tables_Provider::class )->register();
 
 		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
