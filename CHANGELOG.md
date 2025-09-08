@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
-## [0.0.7] 2025-09-04
+## [0.0.7] 2025-09-08
 
 * Fix - Ensure the regulator is registered only when the tables are created/updated successfully.
 * Fix - When scheduling an action, return 0 if the action ID is not an integer.
