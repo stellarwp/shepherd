@@ -28,7 +28,10 @@ Schedules a task for execution.
 - **Returns:** The Regulator instance for method chaining
 - **Throws:** and **Catches:** `ShepherdTaskAlreadyExistsException` if duplicate task exists
 - **Throws:** and **Catches:** `RuntimeException` if task fails to be scheduled or inserted into the database.
-- **Validation:** As of version 0.0.7, checks if Shepherd tables are registered before dispatching. Will trigger `_doing_it_wrong` if tables are not registered.
+- **Since 0.0.7 - Synchronous Fallback:** When Shepherd tables are not registered:
+  - Tasks are processed immediately in a synchronous manner by default
+  - Fires `shepherd_{prefix}_dispatched_sync` action when processing synchronously
+  - Can be disabled via `shepherd_{prefix}_should_dispatch_sync_on_tables_unavailable` filter
 - **Hook Integration:** As of version 0.0.7, uses `action_scheduler_init` hook instead of `init` to ensure Action Scheduler is ready.
 - You can listen for those errors above, by listening to the following actions:
   - `shepherd_{prefix}_task_scheduling_failed`
@@ -122,6 +125,19 @@ Returns the container instance.
 ##### `is_registered(): bool`
 
 Checks if Shepherd has been registered.
+
+##### `register_regulator(): void`
+
+Registers the Regulator component to start processing tasks.
+
+- **Since:** 0.0.7
+- **Visibility:** Public
+- **Purpose:** Separated from the main registration flow to allow for conditional registration
+- **Behavior:**
+  - Retrieves the Regulator instance from the DI container
+  - Calls the Regulator's `register()` method to initialize task processing
+- **Hook:** Automatically called on `shepherd_{prefix}_tables_registered` action
+- **Usage:** Can be manually removed from the action hook if custom registration timing is needed
 
 ##### `delete_tasks_on_action_deletion( int $action_id ): void`
 
