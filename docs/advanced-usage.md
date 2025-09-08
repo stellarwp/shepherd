@@ -97,6 +97,67 @@ When dispatching a duplicate task:
 
 Prevents accidental duplication and is enabled by default.
 
+## Task Dispatching Requirements (Since 0.0.7)
+
+When dispatching tasks, Shepherd performs several checks:
+
+1. **Table Registration**: Verifies that Shepherd's database tables are registered
+2. **Action Scheduler**: Ensures Action Scheduler is initialized
+
+### Synchronous Fallback When Tables Not Registered
+
+If Shepherd's database tables are not yet registered when you dispatch a task, by default the task will be **processed immediately in a synchronous manner** instead of being queued for background processing. This ensures tasks can still execute even during early initialization phases.
+
+```php
+// If tables are not registered, this task will run immediately
+shepherd()->dispatch( new My_Task() );
+```
+
+You can monitor when this synchronous processing occurs:
+
+```php
+$prefix = Config::get_hook_prefix();
+
+add_action( "shepherd_{$prefix}_dispatched_sync", function( $task ) {
+    error_log( 'Task processed synchronously: ' . get_class( $task ) );
+});
+```
+
+#### Disabling Synchronous Fallback
+
+If you prefer tasks to be skipped rather than processed synchronously when tables are unavailable or handle their scheduling yourself:
+
+```php
+add_filter( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", function( $should_dispatch, Task $task ) {
+    // Return false to skip task processing when tables are not ready
+    return false;
+}, 10, 2 );
+```
+
+### Action Scheduler Initialization
+
+If Action Scheduler is not yet initialized when you dispatch a task, Shepherd will automatically queue it and dispatch once Action Scheduler is ready via the `action_scheduler_init` hook.
+
+### Handling Table Registration Errors (Since 0.0.7)
+
+Your application should handle cases where Shepherd's tables fail to register by listening to the `shepherd_{prefix}_tables_error` action:
+
+```php
+$prefix = Config::get_hook_prefix();
+
+add_action( "shepherd_{$prefix}_tables_error", function( $error ) {
+    // Log the error
+    error_log( 'Shepherd tables failed to register: ' . $error->getMessage() );
+
+    // Notify administrators
+    add_action( 'admin_notices', function() use ( $error ) {
+        echo '<div class="notice notice-error"><p>' . esc_html__( 'Background processing is unavailable. Please contact support.', 'stellarwp-shepherd' ) . '</p></div>';
+    } );
+});
+```
+
+If this action is not handled, Shepherd will trigger a `_doing_it_wrong` notice to alert developers during development.
+
 ## Logging
 
 Comprehensive logging tracks the complete task lifecycle.

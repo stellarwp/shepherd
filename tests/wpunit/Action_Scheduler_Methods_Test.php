@@ -5,8 +5,10 @@ declare( strict_types=1 );
 namespace StellarWP\Shepherd;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 
 class Action_Scheduler_Methods_Test extends WPTestCase {
+	use With_Uopz;
 	/**
 	 * @before
 	 * @after
@@ -44,5 +46,42 @@ class Action_Scheduler_Methods_Test extends WPTestCase {
 		as_schedule_single_action( $time, $hook, $args, $group );
 
 		$this->assertTrue( Action_Scheduler_Methods::has_scheduled_action( $hook, $args, $group ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_return_zero_when_schedule_single_action_returns_non_integer() {
+		$this->set_fn_return( 'as_schedule_single_action', 'not-an-integer' );
+
+		$time = time() + 100;
+		$hook = 'shepherd_test_hook_non_int';
+		$args = [ 'test' => 'non_int' ];
+		$group = 'shepherd_test_group';
+
+		$action_id = Action_Scheduler_Methods::schedule_single_action( $time, $hook, $args, $group );
+
+		$this->assertSame( 0, $action_id );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_filter_out_null_actions_from_pending_actions() {
+		$finished_action = $this->createMock( \ActionScheduler_FinishedAction::class );
+		$null_action = $this->createMock( \ActionScheduler_NullAction::class );
+		$normal_action = $this->createMock( \ActionScheduler_Action::class );
+
+		$this->set_class_fn_return(
+			Action_Scheduler_Methods::class,
+			'get_actions_by_ids',
+			[ 1 => $finished_action, 2 => $null_action, 3 => $normal_action ]
+		);
+
+		$pending = Action_Scheduler_Methods::get_pending_actions_by_ids( [ 1, 2, 3 ] );
+
+		// Should only contain the normal action (not finished, not null)
+		$this->assertCount( 1, $pending );
+		$this->assertSame( $normal_action, reset( $pending ) );
 	}
 }

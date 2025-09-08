@@ -28,6 +28,7 @@ trait Custom_Table_Query_Methods {
 	 * Fetches all the rows from the table using a batched query.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Increment the $offset variable.
 	 *
 	 * @param int    $batch_size   The number of rows to fetch per batch.
 	 * @param string $output       The output type of the query, one of OBJECT, ARRAY_A, or ARRAY_N.
@@ -49,19 +50,23 @@ trait Custom_Table_Query_Methods {
 
 			$order_by = $order_by ?: $uid_column . ' ASC';
 
+			$query = DB::prepare(
+				"SELECT {$sql_calc_found_rows} * FROM %i {$where_clause} ORDER BY {$order_by} LIMIT %d, %d",
+				static::table_name( true ),
+				$offset,
+				$batch_size
+			);
+
 			$batch = DB::get_results(
-				DB::prepare(
-					"SELECT {$sql_calc_found_rows} * FROM %i {$where_clause} ORDER BY {$order_by} LIMIT %d, %d",
-					static::table_name( true ),
-					$offset,
-					$batch_size
-				),
+				$query,
 				$output
 			);
 
 			// We need to get the total number of rows, only after the first batch.
 			$total  ??= DB::get_var( 'SELECT FOUND_ROWS()' );
 			$fetched += count( $batch );
+
+			$offset += $batch_size;
 
 			yield from $batch;
 		} while ( $fetched < $total );

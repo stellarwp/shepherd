@@ -89,6 +89,7 @@ class Regulator extends Provider_Abstract {
 	 * Registers the regulator.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Updated to use the `wp_loaded` hook instead of the `init` hook to schedule the cleanup task.
 	 */
 	public function register(): void {
 		add_action( $this->process_task_hook, [ $this, 'process_task' ] );
@@ -97,7 +98,7 @@ class Regulator extends Provider_Abstract {
 		add_action( 'action_scheduler_execution_ignored', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_failed_execution', [ $this, 'untrack_action' ], 1, 0 );
 		add_action( 'action_scheduler_after_process_queue', [ $this, 'handle_reschedule_of_failed_task' ], 1, 0 );
-		add_action( 'init', [ $this, 'schedule_cleanup_task' ], 20, 0 );
+		add_action( 'wp_loaded', [ $this, 'schedule_cleanup_task' ], 20, 0 );
 	}
 
 	/**
@@ -139,6 +140,8 @@ class Regulator extends Provider_Abstract {
 	 * Dispatches a task to be processed later.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.7 Updated to check if the Shepherd tables have been registered already.
+	 * @since 0.0.7 Updated to use the `action_scheduler_init` hook instead of the `init` hook to check if Action Scheduler is initialized.
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
@@ -146,13 +149,43 @@ class Regulator extends Provider_Abstract {
 	 * @return self The regulator instance.
 	 */
 	public function dispatch( Task $task, int $delay = 0 ): self {
-		if ( did_action( 'init' ) || doing_action( 'init' ) ) {
+		$prefix = Config::get_hook_prefix();
+
+		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
+			/**
+			 * Filters whether to dispatch a task synchronously.
+			 *
+			 * @since 0.0.7
+			 *
+			 * @param bool $should_dispatch_sync Whether to dispatch a task synchronously.
+			 * @param Task $task                 The task that should be dispatched synchronously.
+			 */
+			if ( ! apply_filters( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", true, $task ) ) {
+				return $this;
+			}
+
+			// Process the task immediately if the tables are not registered.
+			$task->process();
+
+			/**
+			 * Fires an action when a task is dispatched synchronously.
+			 *
+			 * @since 0.0.7
+			 *
+			 * @param Task $task The task that was dispatched synchronously.
+			 */
+			do_action( "shepherd_{$prefix}_dispatched_sync", $task );
+
+			return $this;
+		}
+
+		if ( did_action( 'action_scheduler_init' ) || doing_action( 'action_scheduler_init' ) ) {
 			$this->dispatch_callback( $task, $delay );
 			return $this;
 		}
 
 		add_action(
-			'init',
+			'action_scheduler_init',
 			function () use ( $task, $delay ): void {
 				$this->dispatch_callback( $task, $delay );
 			},
