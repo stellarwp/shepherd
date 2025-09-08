@@ -152,7 +152,30 @@ class Regulator extends Provider_Abstract {
 		$prefix = Config::get_hook_prefix();
 
 		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
-			_doing_it_wrong( __METHOD__, esc_html__( 'Shepherd tables are not yet registered.', 'stellarwp-shepherd' ), '0.0.7' );
+			/**
+			 * Filters whether to dispatch a task synchronously.
+			 *
+			 * @since 0.0.7
+			 *
+			 * @param bool $should_dispatch_sync Whether to dispatch a task synchronously.
+			 * @param Task $task                 The task that should be dispatched synchronously.
+			 */
+			if ( ! apply_filters( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", true, $task ) ) {
+				return $this;
+			}
+
+			// Process the task immediately if the tables are not registered.
+			$task->process();
+
+			/**
+			 * Fires an action when a task is dispatched synchronously.
+			 *
+			 * @since 0.0.7
+			 *
+			 * @param Task $task The task that was dispatched synchronously.
+			 */
+			do_action( "shepherd_{$prefix}_dispatched_sync", $task );
+
 			return $this;
 		}
 
