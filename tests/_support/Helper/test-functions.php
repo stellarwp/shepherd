@@ -145,6 +145,8 @@ function tests_shepherd_common_bootstrap(): void {
 
 	$container = Config::get_container();
 
+	add_action( 'shepherd_' . Config::get_hook_prefix() . '_tables_error', '__return_true' );
+
 	// Bootstrap Shepherd.
 	$container->singleton( Provider::class );
 	$container->get( Provider::class )->register();
