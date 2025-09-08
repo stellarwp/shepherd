@@ -74,4 +74,93 @@ class Regulator_Test extends WPTestCase {
 
 		$this->assertTrue( $dispatch_callback_called, 'dispatch_callback should be called immediately when AS is initialized' );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_process_task_synchronously_when_tables_not_registered(): void {
+		$prefix = Config::get_hook_prefix();
+
+		$this->set_fn_return( 'did_action', function( $action ) use ( $prefix ) {
+			if ( $action === "shepherd_{$prefix}_tables_registered" ) {
+				return 0;
+			}
+
+			return did_action( $action );
+		}, true );
+
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$test_task = new Tasks\Herding();
+		$process_called = false;
+		$process_call_count = 0;
+
+		$this->set_class_fn_return(
+			Tasks\Herding::class,
+			'process',
+			function() use ( &$process_called, &$process_call_count ) {
+				$process_called = true;
+				$process_call_count++;
+			},
+			true
+		);
+
+		$sync_dispatch_fired = false;
+		$dispatched_task = null;
+		add_action( "shepherd_{$prefix}_dispatched_sync", function( $task ) use ( &$sync_dispatch_fired, &$dispatched_task ) {
+			$sync_dispatch_fired = true;
+			$dispatched_task = $task;
+		} );
+
+		$regulator->dispatch( $test_task );
+
+		$this->assertTrue( $process_called, 'Task should be processed synchronously when tables are not registered' );
+		$this->assertEquals( 1, $process_call_count, 'Task process method should be called exactly once' );
+		$this->assertTrue( $sync_dispatch_fired, 'Synchronous dispatch action should be fired' );
+		$this->assertSame( $test_task, $dispatched_task, 'The dispatched task should be the same instance' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_respect_filter_to_disable_sync_dispatch_when_tables_not_registered(): void {
+		$prefix = Config::get_hook_prefix();
+
+		$this->set_fn_return( 'did_action', function( $action ) use ( $prefix ) {
+			if ( $action === "shepherd_{$prefix}_tables_registered" ) {
+				return 0;
+			}
+
+			return did_action( $action );
+		}, true );
+
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		add_filter( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", '__return_false' );
+
+		$test_task = new Tasks\Herding();
+		$process_called = false;
+		$process_call_count = 0;
+
+		$this->set_class_fn_return(
+			Tasks\Herding::class,
+			'process',
+			function() use ( &$process_called, &$process_call_count ) {
+				$process_called = true;
+				$process_call_count++;
+			},
+			true
+		);
+
+		$sync_dispatch_fired = false;
+		add_action( "shepherd_{$prefix}_dispatched_sync", function() use ( &$sync_dispatch_fired ) {
+			$sync_dispatch_fired = true;
+		} );
+
+		$regulator->dispatch( $test_task );
+
+		$this->assertFalse( $process_called, 'Task process method should not be called when sync dispatch is disabled' );
+		$this->assertEquals( 0, $process_call_count, 'Task process method should not be called at all' );
+		$this->assertFalse( $sync_dispatch_fired, 'Synchronous dispatch should not occur when disabled by filter' );
+	}
 }
