@@ -125,6 +125,6 @@ class Action_Scheduler_Methods {
 	public static function get_pending_actions_by_ids( array $action_ids ): array {
 		$actions = self::get_actions_by_ids( $action_ids );
 
-		return array_filter( $actions, fn( ActionScheduler_Action $action ) => ! $action instanceof ActionScheduler_FinishedAction && ! $action instanceof ActionScheduler_NullAction );
+		return array_filter( $actions, static fn( ActionScheduler_Action $action ) => ! $action instanceof ActionScheduler_FinishedAction && ! $action instanceof ActionScheduler_NullAction );
 	}
 }
