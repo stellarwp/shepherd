@@ -82,18 +82,24 @@ class Provider extends Provider_Abstract {
 
 		$prefix = Config::get_hook_prefix();
 
-		add_action(
-			"shepherd_{$prefix}_tables_registered",
-			function () {
-				$this->container->get( Regulator::class )->register();
-			}
-		);
+		add_action( "shepherd_{$prefix}_tables_registered", [ $this, 'register_regulator' ] );
 
 		$this->container->get( Tables_Provider::class )->register();
 
 		add_action( 'action_scheduler_deleted_action', [ $this, 'delete_tasks_on_action_deletion' ] );
 
 		self::$has_registered = true;
+	}
+
+	/**
+	 * Registers the regulator.
+	 *
+	 * @since 0.0.7
+	 *
+	 * @return void
+	 */
+	public function register_regulator(): void {
+		$this->container->get( Regulator::class )->register();
 	}
 
 	/**
