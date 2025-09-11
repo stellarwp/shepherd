@@ -106,11 +106,17 @@ When dispatching tasks, Shepherd performs several checks:
 
 ### Synchronous Fallback When Tables Not Registered
 
-If Shepherd's database tables are not yet registered when you dispatch a task, by default the task will be **processed immediately in a synchronous manner** instead of being queued for background processing. This ensures tasks can still execute even during early initialization phases.
+If Shepherd's database tables are not yet registered when you dispatch a task, the behavior depends on whether a delay is specified:
+
+- **No delay (default)**: Task will be **processed immediately in a synchronous manner**
+- **With delay**: Task will be **skipped** by default (can be changed via filter)
+
+This ensures tasks can still execute even during early initialization phases while respecting delay requirements.
 
 ```php
-// If tables are not registered, this task will run immediately
-shepherd()->dispatch( new My_Task() );
+// If tables are not registered:
+shepherd()->dispatch( new My_Task() );        // Runs immediately (synchronous)
+shepherd()->dispatch( new My_Task(), 300 );   // Skipped by default
 ```
 
 You can monitor when this synchronous processing occurs:
@@ -123,14 +129,25 @@ add_action( "shepherd_{$prefix}_dispatched_sync", function( $task ) {
 });
 ```
 
-#### Disabling Synchronous Fallback
+#### Customizing Synchronous Fallback (Since 0.0.8)
 
-If you prefer tasks to be skipped rather than processed synchronously when tables are unavailable or handle their scheduling yourself:
+The filter now receives the default behavior based on the delay:
 
 ```php
 add_filter( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", function( $should_dispatch, Task $task ) {
-    // Return false to skip task processing when tables are not ready
-    return false;
+    // Default behavior (since 0.0.8):
+    // - Returns true when delay is 0 (immediate execution)
+    // - Returns false when delay > 0 (skip execution)
+    
+    // Override examples:
+    // Always process synchronously regardless of delay
+    return true;
+    
+    // Never process synchronously
+    // return false;
+    
+    // Custom logic based on task type
+    // return $task instanceof Critical_Task;
 }, 10, 2 );
 ```
 

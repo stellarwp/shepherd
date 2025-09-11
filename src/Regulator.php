@@ -353,7 +353,8 @@ class Regulator extends Provider_Abstract {
 			$task = Tasks_Table::get_by_args_hash( $args_hash );
 
 			if ( ! $task ) {
-				throw new RuntimeException( esc_html__( 'No Shepherd task found with args hash ' . $args_hash . '.', 'stellarwp-shepherd' ) );
+				// translators: %s is the arguments hash.
+				throw new RuntimeException( sprintf( esc_html__( 'No Shepherd task found with args hash %s.', 'stellarwp-shepherd' ), $args_hash ) );
 			}
 
 			$task = array_shift( $task );
@@ -362,7 +363,8 @@ class Regulator extends Provider_Abstract {
 		$task ??= Tasks_Table::get_by_action_id( $this->current_action_id );
 
 		if ( ! $task ) {
-			throw new RuntimeException( esc_html__( 'No Shepherd task found with action ID ' . $this->current_action_id . '.', 'stellarwp-shepherd' ) );
+			// translators: %d is the action ID.
+			throw new RuntimeException( sprintf( esc_html__( 'No Shepherd task found with action ID %d.', 'stellarwp-shepherd' ), $this->current_action_id ) );
 		}
 
 		$log_data = [

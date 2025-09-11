@@ -120,7 +120,11 @@ class Herding extends Task_Abstract {
 	 *
 	 * @param array $task_ids The task IDs.
 	 */
-	public static function delete_data_of_tasks( array $task_ids ): void {
+	public static function delete_data_of_tasks( array $task_ids = [] ): void {
+		if ( empty( $task_ids ) ) {
+			return;
+		}
+
 		$logger = Config::get_container()->get( Logger::class );
 
 		$logs_at_as_table  = false;
