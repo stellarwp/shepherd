@@ -504,6 +504,25 @@ class Regulator extends Provider_Abstract {
 			return;
 		}
 
+		/**
+		 * Filters whether to schedule the cleanup task.
+		 *
+		 * @since 0.0.8
+		 *
+		 * @param bool $should_schedule Whether to schedule the cleanup task.
+		 */
+		$should_schedule = apply_filters( "shepherd_{$prefix}_should_schedule_cleanup_task", true );
+		if ( ! $should_schedule ) {
+			return;
+		}
+
 		$this->dispatch( new Herding(), 6 * HOUR_IN_SECONDS );
+
+		/**
+		 * Fires when the cleanup task is scheduled.
+		 *
+		 * @since 0.0.8
+		 */
+		do_action( 'shepherd_' . Config::get_hook_prefix() . '_cleanup_task_scheduled' );
 	}
 }
