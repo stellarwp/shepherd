@@ -127,4 +127,32 @@ class Action_Scheduler_Methods {
 
 		return array_filter( $actions, static fn( ActionScheduler_Action $action ) => ! $action instanceof ActionScheduler_FinishedAction && ! $action instanceof ActionScheduler_NullAction );
 	}
+
+	/**
+	 * Gets non-pending actions by their IDs.
+	 *
+	 * @since 0.0.8
+	 *
+	 * @param array $action_ids The action IDs.
+	 *
+	 * @return ActionScheduler_Action[] The non-pending actions.
+	 */
+	public static function get_non_pending_actions_by_ids( array $action_ids ): array {
+		$actions = self::get_actions_by_ids( $action_ids );
+
+		return array_filter( $actions, static fn( ActionScheduler_Action $action ) => $action instanceof ActionScheduler_FinishedAction || $action instanceof ActionScheduler_NullAction );
+	}
+
+	/**
+	 * Gets pending and non-pending actions by their IDs.
+	 *
+	 * @since 0.0.8
+	 *
+	 * @param array $action_ids The action IDs.
+	 *
+	 * @return array<ActionScheduler_Action[], ActionScheduler_Action[]> The pending and non-pending actions.
+	 */
+	public static function get_pending_and_non_pending_actions_by_ids( array $action_ids ): array {
+		return [ self::get_pending_actions_by_ids( $action_ids ), self::get_non_pending_actions_by_ids( $action_ids ) ];
+	}
 }

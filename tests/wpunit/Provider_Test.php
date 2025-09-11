@@ -13,9 +13,20 @@ use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Tests\Container;
 use StellarWP\ContainerContract\ContainerInterface;
+use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
 
 class Provider_Test extends WPTestCase {
 	use With_Uopz;
+
+	/**
+	 * @after
+	 */
+	public function reset_logger(): void {
+		Config::set_logger( new ActionScheduler_DB_Logger() );
+		Config::get_container()->singleton( Logger::class, Config::get_logger() );
+	}
 
 	/**
 	 * @test
@@ -270,5 +281,96 @@ class Provider_Test extends WPTestCase {
 		$provider->register();
 
 		$this->assertFalse( $doing_it_wrong_called, '_doing_it_wrong should not be called when tables_error hook is handled' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_only_delete_task_logs_when_using_db_logger(): void {
+		// Create a task to get a valid action ID
+		$test_task = new Do_Action_Task();
+		shepherd()->dispatch( $test_task );
+		$task_id = $test_task->get_id();
+		$action_id = $test_task->get_action_id();
+
+		// Insert a task log manually
+		DB::query(
+			DB::prepare(
+				'INSERT INTO %i (task_id, type, level, entry) VALUES (%d, %s, %s, %s)',
+				Task_Logs::table_name(),
+				$task_id,
+				'test',
+				'info',
+				wp_json_encode( [ 'test' => 'data' ] )
+			)
+		);
+
+		Config::set_logger( new DB_Logger() );
+		Config::get_container()->singleton( Logger::class, Config::get_logger() );
+		$provider = Config::get_container()->get( Provider::class );
+
+		$logs_before = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE task_id = %d',
+				Task_Logs::table_name(),
+				$task_id
+			)
+		);
+		$this->assertEquals( 1, $logs_before );
+
+		$provider->delete_tasks_on_action_deletion( $action_id );
+
+		$logs_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE task_id = %d',
+				Task_Logs::table_name(),
+				$task_id
+			)
+		);
+		$this->assertEquals( 0, $logs_after, 'Logs should be deleted when using DB_Logger' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_delete_task_logs_when_not_using_db_logger(): void {
+		$test_task = new Do_Action_Task();
+		shepherd()->dispatch( $test_task );
+		$task_id = $test_task->get_id();
+		$action_id = $test_task->get_action_id();
+
+		// Insert a task log manually
+		DB::query(
+			DB::prepare(
+				'INSERT INTO %i (task_id, type, level, entry) VALUES (%d, %s, %s, %s)',
+				Task_Logs::table_name(),
+				$task_id,
+				'test',
+				'info',
+				wp_json_encode( [ 'test' => 'data' ] )
+			)
+		);
+
+		$provider = Config::get_container()->get( Provider::class );
+
+		$logs_before = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE task_id = %d',
+				Task_Logs::table_name(),
+				$task_id
+			)
+		);
+		$this->assertEquals( 1, $logs_before );
+
+		$provider->delete_tasks_on_action_deletion( $action_id );
+
+		$logs_after = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE task_id = %d',
+				Task_Logs::table_name(),
+				$task_id
+			)
+		);
+		$this->assertEquals( 1, $logs_after, 'Logs should NOT be deleted when not using DB_Logger' );
 	}
 }

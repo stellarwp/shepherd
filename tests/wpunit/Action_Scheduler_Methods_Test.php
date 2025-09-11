@@ -84,4 +84,75 @@ class Action_Scheduler_Methods_Test extends WPTestCase {
 		$this->assertCount( 1, $pending );
 		$this->assertSame( $normal_action, reset( $pending ) );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_get_non_pending_actions_by_ids() {
+		$finished_action = $this->createMock( \ActionScheduler_FinishedAction::class );
+		$null_action = $this->createMock( \ActionScheduler_NullAction::class );
+		$normal_action = $this->createMock( \ActionScheduler_Action::class );
+		$canceled_action = $this->createMock( \ActionScheduler_CanceledAction::class );
+
+		$this->set_class_fn_return(
+			Action_Scheduler_Methods::class,
+			'get_actions_by_ids',
+			[ 1 => $finished_action, 2 => $null_action, 3 => $normal_action, 4 => $canceled_action ]
+		);
+
+		$non_pending = Action_Scheduler_Methods::get_non_pending_actions_by_ids( [ 1, 2, 3, 4 ] );
+
+		// Should contain finished, null, and canceled actions (canceled extends finished)
+		$this->assertCount( 3, $non_pending );
+		$this->assertContains( $finished_action, $non_pending );
+		$this->assertContains( $null_action, $non_pending );
+		$this->assertContains( $canceled_action, $non_pending );
+		$this->assertNotContains( $normal_action, $non_pending );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_get_pending_and_non_pending_actions_by_ids() {
+		$finished_action = $this->createMock( \ActionScheduler_FinishedAction::class );
+		$null_action = $this->createMock( \ActionScheduler_NullAction::class );
+		$normal_action = $this->createMock( \ActionScheduler_Action::class );
+		$canceled_action = $this->createMock( \ActionScheduler_CanceledAction::class );
+
+		$this->set_class_fn_return(
+			Action_Scheduler_Methods::class,
+			'get_actions_by_ids',
+			[ 1 => $finished_action, 2 => $null_action, 3 => $normal_action, 4 => $canceled_action ]
+		);
+
+		[ $pending, $non_pending ] = Action_Scheduler_Methods::get_pending_and_non_pending_actions_by_ids( [ 1, 2, 3, 4 ] );
+
+		// Check pending actions (only normal action)
+		$this->assertCount( 1, $pending );
+		$this->assertContains( $normal_action, $pending );
+
+		// Check non-pending actions (finished, null, and canceled since it extends finished)
+		$this->assertCount( 3, $non_pending );
+		$this->assertContains( $finished_action, $non_pending );
+		$this->assertContains( $null_action, $non_pending );
+		$this->assertContains( $canceled_action, $non_pending );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_return_empty_arrays_when_no_actions_found() {
+		$this->set_class_fn_return(
+			Action_Scheduler_Methods::class,
+			'get_actions_by_ids',
+			[]
+		);
+
+		$non_pending = Action_Scheduler_Methods::get_non_pending_actions_by_ids( [ 1, 2, 3 ] );
+		$this->assertEmpty( $non_pending );
+
+		[ $pending, $non_pending ] = Action_Scheduler_Methods::get_pending_and_non_pending_actions_by_ids( [ 1, 2, 3 ] );
+		$this->assertEmpty( $pending );
+		$this->assertEmpty( $non_pending );
+	}
 }

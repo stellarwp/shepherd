@@ -7,15 +7,19 @@ namespace StellarWP\Shepherd\Tasks;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
+use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
 use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Config;
+use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
 use StellarWP\Shepherd\Contracts\Logger;
 use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
+use function StellarWP\Shepherd\shepherd;
 
 class Herding_Test extends WPTestCase {
 	use With_Uopz;
+	use With_AS_Assertions;
 
 	/**
 	 * @before
@@ -46,46 +50,24 @@ class Herding_Test extends WPTestCase {
 	 */
 	public function it_should_delete_orphaned_tasks_and_logs() {
 		$herding = new Herding();
+		$logger = Config::get_container()->get( Logger::class );
 
-		// Clear existing data
-		DB::query( DB::prepare( 'DELETE FROM %i', Tasks::table_name() ) );
-		DB::query( DB::prepare( 'DELETE FROM %i', Task_Logs::table_name() ) );
-
-		// Create orphaned tasks (tasks without corresponding actions in Action Scheduler)
-		$orphaned_task_ids = [];
+		// Create tasks and then delete their actions to make them orphaned
+		$task_ids = [];
 		for ( $i = 1; $i <= 3; $i++ ) {
-			DB::query(
-				DB::prepare(
-					'INSERT INTO %i (action_id, class_hash, args_hash, data, current_try) VALUES (%d, %s, %s, %s, %d)',
-					Tasks::table_name(),
-					999990 + $i, // Use high action IDs that won't exist in Action Scheduler
-					'test_class_hash_' . $i,
-					'test_args_hash_' . $i,
-					wp_json_encode( [] ),
-					0
-				)
-			);
-			$orphaned_task_ids[] = $GLOBALS['wpdb']->insert_id;
+			$test_task = new Do_Action_Task( 'test_arg_' . $i );
+			shepherd()->dispatch( $test_task );
+			$task_ids[] = $test_task->get_id();
 
-			// Create logs for these tasks
-			DB::query(
-				DB::prepare(
-					'INSERT INTO %i (task_id, date, level, type, entry) VALUES (%d, %s, %s, %s, %s)',
-					Task_Logs::table_name(),
-					$GLOBALS['wpdb']->insert_id,
-					gmdate( 'Y-m-d H:i:s' ),
-					'info',
-					'test',
-					wp_json_encode( [ 'message' => 'Test log entry' ] )
-				)
-			);
+			$logger->log( 'info', 'Test log entry ' . $i, [ 'task_id' => $test_task->get_id(), 'type' => 'cancelled', 'action_id' => $test_task->get_action_id() ] );
+
+			DB::query( DB::prepare( 'DELETE FROM %i WHERE action_id = %d', DB::prefix( 'actionscheduler_actions' ), $test_task->get_action_id() ) );
 		}
 
-		// Verify tasks and logs exist before cleanup
 		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
 		$logs_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
 		$this->assertEquals( 3, $tasks_before );
-		$this->assertEquals( 3, $logs_before );
+		$this->assertEquals( 6, $logs_before );
 
 		$herding->process();
 
@@ -127,35 +109,104 @@ class Herding_Test extends WPTestCase {
 	public function it_should_sanitize_task_ids_before_deletion() {
 		$herding = new Herding();
 
-		// Clear existing data
-		DB::query( DB::prepare( 'DELETE FROM %i', Tasks::table_name() ) );
-		DB::query( DB::prepare( 'DELETE FROM %i', Task_Logs::table_name() ) );
-
-		// Create orphaned tasks with high action IDs that won't exist in Action Scheduler
-		$orphaned_task_ids = [];
+		// Create tasks and then delete their actions to make them orphaned
+		$task_ids = [];
 		for ( $i = 1; $i <= 3; $i++ ) {
-			DB::query(
-				DB::prepare(
-					'INSERT INTO %i (action_id, class_hash, args_hash, data, current_try) VALUES (%d, %s, %s, %s, %d)',
-					Tasks::table_name(),
-					999990 + $i,
-					'test_class_hash_' . $i,
-					'test_args_hash_' . $i,
-					wp_json_encode( [] ),
-					0
-				)
-			);
-			$orphaned_task_ids[] = $GLOBALS['wpdb']->insert_id;
+			$test_task = new Do_Action_Task( 'sanitize_test_' . $i );
+			shepherd()->dispatch( $test_task );
+			$task_ids[] = $test_task->get_id();
+
+			DB::query( DB::prepare( 'DELETE FROM %i WHERE action_id = %d', DB::prefix( 'actionscheduler_actions' ), $test_task->get_action_id() ) );
 		}
 
-		// Verify tasks exist before cleanup
 		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
 		$this->assertEquals( 3, $tasks_before );
 
 		$herding->process();
 
-		// Verify all tasks were deleted (testing sanitization worked)
 		$tasks_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
 		$this->assertEquals( 0, $tasks_after );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_delete_task_data_with_db_logger() {
+		Config::set_logger( new DB_Logger() );
+		Config::get_container()->singleton( Logger::class, Config::get_logger() );
+		$logger = Config::get_container()->get( Logger::class );
+
+		$task_ids = [];
+		for ( $i = 1; $i <= 3; $i++ ) {
+			$test_task = new Do_Action_Task( 'delete_test_' . $i );
+			shepherd()->dispatch( $test_task );
+			$task_ids[] = $test_task->get_id();
+
+			$logger->log( 'info', 'Test log ' . $i, [ 'task_id' => $test_task->get_id(), 'type' => 'cancelled', 'action_id' => $test_task->get_action_id() ] );
+		}
+
+		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$logs_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
+		$this->assertEquals( 3, $tasks_before );
+		$this->assertEquals( 6, $logs_before );
+
+		Herding::delete_data_of_tasks( $task_ids );
+
+		$tasks_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$logs_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
+		$this->assertEquals( 0, $tasks_after );
+		$this->assertEquals( 0, $logs_after );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_delete_task_data_with_actionscheduler_logger() {
+		Config::set_logger( new ActionScheduler_DB_Logger() );
+		Config::get_container()->singleton( Logger::class, Config::get_logger() );
+		$logger = Config::get_container()->get( Logger::class );
+
+		$task_ids = [];
+		for ( $i = 1; $i <= 3; $i++ ) {
+			$test_task = new Do_Action_Task( 'as_logger_test_' . $i );
+			shepherd()->dispatch( $test_task );
+			$task_ids[] = $test_task->get_id();
+
+			$logger->log( 'info', 'Test log ' . $i, [ 'task_id' => $test_task->get_id(), 'type' => 'cancelled', 'action_id' => $test_task->get_action_id() ] );
+		}
+
+		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$task_logs_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
+		$as_logs_before = DB::get_var(
+			DB::prepare(
+				'SELECT COUNT(*) FROM %i WHERE message LIKE %s',
+				DB::prefix( 'actionscheduler_logs' ),
+				'shepherd_' . Config::get_hook_prefix() . '||%'
+			)
+		);
+		$this->assertEquals( 3, $tasks_before );
+		$this->assertEquals( 0, $task_logs_before );
+		$this->assertGreaterThanOrEqual( 3, $as_logs_before );
+
+		Herding::delete_data_of_tasks( $task_ids );
+
+		$tasks_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
+		$this->assertEquals( 0, $tasks_after );
+
+		$task_logs_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
+		$this->assertEquals( 0, $task_logs_after, 'Task_Logs should not be deleted when using ActionScheduler logger' );
+
+		$as_logs_after = 0;
+		foreach ( $task_ids as $task_id ) {
+			$count = DB::get_var(
+				DB::prepare(
+					'SELECT COUNT(*) FROM %i WHERE message LIKE %s',
+					DB::prefix( 'actionscheduler_logs' ),
+					'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%'
+				)
+			);
+			$as_logs_after += $count;
+		}
+		$this->assertEquals( 0, $as_logs_after, 'AS logs for deleted tasks should be removed' );
 	}
 }
