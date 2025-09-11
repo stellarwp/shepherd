@@ -199,6 +199,7 @@ class Regulator extends Provider_Abstract {
 	 * Dispatches a task to be processed later.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Made strings translatable.
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
@@ -214,7 +215,7 @@ class Regulator extends Provider_Abstract {
 			DB::beginTransaction();
 
 			if ( Action_Scheduler_Methods::has_scheduled_action( $this->process_task_hook, [ $args_hash ], $group ) ) {
-				throw new ShepherdTaskAlreadyExistsException( 'The task is already scheduled.' );
+				throw new ShepherdTaskAlreadyExistsException( esc_html__( 'The task is already scheduled.', 'stellarwp-shepherd' ) );
 			}
 
 			$previous_action_id = $task->get_action_id();
@@ -229,7 +230,7 @@ class Regulator extends Provider_Abstract {
 			);
 
 			if ( ! $action_id ) {
-				throw new RuntimeException( 'Failed to schedule the task.' );
+				throw new RuntimeException( esc_html__( 'Failed to schedule the task.', 'stellarwp-shepherd' ) );
 			}
 
 			$task->set_action_id( $action_id );
@@ -333,14 +334,15 @@ class Regulator extends Provider_Abstract {
 	 * Processes a task.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Made strings translatable.
 	 *
 	 * @param string $args_hash The arguments hash.
 	 *
-	 * @throws RuntimeException                    If no action ID is found, no Shepherd task is found with the action ID, or the task arguments hash does not match the expected hash.
+	 * @throws RuntimeException                      If no action ID is found, no Shepherd task is found with the action ID, or the task arguments hash does not match the expected hash.
 	 * @throws ShepherdTaskException                 If the task fails to be processed.
 	 * @throws ShepherdTaskFailWithoutRetryException If the task fails to be processed without retry.
-	 * @throws Exception                           If the task fails to be processed.
-	 * @throws Throwable                           If the task fails to be processed.
+	 * @throws Exception                             If the task fails to be processed.
+	 * @throws Throwable                             If the task fails to be processed.
 	 */
 	public function process_task( string $args_hash ): void {
 		$task = null;
@@ -349,7 +351,7 @@ class Regulator extends Provider_Abstract {
 			$task = Tasks_Table::get_by_args_hash( $args_hash );
 
 			if ( ! $task ) {
-				throw new RuntimeException( 'No Shepherd task found with args hash ' . $args_hash . '.' );
+				throw new RuntimeException( esc_html__( 'No Shepherd task found with args hash ' . $args_hash . '.', 'stellarwp-shepherd' ) );
 			}
 
 			$task = array_shift( $task );
@@ -358,7 +360,7 @@ class Regulator extends Provider_Abstract {
 		$task ??= Tasks_Table::get_by_action_id( $this->current_action_id );
 
 		if ( ! $task ) {
-			throw new RuntimeException( 'No Shepherd task found with action ID ' . $this->current_action_id . '.' );
+			throw new RuntimeException( esc_html__( 'No Shepherd task found with action ID ' . $this->current_action_id . '.', 'stellarwp-shepherd' ) );
 		}
 
 		$log_data = [
@@ -426,7 +428,7 @@ class Regulator extends Provider_Abstract {
 			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
 
 			if ( $this->should_retry( $task ) ) {
-				throw new ShepherdTaskException( __( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
+				throw new ShepherdTaskException( esc_html__( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
@@ -443,7 +445,7 @@ class Regulator extends Provider_Abstract {
 			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
 
 			if ( $this->should_retry( $task ) ) {
-				throw new ShepherdTaskException( __( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
+				throw new ShepherdTaskException( esc_html__( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
@@ -489,8 +491,15 @@ class Regulator extends Provider_Abstract {
 	 * Schedules the cleanup task.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Updated to check if the Shepherd tables have been registered before scheduling the cleanup task.
 	 */
 	public function schedule_cleanup_task(): void {
+		$prefix = Config::get_hook_prefix();
+
+		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
+			return;
+		}
+
 		$this->dispatch( new Herding(), 6 * HOUR_IN_SECONDS );
 	}
 }
