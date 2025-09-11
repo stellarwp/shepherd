@@ -268,7 +268,7 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 
 		[ $pending_actions, $non_pending_actions ] = Action_Scheduler_Methods::get_pending_and_non_pending_actions_by_ids( $action_ids );
 
-		$stale_task_ids = array_map( fn( Task $task ) => $task->get_id(), array_filter( $tasks, fn( Task $task ) => in_array( $task->get_action_id(), $non_pending_actions, true ) ) );
+		$stale_task_ids = array_map( fn( Task $task ) => $task->get_id(), array_filter( $tasks, fn( Task $task ) => in_array( $task->get_action_id(), array_keys( $non_pending_actions ), true ) ) );
 
 		if ( ! empty( $stale_task_ids ) ) {
 			Herding::delete_data_of_tasks( $stale_task_ids );

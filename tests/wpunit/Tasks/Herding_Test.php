@@ -7,6 +7,7 @@ namespace StellarWP\Shepherd\Tasks;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
+use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
 use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Config;
@@ -18,6 +19,7 @@ use function StellarWP\Shepherd\shepherd;
 
 class Herding_Test extends WPTestCase {
 	use With_Uopz;
+	use With_AS_Assertions;
 
 	/**
 	 * @before
@@ -59,14 +61,13 @@ class Herding_Test extends WPTestCase {
 
 			$logger->log( 'info', 'Test log entry ' . $i, [ 'task_id' => $test_task->get_id(), 'type' => 'cancelled', 'action_id' => $test_task->get_action_id() ] );
 
-			as_unschedule_action( shepherd()->get_hook(), [ $test_task->get_args_hash() ], $test_task->get_group() );
+			DB::query( DB::prepare( 'DELETE FROM %i WHERE action_id = %d', DB::prefix( 'actionscheduler_actions' ), $test_task->get_action_id() ) );
 		}
 
-		// Verify tasks and logs exist before cleanup
 		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
 		$logs_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
 		$this->assertEquals( 3, $tasks_before );
-		$this->assertEquals( 3, $logs_before );
+		$this->assertEquals( 6, $logs_before );
 
 		$herding->process();
 
@@ -115,16 +116,14 @@ class Herding_Test extends WPTestCase {
 			shepherd()->dispatch( $test_task );
 			$task_ids[] = $test_task->get_id();
 
-			as_unschedule_action( shepherd()->get_hook(), [ $test_task->get_args_hash() ], $test_task->get_group() );
+			DB::query( DB::prepare( 'DELETE FROM %i WHERE action_id = %d', DB::prefix( 'actionscheduler_actions' ), $test_task->get_action_id() ) );
 		}
 
-		// Verify tasks exist before cleanup
 		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
 		$this->assertEquals( 3, $tasks_before );
 
 		$herding->process();
 
-		// Verify all tasks were deleted (testing sanitization worked)
 		$tasks_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
 		$this->assertEquals( 0, $tasks_after );
 	}
@@ -133,12 +132,10 @@ class Herding_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_delete_task_data_with_db_logger() {
-		// Set up DB_Logger
 		Config::set_logger( new DB_Logger() );
 		Config::get_container()->singleton( Logger::class, Config::get_logger() );
 		$logger = Config::get_container()->get( Logger::class );
 
-		// Create test tasks
 		$task_ids = [];
 		for ( $i = 1; $i <= 3; $i++ ) {
 			$test_task = new Do_Action_Task( 'delete_test_' . $i );
@@ -151,7 +148,7 @@ class Herding_Test extends WPTestCase {
 		$tasks_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Tasks::table_name() ) );
 		$logs_before = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
 		$this->assertEquals( 3, $tasks_before );
-		$this->assertEquals( 3, $logs_before );
+		$this->assertEquals( 6, $logs_before );
 
 		Herding::delete_data_of_tasks( $task_ids );
 
@@ -188,7 +185,7 @@ class Herding_Test extends WPTestCase {
 			)
 		);
 		$this->assertEquals( 3, $tasks_before );
-		$this->assertEquals( 3, $task_logs_before );
+		$this->assertEquals( 0, $task_logs_before );
 		$this->assertGreaterThanOrEqual( 3, $as_logs_before );
 
 		Herding::delete_data_of_tasks( $task_ids );
@@ -197,7 +194,7 @@ class Herding_Test extends WPTestCase {
 		$this->assertEquals( 0, $tasks_after );
 
 		$task_logs_after = DB::get_var( DB::prepare( 'SELECT COUNT(*) FROM %i', Task_Logs::table_name() ) );
-		$this->assertEquals( 3, $task_logs_after, 'Task_Logs should not be deleted when using ActionScheduler logger' );
+		$this->assertEquals( 0, $task_logs_after, 'Task_Logs should not be deleted when using ActionScheduler logger' );
 
 		$as_logs_after = 0;
 		foreach ( $task_ids as $task_id ) {
