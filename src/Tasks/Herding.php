@@ -14,6 +14,7 @@ namespace StellarWP\Shepherd\Tasks;
 use StellarWP\Shepherd\Config;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Tables\Task_Logs;
+use StellarWP\Shepherd\Tables\AS_Logs;
 use StellarWP\Shepherd\Contracts\Logger;
 use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
 use StellarWP\Shepherd\Loggers\DB_Logger;
@@ -33,11 +34,14 @@ class Herding extends Task_Abstract {
 	 * Processes the herding task.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Used AS_Logs to retrieve table name instead of DB::prefix().
 	 */
 	public function process(): void {
 		DB::beginTransaction();
 
-		$logger = Config::get_container()->get( Logger::class );
+		$container = Config::get_container();
+
+		$logger = $container->get( Logger::class );
 
 		$logs_at_as_table  = false;
 		$logs_at_own_table = false;
@@ -67,7 +71,7 @@ class Herding extends Task_Abstract {
 					DB::query(
 						DB::prepare(
 							'DELETE FROM %i WHERE message LIKE %s',
-							DB::prefix( 'actionscheduler_logs' ),
+							AS_Logs::table_name(),
 							'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%'
 						)
 					);
