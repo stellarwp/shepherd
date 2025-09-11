@@ -142,6 +142,7 @@ class Regulator extends Provider_Abstract {
 	 * @since 0.0.1
 	 * @since 0.0.7 Updated to check if the Shepherd tables have been registered already.
 	 * @since 0.0.7 Updated to use the `action_scheduler_init` hook instead of the `init` hook to check if Action Scheduler is initialized.
+	 * @since 0.0.8 Updated to use the delay to determine if the task should be dispatched synchronously.
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
@@ -156,11 +157,12 @@ class Regulator extends Provider_Abstract {
 			 * Filters whether to dispatch a task synchronously.
 			 *
 			 * @since 0.0.7
+			 * @since 0.0.8 Updated to be true by default only when there should be no delay.
 			 *
 			 * @param bool $should_dispatch_sync Whether to dispatch a task synchronously.
 			 * @param Task $task                 The task that should be dispatched synchronously.
 			 */
-			if ( ! apply_filters( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", true, $task ) ) {
+			if ( ! apply_filters( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", 0 === $delay, $task ) ) {
 				return $this;
 			}
 
