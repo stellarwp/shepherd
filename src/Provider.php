@@ -16,6 +16,7 @@ use StellarWP\Shepherd\Tables\Provider as Tables_Provider;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Contracts\Logger;
+use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
 use RuntimeException;
@@ -164,6 +165,7 @@ class Provider extends Provider_Abstract {
 	 * Deletes tasks on action deletion.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Check that the DB Logger is used before trying to delete task logs from there.
 	 *
 	 * @param int $action_id The action ID.
 	 */
@@ -184,13 +186,15 @@ class Provider extends Provider_Abstract {
 
 		$task_ids = implode( ',', array_unique( array_map( 'intval', $task_ids ) ) );
 
-		DB::query(
-			DB::prepare(
-				"DELETE FROM %i WHERE %i IN ({$task_ids})",
-				Task_Logs::table_name(),
-				'task_id',
-			)
-		);
+		if ( $this->container->get( Logger::class ) instanceof DB_Logger ) {
+			DB::query(
+				DB::prepare(
+					"DELETE FROM %i WHERE %i IN ({$task_ids})",
+					Task_Logs::table_name(),
+					'task_id',
+				)
+			);
+		}
 
 		DB::query(
 			DB::prepare(
