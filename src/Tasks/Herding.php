@@ -157,7 +157,7 @@ class Herding extends Task_Abstract {
 					Tasks::uid_column(),
 				)
 			);
-		} catch ( DatabaseQueryException $e ) {
+		} catch ( DatabaseQueryException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// No need to be loud about the failed deletion.
 		}
 	}
