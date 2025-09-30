@@ -21,6 +21,7 @@ use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Tables\Tasks;
 use StellarWP\DB\DB;
 use Generator;
+use StellarWP\DB\Database\Exceptions\DatabaseQueryException;
 
 /**
  * Shepherd's herding task.
@@ -129,33 +130,37 @@ class Herding extends Task_Abstract {
 
 		$imploded_task_ids = implode( ',', $task_ids );
 
-		if ( $logger->uses_own_table() ) {
-			DB::query(
-				DB::prepare(
-					"DELETE FROM %i WHERE task_id IN ({$imploded_task_ids})",
-					Task_Logs::table_name(),
-				)
-			);
-		}
-
-		if ( $logger->uses_as_table() ) {
-			foreach ( $task_ids as $task_id ) {
+		try {
+			if ( $logger->uses_own_table() ) {
 				DB::query(
 					DB::prepare(
-						'DELETE FROM %i WHERE message LIKE %s',
-						AS_Logs::table_name(),
-						'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%'
+						"DELETE FROM %i WHERE task_id IN ({$imploded_task_ids})",
+						Task_Logs::table_name(),
 					)
 				);
 			}
-		}
 
-		DB::query(
-			DB::prepare(
-				"DELETE FROM %i WHERE %i IN ({$imploded_task_ids})",
-				Tasks::table_name(),
-				Tasks::uid_column(),
-			)
-		);
+			if ( $logger->uses_as_table() ) {
+				foreach ( $task_ids as $task_id ) {
+					DB::query(
+						DB::prepare(
+							'DELETE FROM %i WHERE message LIKE %s',
+							AS_Logs::table_name(),
+							'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%'
+						)
+					);
+				}
+			}
+
+			DB::query(
+				DB::prepare(
+					"DELETE FROM %i WHERE %i IN ({$imploded_task_ids})",
+					Tasks::table_name(),
+					Tasks::uid_column(),
+				)
+			);
+		} catch ( DatabaseQueryException $e ) {
+			// No need to be loud about the failed deletion.
+		}
 	}
 }
