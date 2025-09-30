@@ -509,14 +509,15 @@ class Regulator extends Provider_Abstract {
 		 *
 		 * @since 0.0.8
 		 *
-		 * @param bool $should_schedule Whether to schedule the cleanup task.
+		 * @param int $schedule_every_x_time The time in seconds to schedule the cleanup task. Default is 6 hours.
 		 */
-		$should_schedule = apply_filters( "shepherd_{$prefix}_should_schedule_cleanup_task", true );
-		if ( ! $should_schedule ) {
+		$schedule_every_x_time = (int) apply_filters( "shepherd_{$prefix}_schedule_cleanup_task_every", 6 * HOUR_IN_SECONDS );
+
+		if ( 0 === $schedule_every_x_time ) {
 			return;
 		}
 
-		$this->dispatch( new Herding(), 6 * HOUR_IN_SECONDS );
+		$this->dispatch( new Herding(), $schedule_every_x_time );
 
 		/**
 		 * Fires when the cleanup task is scheduled.
