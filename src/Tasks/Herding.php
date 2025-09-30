@@ -127,20 +127,9 @@ class Herding extends Task_Abstract {
 
 		$logger = Config::get_container()->get( Logger::class );
 
-		$logs_at_as_table  = false;
-		$logs_at_own_table = false;
-
-		if ( $logger instanceof ActionScheduler_DB_Logger ) {
-			$logs_at_as_table = true;
-		}
-
-		if ( $logger instanceof DB_Logger ) {
-			$logs_at_own_table = true;
-		}
-
 		$imploded_task_ids = implode( ',', $task_ids );
 
-		if ( $logs_at_own_table ) {
+		if ( $logger->uses_own_table() ) {
 			DB::query(
 				DB::prepare(
 					"DELETE FROM %i WHERE task_id IN ({$imploded_task_ids})",
@@ -149,7 +138,7 @@ class Herding extends Task_Abstract {
 			);
 		}
 
-		if ( $logs_at_as_table ) {
+		if ( $logger->uses_as_table() ) {
 			foreach ( $task_ids as $task_id ) {
 				DB::query(
 					DB::prepare(
