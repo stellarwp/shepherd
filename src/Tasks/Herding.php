@@ -16,8 +16,6 @@ use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\AS_Logs;
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
-use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Tables\Tasks;
 use StellarWP\DB\DB;
 use Generator;
