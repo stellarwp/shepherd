@@ -186,7 +186,7 @@ class Provider extends Provider_Abstract {
 
 		$task_ids = implode( ',', array_unique( array_map( 'intval', $task_ids ) ) );
 
-		if ( $this->container->get( Logger::class ) instanceof DB_Logger ) {
+		if ( $this->container->get( Logger::class )->uses_own_table() ) {
 			DB::query(
 				DB::prepare(
 					"DELETE FROM %i WHERE %i IN ({$task_ids})",
