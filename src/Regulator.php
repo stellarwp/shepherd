@@ -509,9 +509,9 @@ class Regulator extends Provider_Abstract {
 		 *
 		 * @since 0.0.8
 		 *
-		 * @param int $schedule_every_x_time The time in seconds to schedule the cleanup task. Default is 6 hours.
+		 * @param int $schedule_every_x_time The time in seconds to schedule the cleanup task. Default is 12 hours.
 		 */
-		$schedule_every_x_time = (int) apply_filters( "shepherd_{$prefix}_schedule_cleanup_task_every", 6 * HOUR_IN_SECONDS );
+		$schedule_every_x_time = (int) apply_filters( "shepherd_{$prefix}_schedule_cleanup_task_every", 12 * HOUR_IN_SECONDS );
 
 		if ( 0 === $schedule_every_x_time ) {
 			return;
