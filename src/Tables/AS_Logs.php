@@ -12,7 +12,6 @@ namespace StellarWP\Shepherd\Tables;
 use StellarWP\Shepherd\Abstracts\Table_Abstract;
 use StellarWP\Shepherd\Log;
 use StellarWP\Shepherd\Config;
-use DateTime;
 use StellarWP\Schema\Collections\Column_Collection;
 use StellarWP\Schema\Columns\ID;
 use StellarWP\Schema\Columns\Referenced_ID;
