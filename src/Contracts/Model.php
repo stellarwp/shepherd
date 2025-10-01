@@ -11,7 +11,7 @@ declare( strict_types=1 );
 
 namespace StellarWP\Shepherd\Contracts;
 
-use StellarWP\Schema\Tables\Contracts\Table_Interface;
+use StellarWP\Schema\Tables\Contracts\Table;
 
 /**
  * The Shepherd model contract.
@@ -61,11 +61,11 @@ interface Model {
 	 * Gets the table interface for the model.
 	 *
 	 * @since 0.0.1
-	 * @since 0.0.8 Updated to return Table_Interface instead.
+	 * @since 0.0.8 Updated to return Table instead.
 	 *
-	 * @return Table_Interface The table interface.
+	 * @return Table The table interface.
 	 */
-	public function get_table_interface(): Table_Interface;
+	public function get_table_interface(): Table;
 
 	/**
 	 * Converts the model to an array.
