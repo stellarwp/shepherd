@@ -35,7 +35,7 @@
   "require": {
     "php": ">=7.4",
     "stellarwp/db": "^1.1",
-    "stellarwp/schema": "dev-feat/adding-the-order-by-param-in-get-all-by",
+    "stellarwp/schema": "^3.1.1",
     "woocommerce/action-scheduler": "3.9.3",
     "psr/log": "^1.1"
   },
