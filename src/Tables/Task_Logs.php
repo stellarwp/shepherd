@@ -9,45 +9,27 @@
 
 namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Shepherd\Abstracts\Table_Abstract;
 use StellarWP\Shepherd\Log;
-use StellarWP\DB\DB;
 use DateTime;
+use StellarWP\Schema\Columns\Created_At;
+use StellarWP\Schema\Columns\ID;
+use StellarWP\Schema\Columns\Referenced_ID;
+use StellarWP\Schema\Columns\String_Column;
+use StellarWP\Schema\Columns\Text_Column;
+use StellarWP\Schema\Columns\Column_Types;
+use StellarWP\Schema\Tables\Table_Schema;
+use StellarWP\Schema\Collections\Column_Collection;
 
 /**
  * Task logs table schema.
  *
  * @since 0.0.1
+ * @since 0.0.8 Updated to be compatible with the updated contract.
  *
  * @package StellarWP\Shepherd\Tables;
  */
-class Task_Logs extends Table {
-	/**
-	 * The indexes for the table.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var array<array<string, string>>
-	 */
-	public const INDEXES = [
-		[
-			'name'    => 'task_id',
-			'columns' => 'task_id',
-		],
-		[
-			'name'    => 'action_id',
-			'columns' => 'action_id',
-		],
-		[
-			'name'    => 'type',
-			'columns' => 'type',
-		],
-		[
-			'name'    => 'level',
-			'columns' => 'level',
-		],
-	];
-
+class Task_Logs extends Table_Abstract {
 	/**
 	 * The schema version.
 	 *
@@ -95,59 +77,27 @@ class Task_Logs extends Table {
 	protected static $uid_column = 'id';
 
 	/**
-	 * An array of all the columns in the table.
+	 * Gets the schema history for the table.
 	 *
-	 * @since 0.0.1
+	 * @since 0.0.8
 	 *
-	 * @return array<string, array<string, bool|int|string>>
+	 * @return array<string, callable> The schema history for the table.
 	 */
-	public static function get_columns(): array {
+	public static function get_schema_history(): array {
+		$table_name = self::table_name( true );
 		return [
-			static::$uid_column => [
-				'type'           => self::COLUMN_TYPE_BIGINT,
-				'php_type'       => self::PHP_TYPE_INT,
-				'length'         => 20,
-				'unsigned'       => true,
-				'auto_increment' => true,
-				'nullable'       => false,
-			],
-			'task_id'           => [
-				'type'     => self::COLUMN_TYPE_BIGINT,
-				'php_type' => self::PHP_TYPE_INT,
-				'length'   => 20,
-				'unsigned' => true,
-				'nullable' => false,
-			],
-			'action_id'         => [
-				'type'     => self::COLUMN_TYPE_BIGINT,
-				'php_type' => self::PHP_TYPE_INT,
-				'length'   => 20,
-				'unsigned' => true,
-				'nullable' => false,
-			],
-			'date'              => [
-				'type'     => self::COLUMN_TYPE_TIMESTAMP,
-				'php_type' => self::PHP_TYPE_DATETIME,
-				'nullable' => false,
-				'default'  => 'CURRENT_TIMESTAMP',
-			],
-			'level'             => [
-				'type'     => self::COLUMN_TYPE_VARCHAR,
-				'php_type' => self::PHP_TYPE_STRING,
-				'length'   => 191,
-				'nullable' => false,
-			],
-			'type'              => [
-				'type'     => self::COLUMN_TYPE_VARCHAR,
-				'php_type' => self::PHP_TYPE_STRING,
-				'length'   => 191,
-				'nullable' => false,
-			],
-			'entry'             => [
-				'type'     => self::COLUMN_TYPE_LONGTEXT,
-				'php_type' => self::PHP_TYPE_STRING,
-				'nullable' => false,
-			],
+			self::SCHEMA_VERSION => function () use ( $table_name ) {
+				$columns   = new Column_Collection();
+				$columns[] = new ID( 'id' );
+				$columns[] = new Referenced_ID( 'task_id' );
+				$columns[] = new Referenced_ID( 'action_id' );
+				$columns[] = new Created_At( 'date' );
+				$columns[] = ( new String_Column( 'level' ) )->set_length( 191 )->set_is_index( true );
+				$columns[] = ( new String_Column( 'type' ) )->set_length( 191 )->set_is_index( true );
+				$columns[] = ( new Text_Column( 'entry' ) )->set_type( Column_Types::LONGTEXT );
+
+				return new Table_Schema( $table_name, $columns );
+			},
 		];
 	}
 
@@ -155,18 +105,13 @@ class Task_Logs extends Table {
 	 * Gets the logs by task ID.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Updated to use the new get_all_by method.
 	 *
 	 * @param int $task_id The task ID.
 	 * @return Log[] The logs for the task.
 	 */
 	public static function get_by_task_id( int $task_id ): array {
-		$results = [];
-
-		foreach ( self::fetch_all_where( DB::prepare( 'WHERE task_id = %d', $task_id ), 50, ARRAY_A, 'date ASC' ) as $log_array ) {
-			$results[] = self::get_model_from_array( $log_array );
-		}
-
-		return $results;
+		return self::get_all_by( 'task_id', $task_id, '=', 1000, 'date ASC' );
 	}
 
 	/**
@@ -178,12 +123,12 @@ class Task_Logs extends Table {
 	 *
 	 * @return Log The log.
 	 */
-	protected static function get_model_from_array( array $model_array ): Log {
+	public static function transform_from_array( array $model_array ): Log {
 		$log = new Log();
 		$log->set_id( $model_array['id'] );
 		$log->set_task_id( $model_array['task_id'] );
 		$log->set_action_id( $model_array['action_id'] );
-		$log->set_date( DateTime::createFromFormat( 'Y-m-d H:i:s', $model_array['date'] ) );
+		$log->set_date( $model_array['date'] );
 		$log->set_level( $model_array['level'] );
 		$log->set_type( $model_array['type'] );
 		$log->set_entry( $model_array['entry'] );
