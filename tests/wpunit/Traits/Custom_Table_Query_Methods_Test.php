@@ -8,6 +8,10 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Abstracts\Table_Abstract;
 use StellarWP\Schema\Register;
 use StellarWP\Shepherd\Contracts\Model;
+use StellarWP\Schema\Collections\Column_Collection;
+use StellarWP\Schema\Columns\ID;
+use StellarWP\Schema\Columns\String_Column;
+use StellarWP\Schema\Tables\Table_Schema;
 
 class Dummy_Query_Table extends Table_Abstract {
 	use Custom_Table_Query_Methods;
@@ -20,15 +24,20 @@ class Dummy_Query_Table extends Table_Abstract {
 
 	protected static $group = 'stellarwp_shepherd';
 
-	public static function get_columns(): array {
+	public static function get_schema_history(): array {
+		$table_name = static::table_name( true );
 		return [
-			'id'   => [ 'type' => self::COLUMN_TYPE_BIGINT, 'unsigned' => true, 'auto_increment' => true, 'php_type' => self::PHP_TYPE_INT ],
-			'name' => [ 'type' => self::COLUMN_TYPE_VARCHAR, 'length' => 255, 'php_type' => self::PHP_TYPE_STRING ],
-			'email' => [ 'type' => self::COLUMN_TYPE_VARCHAR, 'length' => 255, 'php_type' => self::PHP_TYPE_STRING ],
+			static::SCHEMA_VERSION => function() use ( $table_name ) {
+				$columns = new Column_Collection();
+				$columns[] = new ID( 'id' );
+				$columns[] = new String_Column( 'name' );
+				return new Table_Schema( $table_name, $columns );
+			},
 		];
 	}
 
-	protected static function get_model_from_array( array $model_array ): Model {
+	public static function transform_from_array( array $model_array ) {
+		return $model_array;
 	}
 }
 
