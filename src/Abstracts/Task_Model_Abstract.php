@@ -275,14 +275,14 @@ abstract class Task_Model_Abstract extends Model_Abstract implements Task_Model 
 		}
 
 		if ( count( $pending_actions ) > 1 ) {
-			throw new RuntimeException( esc_html__( 'Multiple tasks found with the same arguments hash.', 'stellarwp-shepherd' ) );
+			throw new RuntimeException( esc_html_x( 'Multiple tasks found with the same arguments hash.', 'This error is thrown when multiple tasks are found with the same arguments hash while they are also pending.', 'stellarwp-shepherd' ) );
 		}
 
 		$number_of_actions        = count( $action_ids );
 		$number_of_unique_actions = count( array_unique( $action_ids ) );
 
 		if ( $number_of_actions !== $number_of_unique_actions ) {
-			throw new ShepherdTaskAlreadyExistsException( esc_html__( 'Multiple tasks found with the same arguments hash.', 'stellarwp-shepherd' ) );
+			throw new ShepherdTaskAlreadyExistsException( esc_html_x( 'Multiple tasks found with the same arguments hash.', 'This error is thrown when multiple tasks are found with the same arguments hash.', 'stellarwp-shepherd' ) );
 		}
 
 		return $task_id;

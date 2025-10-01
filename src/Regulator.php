@@ -217,7 +217,7 @@ class Regulator extends Provider_Abstract {
 			DB::beginTransaction();
 
 			if ( Action_Scheduler_Methods::has_scheduled_action( $this->process_task_hook, [ $args_hash ], $group ) ) {
-				throw new ShepherdTaskAlreadyExistsException( esc_html__( 'The task is already scheduled.', 'stellarwp-shepherd' ) );
+				throw new ShepherdTaskAlreadyExistsException( esc_html_x( 'The task is already scheduled.', 'This error is thrown when a task is already scheduled.', 'stellarwp-shepherd' ) );
 			}
 
 			$previous_action_id = $task->get_action_id();
@@ -232,7 +232,7 @@ class Regulator extends Provider_Abstract {
 			);
 
 			if ( ! $action_id ) {
-				throw new RuntimeException( esc_html__( 'Failed to schedule the task.', 'stellarwp-shepherd' ) );
+				throw new RuntimeException( esc_html_x( 'Failed to schedule the task.', 'This error is thrown when a task fails to be scheduled.', 'stellarwp-shepherd' ) );
 			}
 
 			$task->set_action_id( $action_id );
@@ -354,7 +354,7 @@ class Regulator extends Provider_Abstract {
 
 			if ( ! $task ) {
 				// translators: %s is the arguments hash.
-				throw new RuntimeException( sprintf( esc_html__( 'No Shepherd task found with args hash %s.', 'stellarwp-shepherd' ), $args_hash ) );
+				throw new RuntimeException( sprintf( esc_html_x( 'No Shepherd task found with args hash %s.', 'This error is thrown when a task is not found with the arguments hash.', 'stellarwp-shepherd' ), $args_hash ) );
 			}
 
 			$task = array_shift( $task );
@@ -364,7 +364,7 @@ class Regulator extends Provider_Abstract {
 
 		if ( ! $task ) {
 			// translators: %d is the action ID.
-			throw new RuntimeException( sprintf( esc_html__( 'No Shepherd task found with action ID %d.', 'stellarwp-shepherd' ), $this->current_action_id ) );
+			throw new RuntimeException( sprintf( esc_html_x( 'No Shepherd task found with action ID %d.', 'This error is thrown when a task is not found with the action ID.', 'stellarwp-shepherd' ), $this->current_action_id ) );
 		}
 
 		$log_data = [
@@ -432,7 +432,7 @@ class Regulator extends Provider_Abstract {
 			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
 
 			if ( $this->should_retry( $task ) ) {
-				throw new ShepherdTaskException( esc_html__( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
+				throw new ShepherdTaskException( esc_html_x( 'The task failed, but will be retried.', 'This error is thrown when a task fails to be processed, but will be retried.', 'stellarwp-shepherd' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
@@ -449,7 +449,7 @@ class Regulator extends Provider_Abstract {
 			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
 
 			if ( $this->should_retry( $task ) ) {
-				throw new ShepherdTaskException( esc_html__( 'The task failed, but will be retried.', 'stellarwp-shepherd' ) );
+				throw new ShepherdTaskException( esc_html_x( 'The task failed, but will be retried.', 'This error is thrown when a task fails to be processed, but will be retried.', 'stellarwp-shepherd' ) );
 			}
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
