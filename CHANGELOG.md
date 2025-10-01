@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
-## [0.0.8] 2025-10-01
+## [0.0.8] 2025-10-02
 
 * Feature - Update the stellarwp/schema library to v3.
 * Fix - Only delete task logs from the Task_Logs table when using DB_Logger in Provider::delete_tasks_on_action_deletion.
