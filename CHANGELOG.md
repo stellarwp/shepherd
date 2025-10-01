@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
+## [0.0.8] 2025-09-30
+
+* Fix - Only delete task logs from the Task_Logs table when using DB_Logger in Provider::delete_tasks_on_action_deletion.
+* Fix - Schedule cleanup task only when Shepherd tables have been registered successfully.
+* Tweak - Update synchronous dispatch filter to default based on delay (true for no delay, false for delayed tasks).
+* Tweak - Make translatable strings using `esc_html__` for proper internationalization.
+* Tweak - Add helper methods `get_non_pending_actions_by_ids` and `get_pending_and_non_pending_actions_by_ids` to Action_Scheduler_Methods.
+* Tweak - Delete stale tasks from the database when saving a new task with the same arguments hash.
+
+[0.0.8]: https://github.com/stellarwp/shepherd/releases/tag/0.0.8
+
 ## [0.0.7] 2025-09-08
 
 * Fix - Ensure the regulator is registered only when the tables are created/updated successfully.

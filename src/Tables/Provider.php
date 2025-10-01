@@ -14,7 +14,6 @@ namespace StellarWP\Shepherd\Tables;
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Schema\Register;
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\DB\Database\Exceptions\DatabaseQueryException;
 use StellarWP\Shepherd\Config;
 
@@ -54,7 +53,7 @@ class Provider extends Provider_Abstract {
 		try {
 			Register::table( Tasks::class );
 
-			if ( $this->container->get( Logger::class ) instanceof DB_Logger ) {
+			if ( $this->container->get( Logger::class )->uses_own_table() ) {
 				Register::table( Task_Logs::class );
 			}
 

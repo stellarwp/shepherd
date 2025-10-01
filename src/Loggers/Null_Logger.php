@@ -33,4 +33,26 @@ class Null_Logger extends NullLogger implements LoggerContract {
 	public function retrieve_logs( int $task_id ): array {
 		return [];
 	}
+
+	/**
+	 * Indicates if the logger uses its own table.
+	 *
+	 * @since 0.0.8
+	 *
+	 * @return bool
+	 */
+	public function uses_own_table(): bool {
+		return false;
+	}
+
+	/**
+	 * Indicates if the logger uses the Action Scheduler table.
+	 *
+	 * @since 0.0.8
+	 *
+	 * @return bool
+	 */
+	public function uses_as_table(): bool {
+		return false;
+	}
 }

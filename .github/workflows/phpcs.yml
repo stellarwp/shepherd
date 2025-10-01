@@ -31,4 +31,4 @@ jobs:
 
       - name: PHP Code Sniffer
         run: |
-          vendor/bin/phpcs ./
+          vendor/bin/phpcs ./ -s

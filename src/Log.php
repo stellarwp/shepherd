@@ -15,8 +15,6 @@ use StellarWP\Shepherd\Config;
 use StellarWP\Shepherd\Contracts\Log_Model;
 use StellarWP\Shepherd\Tables\Task_Logs as Task_Logs_Table;
 use StellarWP\Shepherd\Tables\AS_Logs as AS_Logs_Table;
-use StellarWP\Shepherd\Loggers\ActionScheduler_DB_Logger;
-use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Contracts\Logger;
 use StellarWP\Shepherd\Abstracts\Model_Abstract;
 use DateTimeInterface;
@@ -291,11 +289,11 @@ class Log extends Model_Abstract implements Log_Model {
 
 		$table = null;
 
-		if ( $logger instanceof ActionScheduler_DB_Logger ) {
+		if ( $logger->uses_as_table() ) {
 			$table = AS_Logs_Table::class;
 		}
 
-		if ( $logger instanceof DB_Logger ) {
+		if ( $logger->uses_own_table() ) {
 			$table = Task_Logs_Table::class;
 		}
 
