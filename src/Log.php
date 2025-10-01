@@ -316,7 +316,7 @@ class Log extends Model_Abstract implements Log_Model {
 	 */
 	public function to_array(): array {
 		$table_interface = Task_Logs_Table::class;
-		$columns         = array_keys( $table_interface::get_columns() );
+		$columns         = $table_interface::get_columns()->get_names();
 
 		$model = [];
 		foreach ( $columns as $column ) {

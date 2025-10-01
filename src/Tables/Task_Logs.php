@@ -128,7 +128,7 @@ class Task_Logs extends Table_Abstract {
 		$log->set_id( $model_array['id'] );
 		$log->set_task_id( $model_array['task_id'] );
 		$log->set_action_id( $model_array['action_id'] );
-		$log->set_date( DateTime::createFromFormat( 'Y-m-d H:i:s', $model_array['date'] ) );
+		$log->set_date( $model_array['date'] );
 		$log->set_level( $model_array['level'] );
 		$log->set_type( $model_array['type'] );
 		$log->set_entry( $model_array['entry'] );

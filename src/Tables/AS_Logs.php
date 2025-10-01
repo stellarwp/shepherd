@@ -109,7 +109,7 @@ class AS_Logs extends Table_Abstract {
 		$log = new Log();
 		$log->set_id( $model_array['log_id'] );
 		$log->set_action_id( $model_array['action_id'] );
-		$log->set_date( DateTime::createFromFormat( 'Y-m-d H:i:s', $model_array['log_date_gmt'] ) );
+		$log->set_date( $model_array['log_date_gmt'] );
 
 		$message = explode( '||', $model_array['message'] );
 		$log->set_task_id( (int) ( $message[1] ?? 0 ) );
