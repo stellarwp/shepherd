@@ -35,7 +35,7 @@
   "require": {
     "php": ">=7.4",
     "stellarwp/db": "^1.1",
-    "stellarwp/schema": "^3.1.1",
+    "stellarwp/schema": "dev-fix/error-on-update-evaluation",
     "woocommerce/action-scheduler": "3.9.3",
     "psr/log": "^1.1"
   },
