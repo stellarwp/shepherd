@@ -72,7 +72,7 @@ class Table_Abstract_Test extends WPTestCase {
 		$this->assertStringContainsString( 'CREATE TABLE `wp_pi_tes_dummy_table`', $definition );
 		$this->assertStringContainsString( '`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT', $definition );
 		$this->assertStringContainsString( '`name` varchar(255) NOT NULL', $definition );
-		$this->assertStringContainsString( 'PRIMARY KEY (id`)', $definition );
+		$this->assertStringContainsString( 'PRIMARY KEY (id)', $definition );
 	}
 
 	/**
