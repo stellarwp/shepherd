@@ -11,7 +11,6 @@ namespace StellarWP\Shepherd\Tables;
 
 use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\Shepherd\Log;
-use StellarWP\DB\DB;
 use DateTime;
 use StellarWP\Schema\Columns\Created_At;
 use StellarWP\Schema\Columns\ID;
