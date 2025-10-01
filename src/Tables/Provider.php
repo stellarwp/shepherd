@@ -14,7 +14,6 @@ namespace StellarWP\Shepherd\Tables;
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Schema\Register;
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\DB\Database\Exceptions\DatabaseQueryException;
 use StellarWP\Shepherd\Config;
 

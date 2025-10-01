@@ -16,7 +16,6 @@ use StellarWP\Shepherd\Tables\Provider as Tables_Provider;
 use StellarWP\Schema\Config as Schema_Config;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Contracts\Logger;
-use StellarWP\Shepherd\Loggers\DB_Logger;
 use StellarWP\Shepherd\Tables\Task_Logs;
 use StellarWP\Shepherd\Tables\Tasks;
 use RuntimeException;
