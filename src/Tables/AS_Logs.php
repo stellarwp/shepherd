@@ -9,7 +9,7 @@
 
 namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Schema\Tables\Contracts\Table;
+use StellarWP\Shepherd\Abstracts\Table_Abstract;
 use StellarWP\Shepherd\Log;
 use StellarWP\Shepherd\Config;
 use DateTime;
@@ -26,11 +26,11 @@ use StellarWP\Schema\Tables\Table_Schema;
  * This is used only as an interface and should not be registered as a table for schema to handle.
  *
  * @since 0.0.1
- * @since 0.0.8 Updated to extend Table instead from the schema library.
+ * @since 0.0.8 Updated to be compatible with the updated contract.
  *
  * @package StellarWP\Shepherd\Tables;
  */
-class AS_Logs extends Table {
+class AS_Logs extends Table_Abstract {
 	/**
 	 * The base table name, without the table prefix.
 	 *
