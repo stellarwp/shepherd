@@ -8,6 +8,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Tasks\Herding;
 use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
+use StellarWP\Shepherd\Tests\Tasks\Do_Prefixed_Action_Task;
 use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
 
 class Regulator_Test extends WPTestCase {
@@ -149,5 +150,73 @@ class Regulator_Test extends WPTestCase {
 		$this->assertSame( 0, did_action( $test_task->get_task_name() ) );
 		$this->assertSame( 0, did_action( "shepherd_{$prefix}_dispatched_sync" ) );
 		$this->assertFalse( $sync_dispatch_fired, 'Synchronous dispatch should not occur when disabled by filter' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_default_sync_dispatch_filter_based_on_delay(): void {
+		$prefix = Config::get_hook_prefix();
+
+		$this->set_fn_return( 'did_action', function( $action ) use ( $prefix ) {
+			if ( $action === "shepherd_{$prefix}_tables_registered" ) {
+				return 0;
+			}
+
+			return did_action( $action );
+		}, true );
+
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$test_task1 = new Do_Prefixed_Action_Task( 'foo' );
+
+		$this->assertEquals( 0, did_action( $test_task1->get_task_name() ) );
+		$regulator->dispatch( $test_task1 );
+		$this->assertEquals( 1, did_action( $test_task1->get_task_name() ) );
+
+		$test_task2 = new Do_Prefixed_Action_Task( 'bar' );
+
+		$this->assertEquals( 0, did_action( $test_task2->get_task_name() ) );
+		$regulator->dispatch( $test_task2, 300 );
+		$this->assertEquals( 0, did_action( $test_task2->get_task_name() ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_schedule_cleanup_task_when_tables_not_registered(): void {
+		$prefix = Config::get_hook_prefix();
+
+		// Mock did_action to make it appear tables are not registered
+		$this->set_fn_return( 'did_action', function( $action ) use ( $prefix ) {
+			if ( $action === "shepherd_{$prefix}_tables_registered" ) {
+				return 0;
+			}
+
+			return did_action( $action );
+		}, true );
+
+		$current_count = did_action( 'shepherd_' . $prefix . '_cleanup_task_scheduled' );
+
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$regulator->schedule_cleanup_task();
+
+		$this->assertEquals( $current_count, did_action( 'shepherd_' . $prefix . '_cleanup_task_scheduled' ), 'Cleanup task should not be scheduled when tables are not registered' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_schedule_cleanup_task_when_tables_are_registered(): void {
+		$prefix = Config::get_hook_prefix();
+
+		$current_count = did_action( 'shepherd_' . $prefix . '_cleanup_task_scheduled' );
+
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$regulator->schedule_cleanup_task();
+
+		$this->assertEquals( $current_count + 1, did_action( 'shepherd_' . $prefix . '_cleanup_task_scheduled' ), 'Cleanup task should not be scheduled when tables are not registered' );
 	}
 }

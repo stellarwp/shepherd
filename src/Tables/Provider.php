@@ -54,7 +54,7 @@ class Provider extends Provider_Abstract {
 		try {
 			Register::table( Tasks::class );
 
-			if ( $this->container->get( Logger::class ) instanceof DB_Logger ) {
+			if ( $this->container->get( Logger::class )->uses_own_table() ) {
 				Register::table( Task_Logs::class );
 			}
 

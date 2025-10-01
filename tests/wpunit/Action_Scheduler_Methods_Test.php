@@ -4,6 +4,10 @@ declare( strict_types=1 );
 
 namespace StellarWP\Shepherd;
 
+use ActionScheduler_NullAction;
+use ActionScheduler_FinishedAction;
+use ActionScheduler_CanceledAction;
+use ActionScheduler_Action;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 
@@ -68,20 +72,87 @@ class Action_Scheduler_Methods_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_filter_out_null_actions_from_pending_actions() {
-		$finished_action = $this->createMock( \ActionScheduler_FinishedAction::class );
-		$null_action = $this->createMock( \ActionScheduler_NullAction::class );
-		$normal_action = $this->createMock( \ActionScheduler_Action::class );
+		$finished_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'finished' ], 'shepherd_test_group' );
+		\ActionScheduler::store()->mark_complete( $finished_id );
 
-		$this->set_class_fn_return(
-			Action_Scheduler_Methods::class,
-			'get_actions_by_ids',
-			[ 1 => $finished_action, 2 => $null_action, 3 => $normal_action ]
-		);
+		$pending_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'pending' ], 'shepherd_test_group' );
 
-		$pending = Action_Scheduler_Methods::get_pending_actions_by_ids( [ 1, 2, 3 ] );
+		$pending = Action_Scheduler_Methods::get_pending_actions_by_ids( [ $finished_id, $pending_id ] );
 
-		// Should only contain the normal action (not finished, not null)
 		$this->assertCount( 1, $pending );
-		$this->assertSame( $normal_action, reset( $pending ) );
+		$this->assertArrayHasKey( $pending_id, $pending );
+		$this->assertInstanceOf( \ActionScheduler_Action::class, $pending[ $pending_id ] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_get_non_pending_actions_by_ids() {
+		$finished_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'finished' ], 'shepherd_test_group' );
+		\ActionScheduler::store()->mark_complete( $finished_id );
+
+		$canceled_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'canceled' ], 'shepherd_test_group' );
+		\ActionScheduler::store()->cancel_action( $canceled_id );
+
+		$pending_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'pending' ], 'shepherd_test_group' );
+
+		$non_pending = Action_Scheduler_Methods::get_non_pending_actions_by_ids( [ $finished_id, $canceled_id, $pending_id ] );
+
+		$this->assertCount( 2, $non_pending );
+		$this->assertArrayHasKey( $finished_id, $non_pending );
+		$this->assertArrayHasKey( $canceled_id, $non_pending );
+		$this->assertArrayNotHasKey( $pending_id, $non_pending );
+		$this->assertInstanceOf( ActionScheduler_FinishedAction::class, $non_pending[ $finished_id ] );
+		$this->assertInstanceOf( ActionScheduler_CanceledAction::class, $non_pending[ $canceled_id ] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_get_pending_and_non_pending_actions_by_ids() {
+		$finished_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'finished' ], 'shepherd_test_group' );
+		\ActionScheduler::store()->mark_complete( $finished_id );
+
+		$canceled_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'canceled' ], 'shepherd_test_group' );
+		\ActionScheduler::store()->cancel_action( $canceled_id );
+
+		$pending_id = as_schedule_single_action( time() + 100, 'shepherd_test_hook', [ 'type' => 'pending' ], 'shepherd_test_group' );
+
+		[ $pending, $non_pending ] = Action_Scheduler_Methods::get_pending_and_non_pending_actions_by_ids( [ $finished_id, $canceled_id, $pending_id ] );
+
+		$this->assertCount( 1, $pending );
+		$this->assertArrayHasKey( $pending_id, $pending );
+		$this->assertInstanceOf( ActionScheduler_Action::class, $pending[ $pending_id ] );
+
+		$this->assertCount( 2, $non_pending );
+		$this->assertArrayHasKey( $finished_id, $non_pending );
+		$this->assertArrayHasKey( $canceled_id, $non_pending );
+		$this->assertInstanceOf( ActionScheduler_FinishedAction::class, $non_pending[ $finished_id ] );
+		$this->assertInstanceOf( ActionScheduler_CanceledAction::class, $non_pending[ $canceled_id ] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_handle_empty_action_ids() {
+		$pending = Action_Scheduler_Methods::get_pending_actions_by_ids( [ 1, 2, 3 ] );
+		$this->assertEmpty( $pending );
+
+		$non_pending = Action_Scheduler_Methods::get_non_pending_actions_by_ids( [ 1, 2, 3 ] );
+		$this->assertNotEmpty( $non_pending );
+
+		foreach ( $non_pending as $action ) {
+			$this->assertInstanceOf( ActionScheduler_NullAction::class, $action );
+		}
+
+		$this->assertCount( 3, $non_pending );
+
+		[ $pending, $non_pending ] = Action_Scheduler_Methods::get_pending_and_non_pending_actions_by_ids( [ 1, 2, 3 ] );
+		$this->assertEmpty( $pending );
+		$this->assertCount( 3, $non_pending );
+
+		foreach ( $non_pending as $action ) {
+			$this->assertInstanceOf( ActionScheduler_NullAction::class, $action );
+		}
 	}
 }

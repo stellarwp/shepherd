@@ -291,11 +291,11 @@ class Log extends Model_Abstract implements Log_Model {
 
 		$table = null;
 
-		if ( $logger instanceof ActionScheduler_DB_Logger ) {
+		if ( $logger->uses_as_table() ) {
 			$table = AS_Logs_Table::class;
 		}
 
-		if ( $logger instanceof DB_Logger ) {
+		if ( $logger->uses_own_table() ) {
 			$table = Task_Logs_Table::class;
 		}
 
