@@ -9,40 +9,26 @@
 
 namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\Shepherd\Contracts\Task;
+use StellarWP\Schema\Collections\Column_Collection;
+use StellarWP\Schema\Columns\ID;
+use StellarWP\Schema\Columns\Referenced_ID;
+use StellarWP\Schema\Columns\String_Column;
+use StellarWP\Schema\Columns\Text_Column;
+use StellarWP\Schema\Columns\Integer_Column;
+use StellarWP\Schema\Tables\Table_Schema;
 use InvalidArgumentException;
 
 /**
  * Tasks table schema.
  *
  * @since 0.0.1
+ * @since 0.0.8 Updated to extend Table instead from the schema library.
  *
  * @package StellarWP\Shepherd\Tables;
  */
 class Tasks extends Table {
-	/**
-	 * The indexes for the table.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var array<array<string, string>>
-	 */
-	public const INDEXES = [
-		[
-			'name'    => 'action_id',
-			'columns' => 'action_id',
-		],
-		[
-			'name'    => 'args_hash',
-			'columns' => 'args_hash',
-		],
-		[
-			'name'    => 'class_hash',
-			'columns' => 'class_hash',
-		],
-	];
-
 	/**
 	 * The schema version.
 	 *
@@ -91,54 +77,25 @@ class Tasks extends Table {
 	protected static $uid_column = 'id';
 
 	/**
-	 * An array of all the columns in the table.
+	 * Gets the schema history for the table.
 	 *
-	 * @since 0.0.1
+	 * @since 0.0.8
 	 *
-	 * @return array<string, array<string, bool|int|string>>
+	 * @return array<string, callable> The schema history for the table.
 	 */
-	public static function get_columns(): array {
+	public static function get_schema_history(): array {
+		$table_name = self::table_name( true );
 		return [
-			static::$uid_column => [
-				'type'           => self::COLUMN_TYPE_BIGINT,
-				'php_type'       => self::PHP_TYPE_INT,
-				'length'         => 20,
-				'unsigned'       => true,
-				'auto_increment' => true,
-				'nullable'       => false,
-			],
-			'action_id'         => [
-				'type'     => self::COLUMN_TYPE_BIGINT,
-				'php_type' => self::PHP_TYPE_INT,
-				'length'   => 20,
-				'unsigned' => true,
-				'nullable' => false,
-			],
-			'class_hash'        => [
-				'type'     => self::COLUMN_TYPE_VARCHAR,
-				'php_type' => self::PHP_TYPE_STRING,
-				'length'   => 191,
-				'nullable' => false,
-			],
-			'args_hash'         => [
-				'type'     => self::COLUMN_TYPE_VARCHAR,
-				'php_type' => self::PHP_TYPE_STRING,
-				'length'   => 191,
-				'nullable' => false,
-			],
-			'data'              => [
-				'type'     => self::COLUMN_TYPE_LONGTEXT,
-				'php_type' => self::PHP_TYPE_STRING,
-				'nullable' => true,
-			],
-			'current_try'       => [
-				'type'     => self::COLUMN_TYPE_BIGINT,
-				'php_type' => self::PHP_TYPE_INT,
-				'length'   => 20,
-				'unsigned' => true,
-				'nullable' => false,
-				'default'  => 0,
-			],
+			self::SCHEMA_VERSION => function () use ( $table_name ) {
+				$columns   = new Column_Collection();
+				$columns[] = new ID( 'id' );
+				$columns[] = new Referenced_ID( 'action_id' );
+				$columns[] = ( new String_Column( 'class_hash' ) )->set_length( 191 )->set_is_index( true );
+				$columns[] = ( new String_Column( 'args_hash' ) )->set_length( 191 )->set_is_index( true );
+				$columns[] = ( new Text_Column( 'data' ) )->set_nullable( true );
+				$columns[] = ( new Integer_Column( 'current_try' ) )->set_length( 20 )->set_signed( false )->set_default( 0 );
+				return new Table_Schema( $table_name, $columns );
+			},
 		];
 	}
 
@@ -183,7 +140,7 @@ class Tasks extends Table {
 	 *
 	 * @throws InvalidArgumentException If the task class does not exist or does not implement the Task interface.
 	 */
-	protected static function get_model_from_array( array $task_array ): Task {
+	public static function transform_from_array( array $task_array ): Task {
 		$task_data = json_decode( $task_array['data'] ?? '[]', true );
 
 		$task_class = $task_data['task_class'] ?? '';

@@ -9,11 +9,16 @@
 
 namespace StellarWP\Shepherd\Tables;
 
-use StellarWP\Shepherd\Abstracts\Table_Abstract as Table;
+use StellarWP\Schema\Tables\Contracts\Table;
 use StellarWP\Shepherd\Log;
 use StellarWP\Shepherd\Config;
-use StellarWP\DB\DB;
 use DateTime;
+use StellarWP\Schema\Collections\Column_Collection;
+use StellarWP\Schema\Columns\ID;
+use StellarWP\Schema\Columns\Referenced_ID;
+use StellarWP\Schema\Columns\String_Column;
+use StellarWP\Schema\Columns\Datetime_Column;
+use StellarWP\Schema\Tables\Table_Schema;
 
 /**
  * Action Scheduler logs table schema.
@@ -21,6 +26,7 @@ use DateTime;
  * This is used only as an interface and should not be registered as a table for schema to handle.
  *
  * @since 0.0.1
+ * @since 0.0.8 Updated to extend Table instead from the schema library.
  *
  * @package StellarWP\Shepherd\Tables;
  */
@@ -44,46 +50,35 @@ class AS_Logs extends Table {
 	protected static $uid_column = 'log_id';
 
 	/**
-	 * An array of all the columns in the table.
+	 * The version number for this schema definition.
 	 *
-	 * @since 0.0.1
+	 * @since 0.0.8
 	 *
-	 * @return array<string, array<string, bool|int|string>>
+	 * @var string
 	 */
-	public static function get_columns(): array {
+	const SCHEMA_VERSION = '0.0.1';
+
+	/**
+	 * Gets the schema history for the table.
+	 *
+	 * @since 0.0.8
+	 *
+	 * @return array<string, callable> The schema history for the table.
+	 */
+	public static function get_schema_history(): array {
+		$table_name = self::table_name( true );
+
 		return [
-			static::$uid_column => [
-				'type'           => self::COLUMN_TYPE_BIGINT,
-				'php_type'       => self::PHP_TYPE_INT,
-				'length'         => 20,
-				'unsigned'       => true,
-				'auto_increment' => true,
-				'nullable'       => false,
-			],
-			'action_id'         => [
-				'type'     => self::COLUMN_TYPE_BIGINT,
-				'php_type' => self::PHP_TYPE_INT,
-				'length'   => 20,
-				'unsigned' => true,
-				'nullable' => false,
-			],
-			'message'           => [
-				'type'     => self::COLUMN_TYPE_TEXT,
-				'php_type' => self::PHP_TYPE_STRING,
-				'nullable' => false,
-			],
-			'log_date_gmt'      => [
-				'type'     => self::COLUMN_TYPE_TIMESTAMP,
-				'php_type' => self::PHP_TYPE_DATETIME,
-				'nullable' => true,
-				'default'  => '0000-00-00 00:00:00',
-			],
-			'log_date_local'    => [
-				'type'     => self::COLUMN_TYPE_TIMESTAMP,
-				'php_type' => self::PHP_TYPE_DATETIME,
-				'nullable' => true,
-				'default'  => '0000-00-00 00:00:00',
-			],
+			self::SCHEMA_VERSION => function () use ( $table_name ) {
+				$columns   = new Column_Collection();
+				$columns[] = new ID( 'log_id' );
+				$columns[] = new Referenced_ID( 'action_id' );
+				$columns[] = new String_Column( 'message' );
+				$columns[] = ( new Datetime_Column( 'log_date_gmt' ) )->set_nullable( true );
+				$columns[] = ( new Datetime_Column( 'log_date_local' ) )->set_nullable( true );
+
+				return new Table_Schema( $table_name, $columns );
+			},
 		];
 	}
 
@@ -91,18 +86,14 @@ class AS_Logs extends Table {
 	 * Gets the logs by task ID.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Updated to use the new get_all_by method.
 	 *
 	 * @param int $task_id The task ID.
+	 *
 	 * @return Log[] The logs for the task.
 	 */
 	public static function get_by_task_id( int $task_id ): array {
-		$results = [];
-
-		foreach ( self::fetch_all_where( DB::prepare( 'WHERE message LIKE %s', 'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%' ), 50, ARRAY_A, 'log_date_gmt ASC' ) as $log_array ) {
-			$results[] = self::get_model_from_array( $log_array );
-		}
-
-		return $results;
+		return self::get_all_by( 'message', 'shepherd_' . Config::get_hook_prefix() . '||' . $task_id . '||%', 'LIKE', 1000 );
 	}
 
 	/**
@@ -114,7 +105,7 @@ class AS_Logs extends Table {
 	 *
 	 * @return Log The log.
 	 */
-	protected static function get_model_from_array( array $model_array ): Log {
+	public static function transform_from_array( array $model_array ): Log {
 		$log = new Log();
 		$log->set_id( $model_array['log_id'] );
 		$log->set_action_id( $model_array['action_id'] );

@@ -18,7 +18,7 @@ use StellarWP\Shepherd\Tables\AS_Logs as AS_Logs_Table;
 use StellarWP\Shepherd\Contracts\Logger;
 use StellarWP\Shepherd\Abstracts\Model_Abstract;
 use DateTimeInterface;
-use StellarWP\Shepherd\Abstracts\Table_Abstract;
+use StellarWP\Schema\Tables\Contracts\Table_Interface;
 use Psr\Log\LogLevel;
 use InvalidArgumentException;
 use DateTime;
@@ -279,12 +279,13 @@ class Log extends Model_Abstract implements Log_Model {
 	 * Gets the table interface for the log.
 	 *
 	 * @since 0.0.1
+	 * @since 0.0.8 Updated to return Table_Interface instead.
 	 *
-	 * @return Table_Abstract The table interface.
+	 * @return Table_Interface The table interface.
 	 *
 	 * @throws RuntimeException If the log table interface is invalid.
 	 */
-	public function get_table_interface(): Table_Abstract {
+	public function get_table_interface(): Table_Interface {
 		$logger = Config::get_container()->get( Logger::class );
 
 		$table = null;
