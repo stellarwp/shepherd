@@ -22,7 +22,7 @@ class Task_Test extends WPTestCase {
 
 			public function get_table_interface(): Table_Abstract {
 				return new class() extends Table_Abstract {
-					public static function get_columns(): array {
+					public static function get_schema_history(): array {
 						return [];
 					}
 				};

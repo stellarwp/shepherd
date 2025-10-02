@@ -24,6 +24,8 @@ parameters:
 		- %currentWorkingDirectory%/src
 
 	ignoreErrors:
+		- '#Cannot assign new offset to.*Column_Collection#'
+		- '#StellarWP\\Schema\\Collections\\Column_Collection does not accept StellarWP\\Schema\\Columns\\Contracts\\#'
 		# Uses func_get_args()
 		- '#^Function add_query_arg invoked with [123] parameters?, 0 required\.$#'
 		# Uses func_get_args()

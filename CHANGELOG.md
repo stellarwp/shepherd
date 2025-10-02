@@ -2,8 +2,9 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
-## [0.0.8] 2025-09-30
+## [0.0.8] 2025-10-02
 
+* Feature - Update the stellarwp/schema library to v3.
 * Fix - Only delete task logs from the Task_Logs table when using DB_Logger in Provider::delete_tasks_on_action_deletion.
 * Fix - Schedule cleanup task only when Shepherd tables have been registered successfully.
 * Tweak - Update synchronous dispatch filter to default based on delay (true for no delay, false for delayed tasks).

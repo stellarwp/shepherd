@@ -9,20 +9,33 @@ use StellarWP\Shepherd\Config;
 use StellarWP\Shepherd\Contracts\Model;
 use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 use StellarWP\DB\DB;
+use StellarWP\Schema\Collections\Column_Collection;
+use StellarWP\Schema\Columns\ID;
+use StellarWP\Schema\Columns\String_Column;
+use StellarWP\Schema\Tables\Table_Schema;
 
 class Dummy_Table extends Table_Abstract {
 	protected static $base_table_name = 'pi_%s_dummy_table';
 	protected static $schema_slug = 'shepherd-%s-dummy-table';
 	protected static $uid_column = 'id';
 
-	public static function get_columns(): array {
+	const SCHEMA_VERSION = '0.0.1-test';
+
+	public static function get_schema_history(): array {
+		$table_name = static::table_name( true );
+
 		return [
-			'id'   => [ 'type' => self::COLUMN_TYPE_BIGINT, 'length' => 20, 'unsigned' => true, 'auto_increment' => true ],
-			'name' => [ 'type' => self::COLUMN_TYPE_VARCHAR, 'length' => 255 ],
+			static::SCHEMA_VERSION => function() use ( $table_name ) {
+				$columns = new Column_Collection();
+				$columns[] = new ID( 'id' );
+				$columns[] = new String_Column( 'name' );
+				return new Table_Schema( $table_name, $columns );
+			},
 		];
 	}
 
-	protected static function get_model_from_array( array $model_array ): Model {
+	public static function transform_from_array( array $model_array ) {
+		return $model_array;
 	}
 }
 
@@ -59,14 +72,14 @@ class Table_Abstract_Test extends WPTestCase {
 		$this->assertStringContainsString( 'CREATE TABLE `wp_pi_tes_dummy_table`', $definition );
 		$this->assertStringContainsString( '`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT', $definition );
 		$this->assertStringContainsString( '`name` varchar(255) NOT NULL', $definition );
-		$this->assertStringContainsString( 'PRIMARY KEY (`id`)', $definition );
+		$this->assertStringContainsString( 'PRIMARY KEY (id)', $definition );
 	}
 
 	/**
 	 * @test
 	 */
 	public function it_should_return_empty_searchable_columns() {
-		$this->assertEquals( [], Dummy_Table::get_searchable_columns() );
+		$this->assertEquals( [], Dummy_Table::get_searchable_columns()->get_names() );
 	}
 
 	/**
