@@ -66,7 +66,7 @@ class AS_Logs extends Table_Abstract {
 	 */
 	public static function get_schema_history(): array {
 		return [
-			self::SCHEMA_VERSION => [ __CLASS__, 'get_schema_version_0_0_1' ],
+			self::SCHEMA_VERSION => [ self::class, 'get_schema_version_0_0_1' ],
 		];
 	}
 
