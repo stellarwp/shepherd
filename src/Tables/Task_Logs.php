@@ -83,21 +83,29 @@ class Task_Logs extends Table_Abstract {
 	 * @return array<string, callable> The schema history for the table.
 	 */
 	public static function get_schema_history(): array {
-		$table_name = self::table_name( true );
 		return [
-			self::SCHEMA_VERSION => function () use ( $table_name ) {
-				$columns   = new Column_Collection();
-				$columns[] = new ID( 'id' );
-				$columns[] = new Referenced_ID( 'task_id' );
-				$columns[] = new Referenced_ID( 'action_id' );
-				$columns[] = new Created_At( 'date' );
-				$columns[] = ( new String_Column( 'level' ) )->set_length( 191 )->set_is_index( true );
-				$columns[] = ( new String_Column( 'type' ) )->set_length( 191 )->set_is_index( true );
-				$columns[] = ( new Text_Column( 'entry' ) )->set_type( Column_Types::LONGTEXT );
-
-				return new Table_Schema( $table_name, $columns );
-			},
+			self::SCHEMA_VERSION => [ __CLASS__, 'get_schema_version_0_0_3' ],
 		];
+	}
+
+	/**
+	 * Gets the schema for version 0.0.3.
+	 *
+	 * @since 0.0.8
+	 *
+	 * @return Table_Schema The schema for version 0.0.3.
+	 */
+	public static function get_schema_version_0_0_3(): Table_Schema {
+		$columns   = new Column_Collection();
+		$columns[] = new ID( 'id' );
+		$columns[] = new Referenced_ID( 'task_id' );
+		$columns[] = new Referenced_ID( 'action_id' );
+		$columns[] = new Created_At( 'date' );
+		$columns[] = ( new String_Column( 'level' ) )->set_length( 191 )->set_is_index( true );
+		$columns[] = ( new String_Column( 'type' ) )->set_length( 191 )->set_is_index( true );
+		$columns[] = ( new Text_Column( 'entry' ) )->set_type( Column_Types::LONGTEXT );
+
+		return new Table_Schema( self::table_name( true ), $columns );
 	}
 
 	/**

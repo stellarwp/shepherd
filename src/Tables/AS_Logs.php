@@ -65,20 +65,26 @@ class AS_Logs extends Table_Abstract {
 	 * @return array<string, callable> The schema history for the table.
 	 */
 	public static function get_schema_history(): array {
-		$table_name = self::table_name( true );
-
 		return [
-			self::SCHEMA_VERSION => function () use ( $table_name ) {
-				$columns   = new Column_Collection();
-				$columns[] = new ID( 'log_id' );
-				$columns[] = new Referenced_ID( 'action_id' );
-				$columns[] = new String_Column( 'message' );
-				$columns[] = ( new Datetime_Column( 'log_date_gmt' ) )->set_nullable( true );
-				$columns[] = ( new Datetime_Column( 'log_date_local' ) )->set_nullable( true );
-
-				return new Table_Schema( $table_name, $columns );
-			},
+			self::SCHEMA_VERSION => [ __CLASS__, 'get_schema_version_0_0_1' ],
 		];
+	}
+
+	/**
+	 * Gets the schema for version 0.0.1.
+	 *
+	 * @since 0.0.8
+	 *
+	 * @return Table_Schema The schema for version 0.0.1.
+	 */
+	public static function get_schema_version_0_0_1(): Table_Schema {
+		$columns   = new Column_Collection();
+		$columns[] = new ID( 'log_id' );
+		$columns[] = new Referenced_ID( 'action_id' );
+		$columns[] = new String_Column( 'message' );
+		$columns[] = ( new Datetime_Column( 'log_date_gmt' ) )->set_nullable( true );
+		$columns[] = ( new Datetime_Column( 'log_date_local' ) )->set_nullable( true );
+		return new Table_Schema( self::table_name( true ), $columns );
 	}
 
 	/**
