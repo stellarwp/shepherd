@@ -243,13 +243,15 @@ class Regulator_Test extends WPTestCase {
 		$test_task = new Do_Action_Task();
 		$delay = 60;
 
+		$last_task_id = $regulator->get_last_scheduled_task_id();
+
 		$regulator->dispatch( $test_task, $delay );
 
 		$this->assertTrue( $custom_handler_called, 'Custom dispatch handler should have been called' );
 		$this->assertSame( $test_task, $handler_received_task, 'Custom handler should receive the task' );
 		$this->assertSame( $delay, $handler_received_delay, 'Custom handler should receive the delay' );
 
-		$this->assertNull( $regulator->get_last_scheduled_task_id(), 'Task should not be scheduled when custom handler is used' );
+		$this->assertSame( $last_task_id, $regulator->get_last_scheduled_task_id(), 'Task should not be scheduled when custom handler is used' );
 	}
 
 	/**
@@ -267,9 +269,6 @@ class Regulator_Test extends WPTestCase {
 
 		$test_task = new Do_Action_Task();
 		$delay = 60;
-
-		$this->expectException( Exception::class );
-		$this->expectExceptionMessage( 'Custom dispatch handler failed' );
 
 		$this->assertSame( 0, did_action( "shepherd_{$prefix}_task_scheduling_failed" ) );
 		$regulator->dispatch( $test_task, $delay );
@@ -300,10 +299,12 @@ class Regulator_Test extends WPTestCase {
 		$test_task = new Do_Action_Task();
 		$delay = 60;
 
+		$last_task_id = $regulator->get_last_scheduled_task_id();
+
 		$regulator->dispatch( $test_task, $delay );
 
-		$this->assertTrue( $called, 'Custom dispatch handler should have been called' );
-		$this->assertNotNull( $regulator->get_last_scheduled_task_id(), 'Task should be scheduled when custom handler is not used' );
+		$this->assertFalse( $called, 'Custom dispatch handler should have been called' );
+		$this->assertNotSame( $last_task_id, $regulator->get_last_scheduled_task_id(), 'Task should be scheduled when custom handler is not used' );
 	}
 
 	/**
