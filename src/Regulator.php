@@ -164,7 +164,15 @@ class Regulator extends Provider_Abstract {
 		 */
 		$handler = apply_filters( "shepherd_{$prefix}_dispatch_handler", null, $task, $delay );
 		if ( null !== $handler && is_callable( $handler ) ) {
-			$handler( $task, $delay );
+			try {
+				$handler( $task, $delay );
+			} catch ( Exception $e ) {
+				/**
+				 * Documented in the dispatch_callback method.
+				 */
+				do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_scheduling_failed', $task, new RuntimeException( $e->getMessage(), $e->getCode(), $e ) );
+			}
+
 			return $this;
 		}
 

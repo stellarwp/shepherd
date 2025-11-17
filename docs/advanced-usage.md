@@ -138,14 +138,14 @@ add_filter( "shepherd_{$prefix}_should_dispatch_sync_on_tables_unavailable", fun
     // Default behavior (since 0.0.8):
     // - Returns true when delay is 0 (immediate execution)
     // - Returns false when delay > 0 (skip execution)
-    
+
     // Override examples:
     // Always process synchronously regardless of delay
     return true;
-    
+
     // Never process synchronously
     // return false;
-    
+
     // Custom logic based on task type
     // return $task instanceof Critical_Task;
 }, 10, 2 );
@@ -370,6 +370,31 @@ The task tables include indexes on:
 - **Batch Operations**: Cleanup operations use batch deletions for efficiency
 - **Indexed Queries**: All cleanup queries use indexed columns for optimal performance
 - **Minimal Overhead**: Action deletion hooks add minimal overhead to Action Scheduler operations
+
+## Custom Dispatch Handlers
+
+**Since 0.0.9**, you can completely override Shepherd's default dispatch behavior by providing a custom handler via a filter. This is useful for advanced scenarios where you need full control over how tasks are dispatched.
+
+### Basic Usage
+
+```php
+$prefix = Config::get_hook_prefix();
+
+add_filter( "shepherd_{$prefix}_dispatch_handler", function( $handler, $task, $delay ) {
+    // Return a callable that will handle the dispatch
+    return function( $task, $delay ) {
+        // Your custom dispatch logic
+        my_custom_task_queue()->add( $task, $delay );
+    };
+}, 10, 3 );
+```
+
+### Important Notes
+
+- **Return null to use default handler**: If you return `null` or a non-callable value, Shepherd will use its default dispatch logic
+- **Handler signature**: Your custom handler must accept two parameters: `$task` (Task instance) and `$delay` (integer)
+- **Complete override**: When you provide a custom handler, Shepherd's default dispatch logic (including Action Scheduler integration) is completely bypassed
+- **Responsibility**: Your custom handler is responsible for all aspects of task execution, including scheduling, retries, and logging
 
 ## Advanced Integration
 
