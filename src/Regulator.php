@@ -143,6 +143,7 @@ class Regulator extends Provider_Abstract {
 	 * @since 0.0.7 Updated to check if the Shepherd tables have been registered already.
 	 * @since 0.0.7 Updated to use the `action_scheduler_init` hook instead of the `init` hook to check if Action Scheduler is initialized.
 	 * @since 0.0.8 Updated to use the delay to determine if the task should be dispatched synchronously.
+	 * @since 0.0.9 Added a filter `shepherd_{prefix}_dispatch_handler` to allow for custom dispatch handlers.
 	 *
 	 * @param Task $task  The task to dispatch.
 	 * @param int  $delay The delay in seconds before the task is processed.
@@ -151,6 +152,29 @@ class Regulator extends Provider_Abstract {
 	 */
 	public function dispatch( Task $task, int $delay = 0 ): self {
 		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filters the dispatch handler.
+		 *
+		 * @since TBD
+		 *
+		 * @param callable|null $handler The dispatch handler.
+		 * @param Task          $task    The task to dispatch.
+		 * @param int           $delay   The delay in seconds before the task is processed.
+		 */
+		$handler = apply_filters( "shepherd_{$prefix}_dispatch_handler", null, $task, $delay );
+		if ( null !== $handler && is_callable( $handler ) ) {
+			try {
+				$handler( $task, $delay );
+			} catch ( Exception $e ) {
+				/**
+				 * Documented in the dispatch_callback method.
+				 */
+				do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_scheduling_failed', $task, new RuntimeException( $e->getMessage(), $e->getCode(), $e ) );
+			}
+
+			return $this;
+		}
 
 		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
 			/**

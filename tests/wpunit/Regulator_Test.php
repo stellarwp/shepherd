@@ -10,6 +10,7 @@ use StellarWP\Shepherd\Tests\Traits\With_Uopz;
 use StellarWP\Shepherd\Tests\Tasks\Do_Action_Task;
 use StellarWP\Shepherd\Tests\Tasks\Do_Prefixed_Action_Task;
 use StellarWP\Shepherd\Tests\Traits\With_AS_Assertions;
+use Exception;
 
 class Regulator_Test extends WPTestCase {
 	use With_Uopz;
@@ -218,5 +219,112 @@ class Regulator_Test extends WPTestCase {
 		$regulator->schedule_cleanup_task();
 
 		$this->assertEquals( $current_count + 1, did_action( 'shepherd_' . $prefix . '_cleanup_task_scheduled' ), 'Cleanup task should not be scheduled when tables are not registered' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_use_custom_dispatch_handler_when_provided_via_filter(): void {
+		$prefix = Config::get_hook_prefix();
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$custom_handler_called = false;
+		$handler_received_task = null;
+		$handler_received_delay = null;
+
+		add_filter( "shepherd_{$prefix}_dispatch_handler", function( $handler, $task, $delay ) use ( &$custom_handler_called, &$handler_received_task, &$handler_received_delay ) {
+			return function( $task, $delay ) use ( &$custom_handler_called, &$handler_received_task, &$handler_received_delay ) {
+				$custom_handler_called = true;
+				$handler_received_task = $task;
+				$handler_received_delay = $delay;
+			};
+		}, 10, 3 );
+
+		$test_task = new Do_Action_Task();
+		$delay = 60;
+
+		$last_task_id = $regulator->get_last_scheduled_task_id();
+
+		$regulator->dispatch( $test_task, $delay );
+
+		$this->assertTrue( $custom_handler_called, 'Custom dispatch handler should have been called' );
+		$this->assertSame( $test_task, $handler_received_task, 'Custom handler should receive the task' );
+		$this->assertSame( $delay, $handler_received_delay, 'Custom handler should receive the delay' );
+
+		$this->assertSame( $last_task_id, $regulator->get_last_scheduled_task_id(), 'Task should not be scheduled when custom handler is used' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_fire_fail_action_when_throwing_exception_in_custom_dispatch_handler(): void {
+		$prefix = Config::get_hook_prefix();
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		add_filter( "shepherd_{$prefix}_dispatch_handler", function( $handler, $task, $delay ) {
+			return function( $task, $delay ) {
+				throw new Exception( 'Custom dispatch handler failed' );
+			};
+		}, 10, 3 );
+
+		$test_task = new Do_Action_Task();
+		$delay = 60;
+
+		$this->assertSame( 0, did_action( "shepherd_{$prefix}_task_scheduling_failed" ) );
+		$regulator->dispatch( $test_task, $delay );
+		$this->assertTrue( 0 < did_action( "shepherd_{$prefix}_task_scheduling_failed" ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_do_default_when_returning_null(): void {
+		$prefix = Config::get_hook_prefix();
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$called = false;
+
+		// Add a custom dispatch handler via filter
+		add_filter( "shepherd_{$prefix}_dispatch_handler", function( $handler, $task, $delay ) use ( &$called ) {
+			return function( $task, $delay ) use ( &$called ) {
+				$called = true;
+			};
+		}, 10, 3 );
+
+		// Add a custom dispatch handler via filter
+		add_filter( "shepherd_{$prefix}_dispatch_handler", function( $handler, $task, $delay ) {
+			return null;
+		}, 10, 3 );
+
+		$test_task = new Do_Action_Task();
+		$delay = 60;
+
+		$last_task_id = $regulator->get_last_scheduled_task_id();
+
+		$regulator->dispatch( $test_task, $delay );
+
+		$this->assertFalse( $called, 'Custom dispatch handler should have been called' );
+		$this->assertNotSame( $last_task_id, $regulator->get_last_scheduled_task_id(), 'Task should be scheduled when custom handler is not used' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_do_default_when_returning_non_callable(): void {
+		$prefix = Config::get_hook_prefix();
+		$regulator = Config::get_container()->get( Regulator::class );
+
+
+		// Add a custom dispatch handler via filter
+		add_filter( "shepherd_{$prefix}_dispatch_handler", function( $handler, $task, $delay ) {
+			return 'not a callable';
+		}, 10, 3 );
+
+		$test_task = new Do_Action_Task();
+		$delay = 60;
+
+		$regulator->dispatch( $test_task, $delay );
+
+		$this->assertNotNull( $regulator->get_last_scheduled_task_id(), 'Task should be scheduled when custom handler is not callable' );
 	}
 }

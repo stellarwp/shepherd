@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
+## [0.0.9] 2025-11-17
+
+* Tweak - Add a filter `shepherd_{prefix}_dispatch_handler` to allow for custom dispatch handlers.
+
+[0.0.9]: https://github.com/stellarwp/shepherd/releases/tag/0.0.9
+
 ## [0.0.8] 2025-10-02
 
 * Feature - Update the stellarwp/schema library to v3.
