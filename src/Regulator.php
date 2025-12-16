@@ -25,6 +25,7 @@ use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Shepherd\Traits\Loggable;
 use StellarWP\Shepherd\Tasks\Herding;
 use ActionScheduler_QueueRunner;
+use WP_Object_Cache;
 
 /**
  * Shepherd's regulator.
@@ -408,7 +409,7 @@ class Regulator extends Provider_Abstract {
 		try {
 			$runner = ActionScheduler_QueueRunner::instance();
 
-			foreach ( $tasks as $task ) {
+			foreach ( array_values( $tasks ) as $offset => $task ) {
 				if ( ! in_array( $task->get_id(), $scheduled_task_ids, true ) ) {
 					$this->dispatch_callback( $task, 0 );
 				}
@@ -440,6 +441,11 @@ class Regulator extends Provider_Abstract {
 				 * @param Task $task The task that is finished running.
 				 */
 				do_action( "shepherd_{$prefix}_task_after_run", $task );
+
+				// Free memory every 10 tasks to avoid memory issues.
+				if ( 0 === $offset % 10 ) {
+					$this->free_memory();
+				}
 			}
 		} catch ( Exception $e ) {
 			// The process_task method already catches and handles all the exceptions before throwing them again.
@@ -696,5 +702,46 @@ class Regulator extends Provider_Abstract {
 		 * @since 0.0.8
 		 */
 		do_action( 'shepherd_' . Config::get_hook_prefix() . '_cleanup_task_scheduled' );
+	}
+
+	/**
+	 * Reduce memory footprint by clearing the database query and object caches.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	private function free_memory(): void {
+		/**
+		 * Globals.
+		 *
+		 * @var $wpdb            \wpdb
+		 * @var $wp_object_cache \WP_Object_Cache
+		 */
+		global $wpdb, $wp_object_cache;
+
+		$wpdb->queries = array();
+
+		if ( ! $wp_object_cache instanceof WP_Object_Cache ) {
+			return;
+		}
+
+		// Not all drop-ins support these props, however, there may be existing installations that rely on these being cleared.
+		if ( property_exists( $wp_object_cache, 'group_ops' ) ) {
+			$wp_object_cache->group_ops = array();
+		}
+		if ( property_exists( $wp_object_cache, 'stats' ) ) {
+			$wp_object_cache->stats = array();
+		}
+		if ( property_exists( $wp_object_cache, 'memcache_debug' ) ) {
+			$wp_object_cache->memcache_debug = array();
+		}
+		if ( property_exists( $wp_object_cache, 'cache' ) ) {
+			$wp_object_cache->cache = array();
+		}
+
+		if ( is_callable( array( $wp_object_cache, '__remoteset' ) ) ) {
+			call_user_func( array( $wp_object_cache, '__remoteset' ) ); // important!
+		}
 	}
 }
