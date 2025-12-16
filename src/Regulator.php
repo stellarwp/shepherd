@@ -384,14 +384,14 @@ class Regulator extends Provider_Abstract {
 	private function run_callback( array $tasks, array $callables = [] ): void {
 		$scheduled_task_ids = array_map( fn( Task $task ) => $task->get_id(), $this->scheduled_tasks );
 
-		/** @var array{before: void function ( Task $task ), after: void function ( Task $task ), on_error: void function ( ?Task $task, Exception $e ), always: void function ( Task $task )} $callables */
+		/** @var array{before: callable( Task $task ): void, after: callable( Task $task ): void, on_error: callable( ?Task $task, Exception $e ): void, always: callable( list<Task> $tasks ): void} $callables */
 		$callables = wp_parse_args(
 			$callables,
 			[
-				'before'   => function ( Task $task ): void {},
-				'after'    => function ( Task $task ): void {},
-				'on_error' => function ( Task $task, Exception $e ): void {},
-				'always'   => function ( Task $task ): void {},
+				'before'   => static function ( Task $task ): void {},
+				'after'    => static function ( Task $task ): void {},
+				'on_error' => static function ( Task $task, Exception $e ): void {},
+				'always'   => static function ( array $tasks ): void {},
 			]
 		);
 
@@ -716,8 +716,8 @@ class Regulator extends Provider_Abstract {
 		/**
 		 * Globals.
 		 *
-		 * @var $wpdb            \wpdb
-		 * @var $wp_object_cache \WP_Object_Cache
+		 * @var \wpdb           $wpdb
+		 * @var WP_Object_Cache $wp_object_cache
 		 */
 		global $wpdb, $wp_object_cache;
 
