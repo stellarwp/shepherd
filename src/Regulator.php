@@ -332,12 +332,8 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param Task[] $tasks The tasks to run.
+	 * @param Task[] $tasks     The tasks to run.
 	 * @param array  $callables The callables to run.
-	 *   'before'   => function ( Task $task ): void {},
-	 *   'after'    => function ( Task $task ): void {},
-	 *   'on_error' => function ( ?Task $task, Exception $e ): void {},
-	 *   'always'   => function ( Task $task ): void {},
 	 *
 	 * @return void
 	 */
@@ -380,18 +376,15 @@ class Regulator extends Provider_Abstract {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param Task[] $tasks The tasks to run.
+	 * @param Task[] $tasks     The tasks to run.
 	 * @param array  $callables The callables to run.
-	 *   'before'   => function ( Task $task ): void {},
-	 *   'after'    => function ( Task $task ): void {},
-	 *   'on_error' => function ( ?Task $task, Exception $e ): void {},
-	 *   'always'   => function ( Task $task ): void {},
 	 *
 	 * @return void
 	 */
 	private function run_callback( array $tasks, array $callables = [] ): void {
 		$scheduled_task_ids = array_map( fn( Task $task ) => $task->get_id(), $this->scheduled_tasks );
 
+		/** @var array{before: void function ( Task $task ), after: void function ( Task $task ), on_error: void function ( ?Task $task, Exception $e ), always: void function ( Task $task )} $callables */
 		$callables = wp_parse_args(
 			$callables,
 			[
