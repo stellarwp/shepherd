@@ -24,6 +24,7 @@ use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Shepherd\Traits\Loggable;
 use StellarWP\Shepherd\Tasks\Herding;
+use ActionScheduler_QueueRunner;
 
 /**
  * Shepherd's regulator.
@@ -323,6 +324,152 @@ class Regulator extends Provider_Abstract {
 			 */
 			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_already_scheduled', $task );
 		}
+	}
+
+	/**
+	 * Run a set of tasks.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param Task[] $tasks The tasks to run.
+	 * @param array  $callables The callables to run.
+	 *   'before'   => function ( Task $task ): void {},
+	 *   'after'    => function ( Task $task ): void {},
+	 *   'on_error' => function ( ?Task $task, Exception $e ): void {},
+	 *   'always'   => function ( Task $task ): void {},
+	 *
+	 * @return void
+	 */
+	public function run( array $tasks, array $callables = [] ): void {
+		$prefix = Config::get_hook_prefix();
+
+		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
+			foreach ( $tasks as $task ) {
+				$task->process();
+
+				/**
+				 * Fires an action when a task is run synchronously.
+				 *
+				 * @since 0.1.0
+				 *
+				 * @param Task $task The task that was dispatched synchronously.
+				 */
+				do_action( "shepherd_{$prefix}_task_run_sync", $task );
+			}
+
+			return;
+		}
+
+		if ( did_action( 'action_scheduler_init' ) || doing_action( 'action_scheduler_init' ) ) {
+			$this->run_callback( $tasks, $callables );
+			return;
+		}
+
+		add_action(
+			'action_scheduler_init',
+			function () use ( $tasks, $callables ): void {
+				$this->run_callback( $tasks, $callables );
+			},
+			10
+		);
+	}
+
+	/**
+	 * Runs a set of tasks.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param Task[] $tasks The tasks to run.
+	 * @param array  $callables The callables to run.
+	 *   'before'   => function ( Task $task ): void {},
+	 *   'after'    => function ( Task $task ): void {},
+	 *   'on_error' => function ( ?Task $task, Exception $e ): void {},
+	 *   'always'   => function ( Task $task ): void {},
+	 *
+	 * @return void
+	 */
+	private function run_callback( array $tasks, array $callables = [] ): void {
+		$scheduled_task_ids = array_map( fn( Task $task ) => $task->get_id(), $this->scheduled_tasks );
+
+		$callables = wp_parse_args(
+			$callables,
+			[
+				'before'   => function ( Task $task ): void {},
+				'after'    => function ( Task $task ): void {},
+				'on_error' => function ( Task $task, Exception $e ): void {},
+				'always'   => function ( Task $task ): void {},
+			]
+		);
+
+		$context = defined( 'WP_CLI' ) && WP_CLI ? ' CLI' : '';
+		$context = ! $context && defined( 'REST_REQUEST' ) && REST_REQUEST ? ' REST' : $context;
+		$prefix  = Config::get_hook_prefix();
+
+		try {
+			$runner = ActionScheduler_QueueRunner::instance();
+
+			foreach ( $tasks as $task ) {
+				if ( ! in_array( $task->get_id(), $scheduled_task_ids, true ) ) {
+					$this->dispatch_callback( $task, 0 );
+				}
+
+				if ( is_callable( $callables['before'] ) ) {
+					$callables['before']( $task );
+				}
+
+				/**
+				 * Fires when a task is about to be run.
+				 *
+				 * @since 0.1.0
+				 *
+				 * @param Task $task The task that is about to be run.
+				 */
+				do_action( "shepherd_{$prefix}_task_before_run", $task );
+
+				$runner->process_action( $task->get_action_id(), "Shepherd{$context}" );
+
+				if ( is_callable( $callables['after'] ) ) {
+					$callables['after']( $task );
+				}
+
+				/**
+				 * Fires when a task is finished running.
+				 *
+				 * @since 0.1.0
+				 *
+				 * @param Task $task The task that is finished running.
+				 */
+				do_action( "shepherd_{$prefix}_task_after_run", $task );
+			}
+		} catch ( Exception $e ) {
+			// The process_task method already catches and handles all the exceptions before throwing them again.
+			if ( is_callable( $callables['on_error'] ) ) {
+				$callables['on_error']( isset( $task ) ? $task : null, $e );
+			}
+
+			/**
+			 * Fires when a set of tasks fails to be run.
+			 *
+			 * @since 0.1.0
+			 *
+			 * @param ?Task     $task The task that failed to run.
+			 * @param Exception $e    The exception that was thrown.
+			 */
+			do_action( "shepherd_{$prefix}_tasks_run_failed", isset( $task ) ? $task : null, $e );
+		}
+
+		if ( is_callable( $callables['always'] ) ) {
+			$callables['always']( $tasks );
+		}
+
+		/**
+		 * Fires when a set of tasks is finished running.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param Task[] $tasks The tasks that were run.
+		 */
+		do_action( "shepherd_{$prefix}_tasks_finished", $tasks );
 	}
 
 	/**
