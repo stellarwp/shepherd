@@ -409,6 +409,15 @@ class Regulator extends Provider_Abstract {
 		try {
 			$runner = ActionScheduler_QueueRunner::instance();
 
+			/**
+			 * Filters the number of tasks to clean up after.
+			 *
+			 * @since 0.1.0
+			 *
+			 * @param int $clean_up_memory_every The number of tasks to clean up the memory after.
+			 */
+			$clean_up_memory_every = apply_filters( "shepherd_{$prefix}_clean_up_memory_every", 10 );
+
 			foreach ( array_values( $tasks ) as $offset => $task ) {
 				if ( ! in_array( $task->get_id(), $scheduled_task_ids, true ) ) {
 					$this->dispatch_callback( $task, 0 );
@@ -442,8 +451,7 @@ class Regulator extends Provider_Abstract {
 				 */
 				do_action( "shepherd_{$prefix}_task_after_run", $task );
 
-				// Free memory every 10 tasks to avoid memory issues.
-				if ( 0 === $offset % 10 ) {
+				if ( 0 === $offset % $clean_up_memory_every ) {
 					$this->free_memory();
 				}
 			}
