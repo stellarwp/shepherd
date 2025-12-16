@@ -444,7 +444,7 @@ class Regulator extends Provider_Abstract {
 		} catch ( Exception $e ) {
 			// The process_task method already catches and handles all the exceptions before throwing them again.
 			if ( is_callable( $callables['on_error'] ) ) {
-				$callables['on_error']( isset( $task ) ? $task : null, $e );
+				$callables['on_error']( $task ?? null, $e );
 			}
 
 			/**
@@ -455,7 +455,7 @@ class Regulator extends Provider_Abstract {
 			 * @param ?Task     $task The task that failed to run.
 			 * @param Exception $e    The exception that was thrown.
 			 */
-			do_action( "shepherd_{$prefix}_tasks_run_failed", isset( $task ) ? $task : null, $e );
+			do_action( "shepherd_{$prefix}_tasks_run_failed", $task ?? null, $e );
 		}
 
 		if ( is_callable( $callables['always'] ) ) {
