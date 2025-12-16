@@ -386,9 +386,9 @@ class Regulator extends Provider_Abstract {
 		$callables = wp_parse_args(
 			$callables,
 			[
-				'before'   => static function ( Task $task ): void {},
-				'after'    => static function ( Task $task ): void {},
-				'always'   => static function ( array $tasks ): void {},
+				'before' => static function ( Task $task ): void {},
+				'after'  => static function ( Task $task ): void {},
+				'always' => static function ( array $tasks ): void {},
 			]
 		);
 
