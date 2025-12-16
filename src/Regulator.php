@@ -720,7 +720,7 @@ class Regulator extends Provider_Abstract {
 		 */
 		global $wpdb, $wp_object_cache;
 
-		$wpdb->queries = array();
+		$wpdb->queries = [];
 
 		if ( ! $wp_object_cache instanceof WP_Object_Cache ) {
 			return;
@@ -728,20 +728,20 @@ class Regulator extends Provider_Abstract {
 
 		// Not all drop-ins support these props, however, there may be existing installations that rely on these being cleared.
 		if ( property_exists( $wp_object_cache, 'group_ops' ) ) {
-			$wp_object_cache->group_ops = array();
+			$wp_object_cache->group_ops = [];
 		}
 		if ( property_exists( $wp_object_cache, 'stats' ) ) {
-			$wp_object_cache->stats = array();
+			$wp_object_cache->stats = [];
 		}
 		if ( property_exists( $wp_object_cache, 'memcache_debug' ) ) {
-			$wp_object_cache->memcache_debug = array();
+			$wp_object_cache->memcache_debug = [];
 		}
 		if ( property_exists( $wp_object_cache, 'cache' ) ) {
-			$wp_object_cache->cache = array();
+			$wp_object_cache->cache = [];
 		}
 
-		if ( is_callable( array( $wp_object_cache, '__remoteset' ) ) ) {
-			call_user_func( array( $wp_object_cache, '__remoteset' ) ); // important!
+		if ( is_callable( [ $wp_object_cache, '__remoteset' ] ) ) {
+			call_user_func( [ $wp_object_cache, '__remoteset' ] ); // important!
 		}
 	}
 }
