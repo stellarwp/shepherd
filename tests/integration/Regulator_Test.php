@@ -271,14 +271,12 @@ class Regulator_Test extends WPTestCase {
 		$this->assertSame( 1, did_action( $task1->get_task_name() ) );
 		$this->assertSame( 1, did_action( $task2->get_task_name() ) );
 
-		// Verify logs for task1
 		$logs1 = $this->get_logger()->retrieve_logs( $task1->get_id() );
 		$this->assertCount( 3, $logs1 );
 		$this->assertSame( 'created', $logs1[0]->get_type() );
 		$this->assertSame( 'started', $logs1[1]->get_type() );
 		$this->assertSame( 'finished', $logs1[2]->get_type() );
 
-		// Verify logs for task2
 		$logs2 = $this->get_logger()->retrieve_logs( $task2->get_id() );
 		$this->assertCount( 3, $logs2 );
 		$this->assertSame( 'created', $logs2[0]->get_type() );
@@ -294,18 +292,15 @@ class Regulator_Test extends WPTestCase {
 
 		$task = new Do_Prefixed_Action_Task( 'run_dispatched' );
 
-		// First dispatch the task normally
 		$shepherd->dispatch( $task );
 		$task_id = $shepherd->get_last_scheduled_task_id();
 
 		$this->assertSame( 0, did_action( $task->get_task_name() ) );
 
-		// Now run it - should use the already dispatched task
 		$shepherd->run( [ $task ] );
 
 		$this->assertSame( 1, did_action( $task->get_task_name() ) );
 
-		// Verify the logs show the full lifecycle
 		$logs = $this->get_logger()->retrieve_logs( $task_id );
 		$this->assertCount( 3, $logs );
 		$this->assertSame( 'created', $logs[0]->get_type() );
