@@ -327,4 +327,165 @@ class Regulator_Test extends WPTestCase {
 
 		$this->assertNotNull( $regulator->get_last_scheduled_task_id(), 'Task should be scheduled when custom handler is not callable' );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_run_tasks_synchronously_when_tables_not_registered(): void {
+		$prefix = Config::get_hook_prefix();
+
+		$this->set_fn_return( 'did_action', function( $action ) use ( $prefix ) {
+			if ( $action === "shepherd_{$prefix}_tables_registered" ) {
+				return 0;
+			}
+
+			return did_action( $action );
+		}, true );
+
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$task1 = new Do_Prefixed_Action_Task( 'run_task_1' );
+		$task2 = new Do_Prefixed_Action_Task( 'run_task_2' );
+
+		$this->assertSame( 0, did_action( $task1->get_task_name() ) );
+		$this->assertSame( 0, did_action( $task2->get_task_name() ) );
+
+		$sync_run_count = 0;
+		add_action( "shepherd_{$prefix}_task_run_sync", function() use ( &$sync_run_count ) {
+			$sync_run_count++;
+		} );
+
+		$regulator->run( [ $task1, $task2 ] );
+
+		$this->assertSame( 1, did_action( $task1->get_task_name() ), 'First task should have run' );
+		$this->assertSame( 1, did_action( $task2->get_task_name() ), 'Second task should have run' );
+		$this->assertSame( 2, $sync_run_count, 'sync action should have fired twice' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_run_tasks_and_dispatch_when_tables_registered(): void {
+		$prefix = Config::get_hook_prefix();
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$task1 = new Do_Prefixed_Action_Task( 'run_dispatch_1' );
+		$task2 = new Do_Prefixed_Action_Task( 'run_dispatch_2' );
+
+		$this->assertSame( 0, did_action( $task1->get_task_name() ) );
+		$this->assertSame( 0, did_action( $task2->get_task_name() ) );
+
+		$before_run_count = 0;
+		$after_run_count = 0;
+		$tasks_finished_count = 0;
+
+		add_action( "shepherd_{$prefix}_task_before_run", function() use ( &$before_run_count ) {
+			$before_run_count++;
+		} );
+
+		add_action( "shepherd_{$prefix}_task_after_run", function() use ( &$after_run_count ) {
+			$after_run_count++;
+		} );
+
+		add_action( "shepherd_{$prefix}_tasks_finished", function() use ( &$tasks_finished_count ) {
+			$tasks_finished_count++;
+		} );
+
+		$regulator->run( [ $task1, $task2 ] );
+
+		$this->assertSame( 1, did_action( $task1->get_task_name() ), 'First task should have run' );
+		$this->assertSame( 1, did_action( $task2->get_task_name() ), 'Second task should have run' );
+		$this->assertSame( 2, $before_run_count, 'before_run action should have fired twice' );
+		$this->assertSame( 2, $after_run_count, 'after_run action should have fired twice' );
+		$this->assertSame( 1, $tasks_finished_count, 'tasks_finished action should have fired once' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_execute_before_callable_for_each_task(): void {
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$task1 = new Do_Prefixed_Action_Task( 'before_callable_1' );
+		$task2 = new Do_Prefixed_Action_Task( 'before_callable_2' );
+
+		$before_tasks = [];
+
+		$regulator->run( [ $task1, $task2 ], [
+			'before' => function( $task ) use ( &$before_tasks ) {
+				$before_tasks[] = $task;
+			},
+		] );
+
+		$this->assertCount( 2, $before_tasks );
+		$this->assertSame( $task1->get_args_hash(), $before_tasks[0]->get_args_hash() );
+		$this->assertSame( $task2->get_args_hash(), $before_tasks[1]->get_args_hash() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_execute_after_callable_for_each_task(): void {
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$task1 = new Do_Prefixed_Action_Task( 'after_callable_1' );
+		$task2 = new Do_Prefixed_Action_Task( 'after_callable_2' );
+
+		$after_tasks = [];
+
+		$regulator->run( [ $task1, $task2 ], [
+			'after' => function( $task ) use ( &$after_tasks ) {
+				$after_tasks[] = $task;
+			},
+		] );
+
+		$this->assertCount( 2, $after_tasks );
+		$this->assertSame( $task1->get_args_hash(), $after_tasks[0]->get_args_hash() );
+		$this->assertSame( $task2->get_args_hash(), $after_tasks[1]->get_args_hash() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_execute_always_callable_after_all_tasks(): void {
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$task1 = new Do_Prefixed_Action_Task( 'always_callable_1' );
+		$task2 = new Do_Prefixed_Action_Task( 'always_callable_2' );
+
+		$always_executed = false;
+		$always_tasks = null;
+
+		$regulator->run( [ $task1, $task2 ], [
+			'always' => function( $tasks ) use ( &$always_executed, &$always_tasks ) {
+				$always_executed = true;
+				$always_tasks = $tasks;
+			},
+		] );
+
+		$this->assertTrue( $always_executed, 'always callable should have been executed' );
+		$this->assertCount( 2, $always_tasks );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_dispatch_already_scheduled_tasks_when_running(): void {
+		$prefix = Config::get_hook_prefix();
+		$regulator = Config::get_container()->get( Regulator::class );
+
+		$task = new Do_Prefixed_Action_Task( 'already_scheduled_run' );
+
+		// First dispatch the task
+		$regulator->dispatch( $task );
+		$first_task_id = $regulator->get_last_scheduled_task_id();
+
+		$created_count = did_action( "shepherd_{$prefix}_task_created" );
+
+		// Now run it - should not dispatch again since it's already scheduled
+		$regulator->run( [ $task ] );
+
+		// Check that task_created was NOT fired again
+		$this->assertSame( $created_count, did_action( "shepherd_{$prefix}_task_created" ), 'Task should not be dispatched again if already scheduled' );
+	}
 }
