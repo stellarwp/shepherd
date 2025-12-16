@@ -252,4 +252,138 @@ class Regulator_Test extends WPTestCase {
 
 		$this->assertMatchesLogSnapshot( $logs );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_run_tasks_and_log_lifecycle(): void {
+		$shepherd = shepherd();
+		$this->assertNull( $shepherd->get_last_scheduled_task_id() );
+
+		$task1 = new Do_Prefixed_Action_Task( 'run_log_1' );
+		$task2 = new Do_Prefixed_Action_Task( 'run_log_2' );
+
+		$this->assertSame( 0, did_action( $task1->get_task_name() ) );
+		$this->assertSame( 0, did_action( $task2->get_task_name() ) );
+
+		$shepherd->run( [ $task1, $task2 ] );
+
+		$this->assertSame( 1, did_action( $task1->get_task_name() ) );
+		$this->assertSame( 1, did_action( $task2->get_task_name() ) );
+
+		// Verify logs for task1
+		$logs1 = $this->get_logger()->retrieve_logs( $task1->get_id() );
+		$this->assertCount( 3, $logs1 );
+		$this->assertSame( 'created', $logs1[0]->get_type() );
+		$this->assertSame( 'started', $logs1[1]->get_type() );
+		$this->assertSame( 'finished', $logs1[2]->get_type() );
+
+		// Verify logs for task2
+		$logs2 = $this->get_logger()->retrieve_logs( $task2->get_id() );
+		$this->assertCount( 3, $logs2 );
+		$this->assertSame( 'created', $logs2[0]->get_type() );
+		$this->assertSame( 'started', $logs2[1]->get_type() );
+		$this->assertSame( 'finished', $logs2[2]->get_type() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_run_tasks_and_call_on_error_when_task_fails(): void {
+		$shepherd = shepherd();
+
+		$task1 = new Do_Prefixed_Action_Task( 'run_error_1' );
+		$task2 = new Always_Fail_Task( 'run_error_2' );
+		$task3 = new Do_Prefixed_Action_Task( 'run_error_3' );
+
+		$error_task = null;
+		$error_exception = null;
+		$always_called = false;
+		$always_tasks = null;
+
+		$prefix = tests_shepherd_get_hook_prefix();
+		$run_failed_count = did_action( "shepherd_{$prefix}_tasks_run_failed" );
+
+		$shepherd->run( [ $task1, $task2, $task3 ], [
+			'on_error' => function( $task, $e ) use ( &$error_task, &$error_exception ) {
+				$error_task = $task;
+				$error_exception = $e;
+			},
+			'always' => function( $tasks ) use ( &$always_called, &$always_tasks ) {
+				$always_called = true;
+				$always_tasks = $tasks;
+			},
+		] );
+
+		// First task should have run
+		$this->assertSame( 1, did_action( $task1->get_task_name() ) );
+
+		// Error callback should have been called
+		$this->assertNotNull( $error_task );
+		$this->assertNotNull( $error_exception );
+		$this->assertInstanceOf( Exception::class, $error_exception );
+
+		// Always callback should have been called even on error
+		$this->assertTrue( $always_called, 'always callable should be called even when tasks fail' );
+
+		// tasks_run_failed action should have fired
+		$this->assertSame( $run_failed_count + 1, did_action( "shepherd_{$prefix}_tasks_run_failed" ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_run_task_that_was_previously_dispatched(): void {
+		$shepherd = shepherd();
+
+		$task = new Do_Prefixed_Action_Task( 'run_dispatched' );
+
+		// First dispatch the task normally
+		$shepherd->dispatch( $task );
+		$task_id = $shepherd->get_last_scheduled_task_id();
+
+		$this->assertSame( 0, did_action( $task->get_task_name() ) );
+
+		// Now run it - should use the already dispatched task
+		$shepherd->run( [ $task ] );
+
+		$this->assertSame( 1, did_action( $task->get_task_name() ) );
+
+		// Verify the logs show the full lifecycle
+		$logs = $this->get_logger()->retrieve_logs( $task_id );
+		$this->assertCount( 3, $logs );
+		$this->assertSame( 'created', $logs[0]->get_type() );
+		$this->assertSame( 'started', $logs[1]->get_type() );
+		$this->assertSame( 'finished', $logs[2]->get_type() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_run_single_task_successfully(): void {
+		$shepherd = shepherd();
+
+		$task = new Do_Action_Task();
+
+		$before_called = false;
+		$after_called = false;
+		$always_called = false;
+
+		$shepherd->run( [ $task ], [
+			'before' => function() use ( &$before_called ) {
+				$before_called = true;
+			},
+			'after' => function() use ( &$after_called ) {
+				$after_called = true;
+			},
+			'always' => function() use ( &$always_called ) {
+				$always_called = true;
+			},
+		] );
+
+		$this->assertSame( 1, did_action( $task->get_task_name() ) );
+		$this->assertTrue( $before_called, 'before callable should have been called' );
+		$this->assertTrue( $after_called, 'after callable should have been called' );
+		$this->assertTrue( $always_called, 'always callable should have been called' );
+	}
 }

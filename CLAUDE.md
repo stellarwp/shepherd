@@ -7,6 +7,7 @@ Shepherd is a lightweight background processing library for WordPress built on t
 ## Key Features
 
 - **Background Task Processing**: Offload time-consuming operations to background processes
+- **Synchronous Task Execution**: Run tasks immediately with lifecycle callbacks via `run()` method (since 0.1.0)
 - **Automatic Retries**: Configurable retry mechanism with exponential backoff
 - **Task Debouncing**: Prevents tasks from running too frequently with customizable delays
 - **Unique Task Enforcement**: Prevents duplicate tasks from being scheduled
@@ -104,6 +105,17 @@ shepherd()->dispatch(new My_Task($arg1, $arg2));
 
 // Dispatch with delay (in seconds)
 shepherd()->dispatch(new My_Task($arg1, $arg2), 300); // 5 minutes
+
+// Run tasks synchronously with lifecycle callbacks (since 0.1.0)
+shepherd()->run(
+    [ new My_Task($arg1, $arg2), new Another_Task() ],
+    [
+        'before'   => function( $task ) { /* called before each task */ },
+        'after'    => function( $task ) { /* called after each task */ },
+        'on_error' => function( $task, $e ) { /* called on failure */ },
+        'always'   => function( $tasks ) { /* called after all tasks */ },
+    ]
+);
 
 // Retrieve task logs
 use StellarWP\Shepherd\Contracts\Logger;
