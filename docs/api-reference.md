@@ -46,7 +46,6 @@ Runs a set of tasks synchronously with optional lifecycle callbacks.
   - `$callables` - Optional array of lifecycle callbacks:
     - `'before'` - `function( Task $task ): void` - Called before each task runs
     - `'after'` - `function( Task $task ): void` - Called after each task completes
-    - `'on_error'` - `function( ?Task $task, Exception $e ): void` - Called if a task fails
     - `'always'` - `function( array $tasks ): void` - Called after all tasks complete (even on error)
 - **Since:** 0.1.0
 - **Behavior:**

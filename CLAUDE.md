@@ -112,7 +112,6 @@ shepherd()->run(
     [
         'before'   => function( $task ) { /* called before each task */ },
         'after'    => function( $task ) { /* called after each task */ },
-        'on_error' => function( $task, $e ) { /* called on failure */ },
         'always'   => function( $tasks ) { /* called after all tasks */ },
     ]
 );

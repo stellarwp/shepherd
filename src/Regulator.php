@@ -382,15 +382,12 @@ class Regulator extends Provider_Abstract {
 	 * @return void
 	 */
 	private function run_callback( array $tasks, array $callables = [] ): void {
-		$scheduled_task_ids = array_map( fn( Task $task ) => $task->get_id(), $this->scheduled_tasks );
-
-		/** @var array{before: callable( Task $task ): void, after: callable( Task $task ): void, on_error: callable( ?Task $task, Exception $e ): void, always: callable( list<Task> $tasks ): void} $callables */
+		/** @var array{before: callable( Task $task ): void, after: callable( Task $task ): void, always: callable( list<Task> $tasks ): void} $callables */
 		$callables = wp_parse_args(
 			$callables,
 			[
 				'before'   => static function ( Task $task ): void {},
 				'after'    => static function ( Task $task ): void {},
-				'on_error' => static function ( Task $task, Exception $e ): void {},
 				'always'   => static function ( array $tasks ): void {},
 			]
 		);
@@ -399,70 +396,53 @@ class Regulator extends Provider_Abstract {
 		$context = ! $context && defined( 'REST_REQUEST' ) && REST_REQUEST ? ' REST' : $context;
 		$prefix  = Config::get_hook_prefix();
 
-		try {
-			$runner = ActionScheduler_QueueRunner::instance();
+		$runner = ActionScheduler_QueueRunner::instance();
 
-			/**
-			 * Filters the number of tasks to clean up after.
-			 *
-			 * @since 0.1.0
-			 *
-			 * @param int $clean_up_memory_every The number of tasks to clean up the memory after.
-			 */
-			$clean_up_memory_every = apply_filters( "shepherd_{$prefix}_clean_up_memory_every", 10 );
+		/**
+		 * Filters the number of tasks to clean up after.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param int $clean_up_memory_every The number of tasks to clean up the memory after.
+		 */
+		$clean_up_memory_every = apply_filters( "shepherd_{$prefix}_clean_up_memory_every", 10 );
 
-			foreach ( array_values( $tasks ) as $offset => $task ) {
-				if ( ! in_array( $task->get_id(), $scheduled_task_ids, true ) ) {
-					$this->dispatch_callback( $task, 0 );
-				}
-
-				if ( is_callable( $callables['before'] ) ) {
-					$callables['before']( $task );
-				}
-
-				/**
-				 * Fires when a task is about to be run.
-				 *
-				 * @since 0.1.0
-				 *
-				 * @param Task $task The task that is about to be run.
-				 */
-				do_action( "shepherd_{$prefix}_task_before_run", $task );
-
-				$runner->process_action( $task->get_action_id(), "Shepherd{$context}" );
-
-				if ( is_callable( $callables['after'] ) ) {
-					$callables['after']( $task );
-				}
-
-				/**
-				 * Fires when a task is finished running.
-				 *
-				 * @since 0.1.0
-				 *
-				 * @param Task $task The task that is finished running.
-				 */
-				do_action( "shepherd_{$prefix}_task_after_run", $task );
-
-				if ( 0 === $offset % $clean_up_memory_every ) {
-					$this->free_memory();
-				}
+		foreach ( array_values( $tasks ) as $offset => $task ) {
+			if ( ! in_array( $task->get_id(), $this->scheduled_tasks, true ) ) {
+				$this->dispatch_callback( $task, 0 );
 			}
-		} catch ( Exception $e ) {
-			// The process_task method already catches and handles all the exceptions before throwing them again.
-			if ( is_callable( $callables['on_error'] ) ) {
-				$callables['on_error']( $task ?? null, $e );
+
+			if ( is_callable( $callables['before'] ) ) {
+				$callables['before']( $task );
 			}
 
 			/**
-			 * Fires when a set of tasks fails to be run.
+			 * Fires when a task is about to be run.
 			 *
 			 * @since 0.1.0
 			 *
-			 * @param ?Task     $task The task that failed to run.
-			 * @param Exception $e    The exception that was thrown.
+			 * @param Task $task The task that is about to be run.
 			 */
-			do_action( "shepherd_{$prefix}_tasks_run_failed", $task ?? null, $e );
+			do_action( "shepherd_{$prefix}_task_before_run", $task );
+
+			$runner->process_action( $task->get_action_id(), "Shepherd{$context}" );
+
+			if ( is_callable( $callables['after'] ) ) {
+				$callables['after']( $task );
+			}
+
+			/**
+			 * Fires when a task is finished running.
+			 *
+			 * @since 0.1.0
+			 *
+			 * @param Task $task The task that is finished running.
+			 */
+			do_action( "shepherd_{$prefix}_task_after_run", $task );
+
+			if ( 0 === $offset % $clean_up_memory_every ) {
+				$this->free_memory();
+			}
 		}
 
 		if ( is_callable( $callables['always'] ) ) {

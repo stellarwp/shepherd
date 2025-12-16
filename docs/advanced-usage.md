@@ -409,12 +409,6 @@ shepherd()->run( $tasks, [
         error_log( 'Completed task: ' . get_class( $task ) );
     },
 
-    // Called if any task throws an exception
-    'on_error' => function( ?Task $task, Exception $e ): void {
-        error_log( 'Task failed: ' . $e->getMessage() );
-        // Optionally notify administrators or log to external service
-    },
-
     // Called after all tasks complete (even if some failed)
     'always' => function( array $tasks ): void {
         error_log( 'Finished processing ' . count( $tasks ) . ' tasks' );
@@ -446,10 +440,6 @@ WP_CLI::add_command( 'myapp process-images', function( $args, $assoc_args ) {
             $processed++;
             WP_CLI::success( 'Image processed!' );
         },
-        'on_error' => function( ?Task $task, Exception $e ) use ( &$failed ) {
-            $failed++;
-            WP_CLI::warning( 'Failed: ' . $e->getMessage() );
-        },
         'always' => function( array $tasks ) use ( &$processed, &$failed ) {
             WP_CLI::line( "Processed: {$processed}, Failed: {$failed}" );
         },
@@ -480,12 +470,6 @@ register_rest_route( 'myapp/v1', '/process', [
             'after' => function( Task $task ) use ( &$results ) {
                 $results['processed'][] = $task->get_args()[0];
             },
-            'on_error' => function( ?Task $task, Exception $e ) use ( &$results ) {
-                $results['failed'][] = [
-                    'item' => $task ? $task->get_args()[0] : null,
-                    'error' => $e->getMessage(),
-                ];
-            },
         ] );
 
         return new WP_REST_Response( $results, 200 );
@@ -498,7 +482,6 @@ register_rest_route( 'myapp/v1', '/process', [
 
 - **Already scheduled tasks**: If a task was previously dispatched via `dispatch()`, `run()` will execute it without re-dispatching
 - **Fallback mode**: When Shepherd's database tables are not registered, tasks execute immediately via `process()` without Action Scheduler
-- **Error handling**: When a task fails, the `on_error` callback is invoked and the remaining tasks in the batch are skipped
 - **Context detection**: Shepherd automatically detects CLI and REST contexts for proper logging
 
 ### WordPress Hooks
