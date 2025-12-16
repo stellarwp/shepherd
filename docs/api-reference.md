@@ -37,6 +37,32 @@ Schedules a task for execution.
   - `shepherd_{prefix}_task_scheduling_failed`
   - `shepherd_{prefix}_task_already_exists`
 
+##### `run( array $tasks, array $callables = [] ): void`
+
+Runs a set of tasks synchronously with optional lifecycle callbacks.
+
+- **Parameters:**
+  - `$tasks` - Array of Task instances to run
+  - `$callables` - Optional array of lifecycle callbacks:
+    - `'before'` - `function( Task $task ): void` - Called before each task runs
+    - `'after'` - `function( Task $task ): void` - Called after each task completes
+    - `'always'` - `function( array $tasks ): void` - Called after all tasks complete (even on error)
+- **Since:** 0.1.0
+- **Behavior:**
+  - When tables are registered: Dispatches tasks if not already scheduled, then processes them immediately using Action Scheduler's queue runner
+  - When tables are NOT registered: Processes tasks immediately in a synchronous manner (fallback)
+  - Tasks already scheduled (via `dispatch()`) will be executed without re-dispatching
+- **Actions Fired:**
+  - `shepherd_{prefix}_task_run_sync` - When tables are not registered and task runs synchronously
+  - `shepherd_{prefix}_task_before_run` - Before each task is processed
+  - `shepherd_{prefix}_task_after_run` - After each task completes successfully
+  - `shepherd_{prefix}_tasks_run_failed` - When a task fails during the run
+  - `shepherd_{prefix}_tasks_finished` - After all tasks have been processed
+- **Use Cases:**
+  - CLI commands that need immediate task execution
+  - REST API endpoints that need synchronous task processing
+  - Testing scenarios requiring controlled task execution
+
 ##### `get_last_scheduled_task_id(): ?int`
 
 Returns the ID of the most recently scheduled task.
@@ -525,6 +551,21 @@ Table name: `shepherd_{prefix}_task_logs`
 
 - `shepherd_{prefix}_http_request_processed` - Fired after successful HTTP request
   - Parameters: `$task` (HTTP_Request instance), `$response` (wp_remote_request response array)
+
+- `shepherd_{prefix}_task_run_sync` - Fired when a task is run synchronously via `run()` when tables are not registered (since 0.1.0)
+  - Parameters: `$task` (Task instance)
+
+- `shepherd_{prefix}_task_before_run` - Fired before a task is processed via `run()` (since 0.1.0)
+  - Parameters: `$task` (Task instance)
+
+- `shepherd_{prefix}_task_after_run` - Fired after a task completes via `run()` (since 0.1.0)
+  - Parameters: `$task` (Task instance)
+
+- `shepherd_{prefix}_tasks_run_failed` - Fired when a task fails during `run()` (since 0.1.0)
+  - Parameters: `$task` (Task instance or null), `$exception` (Exception)
+
+- `shepherd_{prefix}_tasks_finished` - Fired after all tasks have been processed via `run()` (since 0.1.0)
+  - Parameters: `$tasks` (array of Task instances)
 
 ### Filters
 

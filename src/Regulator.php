@@ -24,6 +24,8 @@ use StellarWP\Shepherd\Exceptions\ShepherdTaskAlreadyExistsException;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Shepherd\Traits\Loggable;
 use StellarWP\Shepherd\Tasks\Herding;
+use ActionScheduler_QueueRunner;
+use WP_Object_Cache;
 
 /**
  * Shepherd's regulator.
@@ -326,6 +328,138 @@ class Regulator extends Provider_Abstract {
 	}
 
 	/**
+	 * Run a set of tasks.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param Task[] $tasks     The tasks to run.
+	 * @param array  $callables The callables to run.
+	 *
+	 * @return void
+	 */
+	public function run( array $tasks, array $callables = [] ): void {
+		$prefix = Config::get_hook_prefix();
+
+		if ( ! did_action( "shepherd_{$prefix}_tables_registered" ) ) {
+			foreach ( $tasks as $task ) {
+				$task->process();
+
+				/**
+				 * Fires an action when a task is run synchronously.
+				 *
+				 * @since 0.1.0
+				 *
+				 * @param Task $task The task that was dispatched synchronously.
+				 */
+				do_action( "shepherd_{$prefix}_task_run_sync", $task );
+			}
+
+			return;
+		}
+
+		if ( did_action( 'action_scheduler_init' ) || doing_action( 'action_scheduler_init' ) ) {
+			$this->run_callback( $tasks, $callables );
+			return;
+		}
+
+		add_action(
+			'action_scheduler_init',
+			function () use ( $tasks, $callables ): void {
+				$this->run_callback( $tasks, $callables );
+			},
+			10
+		);
+	}
+
+	/**
+	 * Runs a set of tasks.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param Task[] $tasks     The tasks to run.
+	 * @param array  $callables The callables to run.
+	 *
+	 * @return void
+	 */
+	private function run_callback( array $tasks, array $callables = [] ): void {
+		/** @var array{before: callable( Task $task ): void, after: callable( Task $task ): void, always: callable( list<Task> $tasks ): void} $callables */
+		$callables = wp_parse_args(
+			$callables,
+			[
+				'before'   => static function ( Task $task ): void {},
+				'after'    => static function ( Task $task ): void {},
+				'always'   => static function ( array $tasks ): void {},
+			]
+		);
+
+		$context = defined( 'WP_CLI' ) && WP_CLI ? ' CLI' : '';
+		$context = ! $context && defined( 'REST_REQUEST' ) && REST_REQUEST ? ' REST' : $context;
+		$prefix  = Config::get_hook_prefix();
+
+		$runner = ActionScheduler_QueueRunner::instance();
+
+		/**
+		 * Filters the number of tasks to clean up after.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param int $clean_up_memory_every The number of tasks to clean up the memory after.
+		 */
+		$clean_up_memory_every = apply_filters( "shepherd_{$prefix}_clean_up_memory_every", 10 );
+
+		foreach ( array_values( $tasks ) as $offset => $task ) {
+			if ( ! in_array( $task->get_id(), $this->scheduled_tasks, true ) ) {
+				$this->dispatch_callback( $task, 0 );
+			}
+
+			if ( is_callable( $callables['before'] ) ) {
+				$callables['before']( $task );
+			}
+
+			/**
+			 * Fires when a task is about to be run.
+			 *
+			 * @since 0.1.0
+			 *
+			 * @param Task $task The task that is about to be run.
+			 */
+			do_action( "shepherd_{$prefix}_task_before_run", $task );
+
+			$runner->process_action( $task->get_action_id(), "Shepherd{$context}" );
+
+			if ( is_callable( $callables['after'] ) ) {
+				$callables['after']( $task );
+			}
+
+			/**
+			 * Fires when a task is finished running.
+			 *
+			 * @since 0.1.0
+			 *
+			 * @param Task $task The task that is finished running.
+			 */
+			do_action( "shepherd_{$prefix}_task_after_run", $task );
+
+			if ( 0 === $offset % $clean_up_memory_every ) {
+				$this->free_memory();
+			}
+		}
+
+		if ( is_callable( $callables['always'] ) ) {
+			$callables['always']( $tasks );
+		}
+
+		/**
+		 * Fires when a set of tasks is finished running.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param Task[] $tasks The tasks that were run.
+		 */
+		do_action( "shepherd_{$prefix}_tasks_finished", $tasks );
+	}
+
+	/**
 	 * Gets the last scheduled task ID.
 	 *
 	 * @since 0.0.1
@@ -549,5 +683,46 @@ class Regulator extends Provider_Abstract {
 		 * @since 0.0.8
 		 */
 		do_action( 'shepherd_' . Config::get_hook_prefix() . '_cleanup_task_scheduled' );
+	}
+
+	/**
+	 * Reduce memory footprint by clearing the database query and object caches.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	private function free_memory(): void {
+		/**
+		 * Globals.
+		 *
+		 * @var \wpdb           $wpdb
+		 * @var WP_Object_Cache $wp_object_cache
+		 */
+		global $wpdb, $wp_object_cache;
+
+		$wpdb->queries = [];
+
+		if ( ! $wp_object_cache instanceof WP_Object_Cache ) {
+			return;
+		}
+
+		// Not all drop-ins support these props, however, there may be existing installations that rely on these being cleared.
+		if ( property_exists( $wp_object_cache, 'group_ops' ) ) {
+			$wp_object_cache->group_ops = [];
+		}
+		if ( property_exists( $wp_object_cache, 'stats' ) ) {
+			$wp_object_cache->stats = [];
+		}
+		if ( property_exists( $wp_object_cache, 'memcache_debug' ) ) {
+			$wp_object_cache->memcache_debug = [];
+		}
+		if ( property_exists( $wp_object_cache, 'cache' ) ) {
+			$wp_object_cache->cache = [];
+		}
+
+		if ( is_callable( [ $wp_object_cache, '__remoteset' ] ) ) {
+			call_user_func( [ $wp_object_cache, '__remoteset' ] ); // important!
+		}
 	}
 }

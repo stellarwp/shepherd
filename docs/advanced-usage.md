@@ -371,6 +371,152 @@ The task tables include indexes on:
 - **Indexed Queries**: All cleanup queries use indexed columns for optimal performance
 - **Minimal Overhead**: Action deletion hooks add minimal overhead to Action Scheduler operations
 
+## Synchronous Task Execution (Since 0.1.0)
+
+The `run()` method allows you to execute tasks synchronously with full control over the execution lifecycle. This is useful for CLI commands, REST API endpoints, or any scenario where you need tasks to execute immediately.
+
+### Basic Usage
+
+```php
+use function StellarWP\Shepherd\shepherd;
+
+// Run a single task immediately
+shepherd()->run( [ new My_Task() ] );
+
+// Run multiple tasks in sequence
+$tasks = [
+    new Process_Image_Task( $image_id ),
+    new Generate_Thumbnail_Task( $image_id ),
+    new Update_Metadata_Task( $image_id ),
+];
+
+shepherd()->run( $tasks );
+```
+
+### Lifecycle Callbacks
+
+The `run()` method accepts an optional array of callbacks for fine-grained control:
+
+```php
+shepherd()->run( $tasks, [
+    // Called before each task runs
+    'before' => function( Task $task ): void {
+        error_log( 'Starting task: ' . get_class( $task ) );
+    },
+
+    // Called after each task completes successfully
+    'after' => function( Task $task ): void {
+        error_log( 'Completed task: ' . get_class( $task ) );
+    },
+
+    // Called after all tasks complete (even if some failed)
+    'always' => function( array $tasks ): void {
+        error_log( 'Finished processing ' . count( $tasks ) . ' tasks' );
+    },
+] );
+```
+
+### CLI Command Example
+
+```php
+use WP_CLI;
+use function StellarWP\Shepherd\shepherd;
+
+WP_CLI::add_command( 'myapp process-images', function( $args, $assoc_args ) {
+    $image_ids = get_unprocessed_image_ids();
+    $tasks = array_map(
+        fn( $id ) => new Process_Image_Task( $id ),
+        $image_ids
+    );
+
+    $processed = 0;
+    $failed = 0;
+
+    shepherd()->run( $tasks, [
+        'before' => function( Task $task ) {
+            WP_CLI::log( 'Processing image...' );
+        },
+        'after' => function( Task $task ) use ( &$processed ) {
+            $processed++;
+            WP_CLI::success( 'Image processed!' );
+        },
+        'always' => function( array $tasks ) use ( &$processed, &$failed ) {
+            WP_CLI::line( "Processed: {$processed}, Failed: {$failed}" );
+        },
+    ] );
+} );
+```
+
+### REST API Example
+
+```php
+use function StellarWP\Shepherd\shepherd;
+
+register_rest_route( 'myapp/v1', '/process', [
+    'methods' => 'POST',
+    'callback' => function( WP_REST_Request $request ) {
+        $items = $request->get_param( 'items' );
+        $tasks = array_map(
+            fn( $item ) => new Process_Item_Task( $item ),
+            $items
+        );
+
+        $results = [
+            'processed' => [],
+            'failed' => [],
+        ];
+
+        shepherd()->run( $tasks, [
+            'after' => function( Task $task ) use ( &$results ) {
+                $results['processed'][] = $task->get_args()[0];
+            },
+        ] );
+
+        return new WP_REST_Response( $results, 200 );
+    },
+    'permission_callback' => fn() => current_user_can( 'manage_options' ),
+] );
+```
+
+### Behavior Notes
+
+- **Already scheduled tasks**: If a task was previously dispatched via `dispatch()`, `run()` will execute it without re-dispatching
+- **Fallback mode**: When Shepherd's database tables are not registered, tasks execute immediately via `process()` without Action Scheduler
+- **Context detection**: Shepherd automatically detects CLI and REST contexts for proper logging
+
+### WordPress Hooks
+
+Monitor synchronous task execution using WordPress actions:
+
+```php
+$prefix = Config::get_hook_prefix();
+
+// Fired before each task runs
+add_action( "shepherd_{$prefix}_task_before_run", function( Task $task ) {
+    // Prepare for task execution
+}, 10, 1 );
+
+// Fired after each task completes
+add_action( "shepherd_{$prefix}_task_after_run", function( Task $task ) {
+    // Post-task cleanup or notifications
+}, 10, 1 );
+
+// Fired when any task fails
+add_action( "shepherd_{$prefix}_tasks_run_failed", function( ?Task $task, Exception $e ) {
+    // Handle batch failure
+}, 10, 2 );
+
+// Fired after all tasks complete
+add_action( "shepherd_{$prefix}_tasks_finished", function( array $tasks ) {
+    // Batch completion handling
+}, 10, 1 );
+
+// Fired when tables aren't registered (fallback mode)
+add_action( "shepherd_{$prefix}_task_run_sync", function( Task $task ) {
+    // Track fallback executions
+}, 10, 1 );
+```
+
 ## Custom Dispatch Handlers
 
 **Since 0.0.9**, you can completely override Shepherd's default dispatch behavior by providing a custom handler via a filter. This is useful for advanced scenarios where you need full control over how tasks are dispatched.
