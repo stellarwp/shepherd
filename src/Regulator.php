@@ -335,6 +335,12 @@ class Regulator extends Provider_Abstract {
 	 * @param Task[] $tasks     The tasks to run.
 	 * @param array  $callables The callables to run.
 	 *
+	 * @phpstan-param array{
+	 *  before: callable( Task $task ): void,
+	 *  after: callable( Task $task ): void,
+	 *  always: callable( list<Task> $tasks ): void,
+	 * }
+	 *
 	 * @return void
 	 */
 	public function run( array $tasks, array $callables = [] ): void {
@@ -379,10 +385,15 @@ class Regulator extends Provider_Abstract {
 	 * @param Task[] $tasks     The tasks to run.
 	 * @param array  $callables The callables to run.
 	 *
+	 * @phpstan-param array{
+	 *  before: callable( Task $task ): void,
+	 *  after: callable( Task $task ): void,
+	 *  always: callable( list<Task> $tasks ): void,
+	 * }
+	 *
 	 * @return void
 	 */
 	private function run_callback( array $tasks, array $callables = [] ): void {
-		/** @var array{before: callable( Task $task ): void, after: callable( Task $task ): void, always: callable( list<Task> $tasks ): void} $callables */
 		$callables = wp_parse_args(
 			$callables,
 			[
@@ -404,8 +415,10 @@ class Regulator extends Provider_Abstract {
 		 * @since 0.1.0
 		 *
 		 * @param int $clean_up_memory_every The number of tasks to clean up the memory after.
+		 *
+		 * @return int The number of tasks to clean up the memory after.
 		 */
-		$clean_up_memory_every = apply_filters( "shepherd_{$prefix}_clean_up_memory_every", 10 );
+		$clean_up_memory_every = (int) apply_filters( "shepherd_{$prefix}_clean_up_memory_every", 10 );
 
 		foreach ( array_values( $tasks ) as $offset => $task ) {
 			if ( ! in_array( $task->get_id(), $this->scheduled_tasks, true ) ) {
@@ -440,7 +453,7 @@ class Regulator extends Provider_Abstract {
 			 */
 			do_action( "shepherd_{$prefix}_task_after_run", $task );
 
-			if ( 0 === $offset % $clean_up_memory_every ) {
+			if ( 0 === ( $offset + 1 ) % $clean_up_memory_every ) {
 				$this->free_memory();
 			}
 		}
