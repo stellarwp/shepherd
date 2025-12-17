@@ -335,11 +335,11 @@ class Regulator extends Provider_Abstract {
 	 * @param Task[] $tasks     The tasks to run.
 	 * @param array  $callables The callables to run.
 	 *
-	 * @phpstan-param array{
+	 * @phpstan-param array{} | array{
 	 *  before: callable( Task $task ): void,
 	 *  after: callable( Task $task ): void,
 	 *  always: callable( list<Task> $tasks ): void,
-	 * }
+	 * } $callables
 	 *
 	 * @return void
 	 */
@@ -385,11 +385,11 @@ class Regulator extends Provider_Abstract {
 	 * @param Task[] $tasks     The tasks to run.
 	 * @param array  $callables The callables to run.
 	 *
-	 * @phpstan-param array{
+	 * @phpstan-param array{} | array{
 	 *  before: callable( Task $task ): void,
 	 *  after: callable( Task $task ): void,
 	 *  always: callable( list<Task> $tasks ): void,
-	 * }
+	 * } $callables
 	 *
 	 * @return void
 	 */
