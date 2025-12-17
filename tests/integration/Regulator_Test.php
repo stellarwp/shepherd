@@ -337,4 +337,124 @@ class Regulator_Test extends WPTestCase {
 		$this->assertTrue( $after_called, 'after callable should have been called' );
 		$this->assertTrue( $always_called, 'always callable should have been called' );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_catch_exception_thrown_in_before_callable(): void {
+		$shepherd = shepherd();
+		$prefix = tests_shepherd_get_hook_prefix();
+
+		$task = new Do_Action_Task();
+
+		$run_failed_count = did_action( "shepherd_{$prefix}_tasks_run_failed" );
+		$captured_tasks = null;
+		$captured_exception = null;
+
+		add_action( "shepherd_{$prefix}_tasks_run_failed", function( $tasks, $e ) use ( &$captured_tasks, &$captured_exception ) {
+			$captured_tasks = $tasks;
+			$captured_exception = $e;
+		}, 10, 2 );
+
+		$shepherd->run( [ $task ], [
+			'before' => function() {
+				throw new Exception( 'Before callable failed' );
+			},
+		] );
+
+		$this->assertSame( $run_failed_count + 1, did_action( "shepherd_{$prefix}_tasks_run_failed" ), 'tasks_run_failed action should have fired' );
+		$this->assertIsArray( $captured_tasks );
+		$this->assertCount( 1, $captured_tasks );
+		$this->assertInstanceOf( Exception::class, $captured_exception );
+		$this->assertSame( 'Before callable failed', $captured_exception->getMessage() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_catch_exception_thrown_in_after_callable(): void {
+		$shepherd = shepherd();
+		$prefix = tests_shepherd_get_hook_prefix();
+
+		$task = new Do_Action_Task();
+
+		$run_failed_count = did_action( "shepherd_{$prefix}_tasks_run_failed" );
+		$captured_exception = null;
+
+		add_action( "shepherd_{$prefix}_tasks_run_failed", function( $tasks, $e ) use ( &$captured_exception ) {
+			$captured_exception = $e;
+		}, 10, 2 );
+
+		$shepherd->run( [ $task ], [
+			'after' => function() {
+				throw new Exception( 'After callable failed' );
+			},
+		] );
+
+		// Task should have run before the after callable threw
+		$this->assertSame( 1, did_action( $task->get_task_name() ), 'Task should have run before after callable failed' );
+		$this->assertSame( $run_failed_count + 1, did_action( "shepherd_{$prefix}_tasks_run_failed" ), 'tasks_run_failed action should have fired' );
+		$this->assertInstanceOf( Exception::class, $captured_exception );
+		$this->assertSame( 'After callable failed', $captured_exception->getMessage() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_catch_exception_thrown_in_always_callable(): void {
+		$shepherd = shepherd();
+		$prefix = tests_shepherd_get_hook_prefix();
+
+		$task = new Do_Action_Task();
+
+		$run_failed_count = did_action( "shepherd_{$prefix}_tasks_run_failed" );
+		$tasks_finished_count = did_action( "shepherd_{$prefix}_tasks_finished" );
+		$captured_exception = null;
+
+		add_action( "shepherd_{$prefix}_tasks_run_failed", function( $tasks, $e ) use ( &$captured_exception ) {
+			$captured_exception = $e;
+		}, 10, 2 );
+
+		$shepherd->run( [ $task ], [
+			'always' => function() {
+				throw new Exception( 'Always callable failed' );
+			},
+		] );
+
+		// Task should have run successfully
+		$this->assertSame( 1, did_action( $task->get_task_name() ), 'Task should have run' );
+		// tasks_finished should NOT have fired because always callable threw before it
+		$this->assertSame( $tasks_finished_count, did_action( "shepherd_{$prefix}_tasks_finished" ), 'tasks_finished should not have fired' );
+		// tasks_run_failed should have fired
+		$this->assertSame( $run_failed_count + 1, did_action( "shepherd_{$prefix}_tasks_run_failed" ), 'tasks_run_failed action should have fired' );
+		$this->assertInstanceOf( Exception::class, $captured_exception );
+		$this->assertSame( 'Always callable failed', $captured_exception->getMessage() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_catch_throwable_in_callable(): void {
+		$shepherd = shepherd();
+		$prefix = tests_shepherd_get_hook_prefix();
+
+		$task = new Do_Action_Task();
+
+		$run_failed_count = did_action( "shepherd_{$prefix}_tasks_run_failed" );
+		$captured_throwable = null;
+
+		add_action( "shepherd_{$prefix}_tasks_run_failed", function( $tasks, $e ) use ( &$captured_throwable ) {
+			$captured_throwable = $e;
+		}, 10, 2 );
+
+		$shepherd->run( [ $task ], [
+			'before' => function() {
+				throw new \Error( 'Type error in callable' );
+			},
+		] );
+
+		$this->assertSame( $run_failed_count + 1, did_action( "shepherd_{$prefix}_tasks_run_failed" ), 'tasks_run_failed action should have fired for Throwable' );
+		$this->assertInstanceOf( \Throwable::class, $captured_throwable );
+		$this->assertSame( 'Type error in callable', $captured_throwable->getMessage() );
+	}
 }

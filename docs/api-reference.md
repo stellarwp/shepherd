@@ -561,8 +561,8 @@ Table name: `shepherd_{prefix}_task_logs`
 - `shepherd_{prefix}_task_after_run` - Fired after a task completes via `run()` (since 0.1.0)
   - Parameters: `$task` (Task instance)
 
-- `shepherd_{prefix}_tasks_run_failed` - Fired when a task fails during `run()` (since 0.1.0)
-  - Parameters: `$task` (Task instance or null), `$exception` (Exception)
+- `shepherd_{prefix}_tasks_run_failed` - Fired when a task or callable fails during `run()` (since 0.1.0)
+  - Parameters: `$tasks` (array of Task instances), `$exception` (Exception or Throwable)
 
 - `shepherd_{prefix}_tasks_finished` - Fired after all tasks have been processed via `run()` (since 0.1.0)
   - Parameters: `$tasks` (array of Task instances)

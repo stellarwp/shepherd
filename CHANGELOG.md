@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
-## [0.1.0] 2025-12-16
+## [0.1.0] 2025-12-17
 
 * Feature - Introduces a method `run` to the Regulator class which enables running a set of tasks synchronously.
 

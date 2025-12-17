@@ -409,7 +409,7 @@ shepherd()->run( $tasks, [
         error_log( 'Completed task: ' . get_class( $task ) );
     },
 
-    // Called after all tasks complete (even if some failed)
+    // Called after all tasks complete (even on error)
     'always' => function( array $tasks ): void {
         error_log( 'Finished processing ' . count( $tasks ) . ' tasks' );
     },
@@ -483,6 +483,7 @@ register_rest_route( 'myapp/v1', '/process', [
 - **Already scheduled tasks**: If a task was previously dispatched via `dispatch()`, `run()` will execute it without re-dispatching
 - **Fallback mode**: When Shepherd's database tables are not registered, tasks execute immediately via `process()` without Action Scheduler
 - **Context detection**: Shepherd automatically detects CLI and REST contexts for proper logging
+- **Exception handling**: Exceptions or Throwables thrown inside callables (`before`, `after`, `always`) are caught and trigger the `tasks_run_failed` action
 
 ### WordPress Hooks
 
@@ -501,12 +502,13 @@ add_action( "shepherd_{$prefix}_task_after_run", function( Task $task ) {
     // Post-task cleanup or notifications
 }, 10, 1 );
 
-// Fired when any task fails
-add_action( "shepherd_{$prefix}_tasks_run_failed", function( ?Task $task, Exception $e ) {
-    // Handle batch failure
+// Fired when any task or callable fails (catches Exception and Throwable)
+add_action( "shepherd_{$prefix}_tasks_run_failed", function( array $tasks, Throwable $e ) {
+    // Handle batch failure - receives all tasks and the exception/error
+    error_log( 'Tasks failed: ' . $e->getMessage() );
 }, 10, 2 );
 
-// Fired after all tasks complete
+// Fired after all tasks complete successfully
 add_action( "shepherd_{$prefix}_tasks_finished", function( array $tasks ) {
     // Batch completion handling
 }, 10, 1 );

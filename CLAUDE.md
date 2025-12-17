@@ -110,9 +110,9 @@ shepherd()->dispatch(new My_Task($arg1, $arg2), 300); // 5 minutes
 shepherd()->run(
     [ new My_Task($arg1, $arg2), new Another_Task() ],
     [
-        'before'   => function( $task ) { /* called before each task */ },
-        'after'    => function( $task ) { /* called after each task */ },
-        'always'   => function( $tasks ) { /* called after all tasks */ },
+        'before' => function( $task ) { /* called before each task */ },
+        'after'  => function( $task ) { /* called after each task */ },
+        'always' => function( $tasks ) { /* called after all tasks complete successfully */ },
     ]
 );
 
