@@ -16,7 +16,6 @@ use StellarWP\ContainerContract\ContainerInterface as Container;
 use StellarWP\Shepherd\Contracts\Task;
 use StellarWP\Shepherd\Tables\Tasks as Tasks_Table;
 use RuntimeException;
-use Exception;
 use Throwable;
 use StellarWP\DB\DB;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskException;
@@ -168,7 +167,7 @@ class Regulator extends Provider_Abstract {
 		if ( null !== $handler && is_callable( $handler ) ) {
 			try {
 				$handler( $task, $delay );
-			} catch ( Exception $e ) {
+			} catch ( Throwable $e ) {
 				/**
 				 * Documented in the dispatch_callback method.
 				 */
@@ -472,16 +471,6 @@ class Regulator extends Provider_Abstract {
 			 * @param Task[] $tasks The tasks that were run.
 			 */
 			do_action( "shepherd_{$prefix}_tasks_finished", $tasks );
-		} catch ( Exception $e ) {
-			/**
-			 * Fires when a set of tasks fails to be run.
-			 *
-			 * @since 0.1.0
-			 *
-			 * @param Task[]    $tasks The tasks that failed to be run.
-			 * @param Exception $e     The exception that was thrown.
-			 */
-			do_action( "shepherd_{$prefix}_tasks_run_failed", $tasks, $e );
 		} catch ( Throwable $e ) {
 			/**
 			 * Fires when a set of tasks fails to be run.
@@ -537,7 +526,6 @@ class Regulator extends Provider_Abstract {
 	 * @throws RuntimeException                      If no action ID is found, no Shepherd task is found with the action ID, or the task arguments hash does not match the expected hash.
 	 * @throws ShepherdTaskException                 If the task fails to be processed.
 	 * @throws ShepherdTaskFailWithoutRetryException If the task fails to be processed without retry.
-	 * @throws Exception                             If the task fails to be processed.
 	 * @throws Throwable                             If the task fails to be processed.
 	 */
 	public function process_task( string $args_hash ): void {
@@ -613,23 +601,6 @@ class Regulator extends Provider_Abstract {
 
 			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 
-			throw $e;
-		} catch ( Exception $e ) {
-			/**
-			 * Fires when a task fails to be processed.
-			 *
-			 * @since 0.0.1
-			 *
-			 * @param Task      $task The task that failed to be processed.
-			 * @param Exception $e    The exception that was thrown.
-			 */
-			do_action( 'shepherd_' . Config::get_hook_prefix() . '_task_failed', $task, $e );
-
-			if ( $this->should_retry( $task ) ) {
-				throw new ShepherdTaskException( esc_html_x( 'The task failed, but will be retried.', 'This error is thrown when a task fails to be processed, but will be retried.', 'stellarwp-shepherd' ) );
-			}
-
-			$this->log_failed( $task->get_id(), array_merge( $log_data, [ 'exception' => $e->getMessage() ] ) );
 			throw $e;
 		} catch ( Throwable $e ) {
 			/**
