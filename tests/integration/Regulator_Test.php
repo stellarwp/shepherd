@@ -348,11 +348,11 @@ class Regulator_Test extends WPTestCase {
 		$task = new Do_Action_Task();
 
 		$run_failed_count = did_action( "shepherd_{$prefix}_tasks_run_failed" );
-		$captured_tasks = null;
+		$captured_tasks = [];
 		$captured_exception = null;
 
 		add_action( "shepherd_{$prefix}_tasks_run_failed", function( $tasks, $e ) use ( &$captured_tasks, &$captured_exception ) {
-			$captured_tasks = $tasks;
+			$captured_tasks[] = $tasks;
 			$captured_exception = $e;
 		}, 10, 2 );
 
