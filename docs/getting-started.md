@@ -134,6 +134,9 @@ shepherd()->dispatch( $my_task );
 
 // Or dispatch with a delay (in seconds)
 shepherd()->dispatch( $my_task, 5 * MINUTE_IN_SECONDS ); // Execute after 5 minutes
+
+// Run tasks immediately (synchronous execution - since 0.1.0)
+shepherd()->run( [ $my_task ] );
 ```
 
 ### What Happens Next?
