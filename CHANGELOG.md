@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project adhere to the [Semantic Versioning](http://semver.org/) standard.
 
+## [0.2.0] 2026-01-05
+
+* Feature - Update minimum required version of the stellarwp/schema library to v3.2.0.
+
+[0.2.0]: https://github.com/stellarwp/shepherd/releases/tag/0.2.0
+
 ## [0.1.0] 2025-12-17
 
 * Feature - Introduces a method `run` to the Regulator class which enables running a set of tasks synchronously.
