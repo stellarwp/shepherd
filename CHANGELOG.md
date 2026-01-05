@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 * Feature - Introduces a method `run` to the Regulator class which enables running a set of tasks synchronously.
 
-[0.0.9]: https://github.com/stellarwp/shepherd/releases/tag/0.0.9
+[0.1.0]: https://github.com/stellarwp/shepherd/releases/tag/0.1.0
 
 ## [0.0.9] 2025-11-17
 
