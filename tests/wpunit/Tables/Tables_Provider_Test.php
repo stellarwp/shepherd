@@ -33,6 +33,27 @@ class Tables_Provider_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
+	public function it_should_not_fire_tables_registered_action_when_wp_installing(): void {
+		// Mock wp_installing() to return true
+		$this->set_fn_return( 'wp_installing', true );
+
+		$hook_fired = false;
+		$prefix = Config::get_hook_prefix();
+
+		add_action( "shepherd_{$prefix}_tables_registered", function() use ( &$hook_fired ) {
+			$hook_fired = true;
+		} );
+
+		// Re-register to trigger the action
+		$provider = new Provider( Config::get_container() );
+		$provider->register();
+
+		$this->assertFalse( $hook_fired, 'The tables_registered action should NOT be fired when wp_installing() returns true' );
+	}
+
+	/**
+	 * @test
+	 */
 	public function it_should_fire_error_action_on_database_exception(): void {
 		$error_hook_fired = false;
 		$registered_hook_fired = false;
